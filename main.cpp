@@ -79,10 +79,27 @@ int main()
     // Test Eigen library.
     int n = 10;
     Eigen::VectorXi v(n);
-    for(int i = 0; i < n;  i++)
-    {
+    for(int i = 0; i < n;  i++) {
         v[i] = i;
     }
     std::cout << "vector: " << v.transpose() << "\n";
+
+    // Test mapping from C arrays to Eigen structures.
+    int array[9];
+    for(int i = 0; i < 9; ++i) {
+        array[i] = i;
+    }
     
+    // Map to Eigen structure.
+    typedef Eigen::Matrix<int, 3, 3> Matrix3i;
+    Eigen::Map<Matrix3i> array_eigen(array);
+    std::cout << array_eigen << "\n";
+    
+    // Modify Eigen atructure.
+    array_eigen(0,1) = 100;
+    std::cout << array_eigen << "\n";
+
+    // Check this is reflected in the C array.
+    for(int i = 0; i < 9; ++i) std::cout << array[i] << " ";
+    std::cout << "\n";
 }
