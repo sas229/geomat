@@ -155,6 +155,44 @@ extern "C" void umat(
 
         // Set state variables.
 
+        // Test mapping from C arrays to Eigen structures.
+        typedef Eigen::Vector<double, 6> Vector6d;
+
+        // Map to Eigen structure.
+        Eigen::Map<Vector6d> map(stress);
+        std::cout << map.transpose() << "\n";
+        
+        // Modify Eigen structure.
+        map(2) = 100.0;
+        std::cout << map.transpose() << "\n";
+
+        // Check this is reflected in the C array.
+        for(int i = 0; i < 6; ++i) std::cout << stress[i] << " ";
+        std::cout << "\n";
+        if (stress[2] == 100.0) {
+            std::cout << "Mapping performed successfully.\n";
+        } else {
+            std::cout << "Mapping failed\n";
+        }
+
+        // Make Eigen matrix and initialise with Map.
+        Vector6d s(map);
+
+        // Manipulate Eigen matrix;
+        s(3) = 200.0;
+        
+        // Update Eigen Map.
+        map = s;
+        std::cout << map.transpose() << "\n";
+        
+        // Verify C array has been modified.
+        for(int i = 0; i < 6; ++i) std::cout << stress[i] << " ";
+        std::cout << "\n";
+        if (stress[3] == 200.0) {
+            std::cout << "Mapping performed successfully.\n";
+        } else {
+            std::cout << "Mapping failed\n";
+        }
         
     } 
     if (model_instantiated) {
