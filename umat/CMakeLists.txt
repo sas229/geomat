@@ -1,0 +1,5 @@
+add_library(umat INTERFACE)
+find_package(Eigen3 3.3 REQUIRED)
+target_sources(umat INTERFACE ${CMAKE_CURRENT_LIST_DIR}/src/umat.cpp)
+target_include_directories(umat INTERFACE ${CMAKE_CURRENT_LIST_DIR}/src/)
+target_link_libraries(umat INTERFACE Eigen3::Eigen Model)

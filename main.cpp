@@ -1,14 +1,13 @@
 #include <iostream>
-#include <Eigen/Eigen>
-#include "umat.cpp"
 #include <typeinfo>
 
-int main()
-{      
+#include "umat.hpp"
+
+int main() {      
     int ndi = 3;
     int nshr = 3;
-    int ntens = ndi*nshr;
-    double stress[ntens] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    int ntens = ndi+nshr;
+    double stress[ntens] = {1, 2, 3, 4, 5, 6};
     int nstatv = 2;
     double statev[nstatv] = {7, 8};
     double ddsdde[ndi*nshr] = {3, 2, 1, 6, 5, 4, 9, 8, 7};

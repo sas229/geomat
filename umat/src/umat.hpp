@@ -1,66 +1,19 @@
-#pragma once
+#ifndef UMAT_H
+#define UMAT_H
+
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <Eigen/Eigen>
 #include <vector>
-#include <memory>
 #include <typeinfo>
+#include <memory>
 
-class Model {
-    public:
-        Model(std::string name) {
-            _name = name;
-        }
-        std::string get_name(void) {return _name;}
-        virtual double get_lambda(void) {return _lambda;}
-    private:
-        std::string _name;
-        double _lambda;
-};
+#include <Eigen/Eigen>
 
-class MCC : public Model {
-    public: 
-       MCC(std::string name = "MCC") : Model(name) {}
-       double get_lambda(void) {return 2.541;} 
-    private:
-        int _nparams = 6;
-};
-
-class SMCC : public Model {
-    public: 
-       SMCC(std::string name = "SMCC") : Model(name) {}
-       double get_lambda(void) {return 0.442;} 
-    private:
-        int _nparams = 9;
-};
-
-// Global booleans to control model instantiation.
-bool first_call = true;
-bool model_instantiated = false;
-
-// Global unique pointer to store a pointer to the chosen model.
-std::unique_ptr<Model> model;
-
-// Debug output to file.
-std::ofstream debug("umat.log");
-
-void instantiate_model(char* cmname) {
-    // Set first_call boolean to false so that model instantiation is not repeated on subsequent calls to the umat function.
-    first_call = false;
-
-    // Compare model name supplied with available model names. Instantiate model if found, otherwise report error.
-    if (strcmp(cmname, "MCC") == 0) {
-        model.reset(new MCC);   
-    } else if (strcmp(cmname, "SMCC") == 0) {
-        model.reset(new SMCC);    
-    } else {
-        debug << "Error: Model name given not implemented. Check name given in input file.\n";
-        return;
-    }
-    model_instantiated = true;
-    debug << cmname << " model instantiated.\n";
-}
+#include "Model.hpp"
+#include "MCC.hpp"
+#include "SMCC.hpp"
+// #include "utilities.hpp"
 
 /** Abaqus umat interface.
  * 
@@ -145,74 +98,6 @@ extern "C" void umat(
     int *kspt,
     int *kstep,
     int *kinc
-    )
-{   
-    if (first_call) {
-        // Instantiate model if first call to umat function.
-        instantiate_model(cmname);
+    );
 
-        // Set parameters.
-
-        // Set state variables.
-
-        // Test mapping from C arrays to Eigen structures.
-        typedef Eigen::Vector<double, 6> Vector6d;
-
-        // Map to Eigen structure.
-        Eigen::Map<Vector6d> map(stress);
-        std::cout << map.transpose() << "\n";
-        
-        // Modify Eigen structure.
-        map(2) = 100.0;
-        std::cout << map.transpose() << "\n";
-
-        // Check this is reflected in the C array.
-        for(int i = 0; i < 6; ++i) std::cout << stress[i] << " ";
-        std::cout << "\n";
-        if (stress[2] == 100.0) {
-            std::cout << "Mapping performed successfully.\n";
-        } else {
-            std::cout << "Mapping failed\n";
-        }
-
-        // Make Eigen matrix and initialise with Map.
-        Vector6d s(map);
-
-        // Manipulate Eigen matrix;
-        s(3) = 200.0;
-        
-        // Update Eigen Map.
-        map = s;
-        std::cout << map.transpose() << "\n";
-        
-        // Verify C array has been modified.
-        for(int i = 0; i < 6; ++i) std::cout << stress[i] << " ";
-        std::cout << "\n";
-        if (stress[3] == 200.0) {
-            std::cout << "Mapping performed successfully.\n";
-        } else {
-            std::cout << "Mapping failed\n";
-        }
-        
-    } 
-    if (model_instantiated) {
-        // Perform stress integration.
-        std::string name;
-        name = model->get_name();
-        debug << "Model name: " << name << "\n";
-
-        double lambda;
-        lambda = model->get_lambda();
-        debug << "Lambda = " << lambda << "\n";
-
-        // Do stress integration with existing model.
-        stress[0] = 99;
-        debug << "ddsdde: " << ddsdde[0];
-        for (int i = 1; i < *ntens; ++i) {
-            debug  << ", " << ddsdde[i];
-        }
-        debug << "\n";   
-    }
-    
-}
-
+#endif
