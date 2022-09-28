@@ -1,5 +1,0 @@
-add_library(utilities INTERFACE)
-find_package(Eigen3 3.3 REQUIRED)
-target_sources(utilities INTERFACE ${CMAKE_CURRENT_LIST_DIR}/src/utilities.cpp)
-target_include_directories(utilities INTERFACE ${CMAKE_CURRENT_LIST_DIR}/src/)
-target_link_libraries(utilities INTERFACE Model MCC SMCC)

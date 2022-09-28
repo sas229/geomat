@@ -2,7 +2,6 @@
 #define UMAT_H
 
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <vector>
 #include <typeinfo>
@@ -10,10 +9,12 @@
 
 #include <Eigen/Eigen>
 
+#include <g3log/g3log.hpp>
+#include <g3log/logworker.hpp>
+
 #include "Model.hpp"
 #include "MCC.hpp"
 #include "SMCC.hpp"
-// #include "utilities.hpp"
 
 /** Abaqus umat interface.
  * 

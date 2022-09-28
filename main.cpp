@@ -34,6 +34,7 @@ int main() {
     int kstep;
     int kinc;
 
+    // Try ten increments.
     for (int i=0; i < 10; ++i) {
         umat(
             stress,

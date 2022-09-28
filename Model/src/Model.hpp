@@ -2,6 +2,7 @@
 #define MODEL_H
 
 #include <string>
+#include <g3log/g3log.hpp>
 #include <Eigen/Eigen>
 
 typedef Eigen::Vector<double, 6> Vector6d;

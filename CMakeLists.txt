@@ -8,11 +8,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -DEIGEN_DONT_PARALLELIZE")
 message(${CMAKE_CXX_FLAGS})
 
-# find_package (Boost REQUIRED)
-
-# add_subdirectory(${PROJECT_SOURCE_DIR}/globals)
 add_subdirectory(${PROJECT_SOURCE_DIR}/umat)
-add_subdirectory(${PROJECT_SOURCE_DIR}/utilities)
 add_subdirectory(${PROJECT_SOURCE_DIR}/Model)
 add_subdirectory(${PROJECT_SOURCE_DIR}/models)
 
