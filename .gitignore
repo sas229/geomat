@@ -30,6 +30,13 @@
 *.exe
 *.out
 *.app
+hdoc-1.3.0
 
 # Folders
 build/
+
+# Log
+*.log
+
+# Docs
+.hdoc.toml
