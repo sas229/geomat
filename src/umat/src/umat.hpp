@@ -40,6 +40,7 @@
  * @param time Value of step time (1) and total time (2) at the beginning of the increment.
  * @param dtime Time increment.
  * @param temp Temperature at the start of the increment.
+ * @param dtemp Temperature increment.
  * @param predef Array of predefined field variables at this point at the start of the increment, interpolated from nodes.
  * @param dpred Array of increments of predefined field variables.
  * @param cmname User-defined material name (avoid ABQ_ prefix).
@@ -51,6 +52,7 @@
  * @param nprops Number of user-defined material constants associated with this user material.
  * @param coords An array containing the coordinates of this point.
  * @param drot Rotation increment matrix.
+ * @param pnewdt Ratio of suggested new time increment to the time increment being used.
  * @param celent Characteristic element length, which is a typical length of a line across an element for a first-order element; it is half of the same typical length for a second-order element.
  * @param dfgrd0 Array containing the deformation gradient at the beginning of the increment.
  * @param dfgrd1 Array containing the deformation gradient at the end of the increment.
