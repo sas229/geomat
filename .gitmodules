@@ -1,0 +1,6 @@
+[submodule "libraries/eigen"]
+	path = libraries/eigen
+	url = https://gitlab.com/libeigen/eigen.git
+[submodule "libraries/plog"]
+	path = libraries/plog
+	url = https://github.com/SergiusTheBest/plog.git
