@@ -6,12 +6,6 @@ bool first_call = true;
 // Unique pointer to store a pointer to the chosen model.
 std::unique_ptr<Model> model;
 
-// Create logger.
-const std::string directory = "./";
-const std::string name = "umat";
-auto worker = g3::LogWorker::createLogWorker();
-auto handle = worker->addDefaultLogger(name, directory, "");
-
 extern "C" void umat(
     double *stress,
     double *statev,
@@ -52,16 +46,18 @@ extern "C" void umat(
     int *kinc) {   
     if (first_call) {
         // Initialise logger.
-        g3::initializeLogging(worker.get());
+        char log_filename[] = "umat.log";
+        std::remove(log_filename);
+        plog::init(plog::debug, log_filename); // Initialize the logger.
 
         // Instantiate model.
-        LOG(DEBUG) << "Attempting to instantiate model called " << cmname << ".";
+        PLOG_DEBUG << "Attempting to instantiate model called " << cmname << ".";
         if (strcmp(cmname, "MCC") == 0) {
             model.reset(new MCC);   
         } else if (strcmp(cmname, "SMCC") == 0) {
             model.reset(new SMCC);    
         } else {
-            LOG(FATAL) << "Model name given not implemented. Check name given in input file.";
+            PLOG_FATAL << "Model name given not implemented. Check name given in input file.";
         }
         first_call = false; 
     } 

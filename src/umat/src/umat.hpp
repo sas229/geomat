@@ -9,8 +9,8 @@
 
 #include <Eigen/Eigen>
 
-#include <g3log/g3log.hpp>
-#include <g3log/logworker.hpp>
+#include <plog/Log.h>
+#include <plog/Initializers/RollingFileInitializer.h>
 
 #include "Model.hpp"
 #include "MCC.hpp"

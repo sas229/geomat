@@ -2,7 +2,7 @@
 #define MODEL_H
 
 #include <string>
-#include <g3log/g3log.hpp>
+#include <plog/Log.h>
 #include <Eigen/Eigen>
 
 /** @brief Vector with six indexes. */

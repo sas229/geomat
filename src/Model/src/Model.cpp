@@ -7,7 +7,7 @@ void Model::set_name(std::string name) {
 
 void Model::set_nparams(int nparams) {
     _nparams = nparams;
-    LOG(INFO) << _name << " model instantiated with " << _nparams << " parameters.";
+    PLOG_DEBUG << _name << " model instantiated with " << _nparams << " parameters.";
 }
 
 void Model::set_stress(Vector6d stress) {
