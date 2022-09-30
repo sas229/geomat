@@ -9,7 +9,7 @@
 from sphinx.builders.html import StandaloneHTMLBuilder
 import subprocess
 
-# Doxygen
+# Generate xml using oxygen.
 subprocess.call('doxygen Doxyfile.in', shell=True)
 
 project = 'umat'
@@ -68,7 +68,7 @@ html_static_path = ['_static']
 # -- Breathe configuration -------------------------------------------------
 
 breathe_projects = {
-	"umat": "../build/xml"
+	"umat": "../../build/xml"
 }
 breathe_default_project = "umat"
 breathe_default_members = ('members', 'undoc-members')
