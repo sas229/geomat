@@ -1,10 +1,22 @@
 #include "umat.hpp"
 
-// Booleans to control model instantiation.
+/** @brief Boolean indicating whether the current increment is the first call to the umat function. */
 bool first_call = true;
 
-// Unique pointer to store a pointer to the chosen model.
+/** @brief Unique pointer to store the memory address of the chosen model. */
 std::unique_ptr<Model> model;
+
+/** @brief Eigen vector with six indexes. */
+typedef Eigen::Vector<double, 6> Tensor3D;
+
+/** @brief Eigen vector with four indexes. */
+typedef Eigen::Vector<double, 4> Tensor2D;
+
+Eigen::Map<Tensor2D> _map_to_2D_stress_tensor(NULL);
+Eigen::Map<Tensor3D> _map_to_3D_stress_tensor(NULL);
+
+Tensor2D _stress_2D;
+Tensor3D _stress_3D;
 
 extern "C" void umat(
     double *stress,
@@ -44,40 +56,61 @@ extern "C" void umat(
     int *kspt,
     int *kstep,
     int *kinc) {   
+    // On first call, initialise logger and instantiate model.
     if (first_call) {
         // Initialise logger.
         char log_filename[] = "umat.log";
         std::remove(log_filename);
-        plog::init(plog::debug, log_filename); // Initialize the logger.
+        plog::init(plog::debug, log_filename);
 
         // Instantiate model.
-        PLOG_DEBUG << "Attempting to instantiate model called " << cmname << ".";
+        PLOG_DEBUG << *ndi << "D problem defined with " << *ntens << " stress variables.";
+        PLOG_DEBUG << "Attempting to instantiate " << cmname << " model.";
         if (strcmp(cmname, "MCC") == 0) {
             model.reset(new MCC);   
         } else if (strcmp(cmname, "SMCC") == 0) {
             model.reset(new SMCC);    
         } else {
-            PLOG_FATAL << "Model name given not implemented. Check name given in input file.";
+            PLOG_FATAL << "Model name given not implemented. Check name given in CAE / input file.";
         }
-        first_call = false; 
+        first_call = false;
     } 
 
-    // Create map to data.
-    Eigen::Map<Vector6d> _map_to_stress(stress);
+    // Create maps to data.
+    if (*ntens < 6) {
+        // 2D problem.
 
-    // Create a native Eigen type using the map as initialisation.
-    Vector6d _stress{_map_to_stress};
+        // Create maps to pointers.
+        new (&_map_to_2D_stress_tensor) Eigen::Map<Tensor2D>(stress); 
 
-    // Set variables within model.
-    model->set_stress(_stress);
+        // Create a native Eigen type using the map as initialisation.
+        _stress_2D = _map_to_2D_stress_tensor; 
+
+        // Set variables within model.
+        model->set_stress(_stress_2D);
+
+        // Equate map to updated variable in order to map back to input variable.
+        _map_to_2D_stress_tensor = model->get_stress();
+    } else {
+        // 3D problem.
+
+        // Create maps to pointers.
+        new (&_map_to_3D_stress_tensor) Eigen::Map<Tensor3D>(stress);  
+
+        // Create a native Eigen type using the map as initialisation.
+        _stress_3D = _map_to_3D_stress_tensor;
+
+        // Set variables within model.
+        model->set_stress(_stress_3D);
+
+        // Equate map to updated variable in order to map back to input variable.
+        _map_to_3D_stress_tensor = model->get_stress();
+    }
 
     // Do some work with it... (i.e. stress integration).
     
     // Perform stress integration.
     
-    // Equate map to updated variable in order to map back to input variable.
-    _map_to_stress = model->get_stress();
-
     // Verify that original stress variable from Abaqus has been updated.
     for (int i=0; i < *ntens; ++i) {
         std::cout << stress[i] << " ";

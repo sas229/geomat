@@ -4,8 +4,8 @@
 #include "umat.hpp"
 
 int main() {      
-    int ndi = 3;
-    int nshr = 3;
+    int ndi = 2;
+    int nshr = 2;
     int ntens = ndi+nshr;
     double stress[ntens] = {1, 2, 3, 4, 5, 6};
     int nstatv = 2;

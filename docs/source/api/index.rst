@@ -1,12 +1,8 @@
 API
 ===
 
-.. .. doxygenfunction:: umat
-..    :project: umat
-
-.. .. doxygenclass:: Model
-..    :project: umat
-..    :members:
+.. doxygenfunction:: umat
+   :project: umat
 
 .. doxygenfile:: Model.hpp
     :project: umat

@@ -16,7 +16,7 @@
 #include "MCC.hpp"
 #include "SMCC.hpp"
 
-/** Abaqus umat interface.
+/** @brief Interface to allow Abaqus to call umat material models via a C++ implementation.
  * 
  * This function allows Abaqus to call the library of user-defined materials defined within this library. 
  * Fortran passes variables by reference by default, hence pointers are passed for all variables. In the 
@@ -24,7 +24,12 @@
  * stored first, followed by shear components. There are `ndi' direct and `nshr' engineering shear components.
  * At a minimum the function must define `ddsdde', `stress', `statev'. 
  * 
- * @brief Interface to allow Abaqus to call umat material models via a C++ implementation.
+ * The interface initializes Eigen objects using the pointers to arrays and passes them to the instantiated model
+ * and on solution will remap the output to the input pointer arraysfor consumtpion by Abaqus. In this way, this
+ * function simply acts as an interface between Abaqus and the generalised constitutive model objects derived from the 
+ * Model base class provided by this framework. This approach allows the constitutive models to be easily wrapped 
+ * for use in Python using pybind11.
+ * 
  * @param stress Stress tensor at the beginning of the increment to be updated.
  * @param statev An array of solution dependent state variables to be updated.
  * @param ddsdde Jacobian matrix to be updated.
