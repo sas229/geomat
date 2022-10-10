@@ -63,7 +63,7 @@ html_theme_options = {
 # html_logo = ''
 # github_url = ''
 # html_baseurl = ''
-html_static_path = ['_static']
+# html_static_path = ['_static']
 
 # -- Breathe configuration -------------------------------------------------
 

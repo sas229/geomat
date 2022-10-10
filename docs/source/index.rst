@@ -22,6 +22,7 @@ Indices and tables
 Table of Contents
 ^^^^^^^^^^^^^^^^^
 
-.. toctree::    
-   api/index
+.. toctree:: 
+   installation   
+   api
    
