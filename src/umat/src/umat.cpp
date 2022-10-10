@@ -6,11 +6,11 @@ bool first_call = true;
 /** @brief Unique pointer to store the memory address of the chosen model. */
 std::unique_ptr<Model> model;
 
-/** @brief Eigen vector with six indexes. */
+/** @brief Eigen vector with six indices. */
 typedef Eigen::Vector<double, 6> Tensor3D;
 
-/** @brief Eigen vector with four indexes. */
-typedef Eigen::Vector<double, 4> Tensor2D;
+/** @brief Eigen vector with three indices. */
+typedef Eigen::Vector<double, 3> Tensor2D;
 
 Eigen::Map<Tensor2D> _map_to_2D_stress_tensor(NULL);
 Eigen::Map<Tensor3D> _map_to_3D_stress_tensor(NULL);
