@@ -7,11 +7,10 @@ bool first_call = true;
 std::unique_ptr<Model> model;
 
 /** @brief Eigen vector with six indices. */
-typedef Eigen::Vector<double, 6> Tensor3D;
+typedef Eigen::Vector<double, 6> Vector6d;
 
-Eigen::Map<Tensor3D> _map_to_3D_stress_tensor(NULL);
-
-Tensor3D _stress_3D;
+/** @brief Eigen vector with six indices. */
+typedef Eigen::Matrix<double, 3, 3> Matrix3d;
 
 extern "C" void umat(
     double *stress,
@@ -72,24 +71,34 @@ extern "C" void umat(
     } 
 
     // Create maps to data.
-    new (&_map_to_3D_stress_tensor) Eigen::Map<Tensor3D>(stress);  
+    Eigen::Map<Vector6d> map_to_stress(stress);
+    Eigen::Map<Matrix3d> map_to_jacobian(ddsdde);
 
     // Create a native Eigen type using the map as initialisation.
-    _stress_3D = _map_to_3D_stress_tensor;
+    Vector6d Eigen_stress = map_to_stress;
+    Matrix3d Eigen_jacobian = map_to_jacobian;
 
     // Set variables within model.
-    model->set_stress(_stress_3D);
+    model->set_stress(Eigen_stress);
+    model->set_jacobian(Eigen_jacobian);
 
     // Do some work with it... (i.e. stress integration).
     
     // Perform stress integration.
 
     // Equate map to updated variable in order to map back to input variable.
-    _map_to_3D_stress_tensor = model->get_stress();
+    map_to_stress = model->get_stress();
+    map_to_jacobian = model->get_jacobian();
     
     // Verify that original stress variable from Abaqus has been updated.
     for (int i=0; i < *ntens; ++i) {
         std::cout << stress[i] << " ";
+    }
+    std::cout << "\n"; 
+
+    // Verify that original stress variable from Abaqus has been updated.
+    for (int i=0; i < 9; ++i) {
+        std::cout << ddsdde[i] << " ";
     }
     std::cout << "\n";  
 }
