@@ -9,13 +9,8 @@ std::unique_ptr<Model> model;
 /** @brief Eigen vector with six indices. */
 typedef Eigen::Vector<double, 6> Tensor3D;
 
-/** @brief Eigen vector with three indices. */
-typedef Eigen::Vector<double, 3> Tensor2D;
-
-Eigen::Map<Tensor2D> _map_to_2D_stress_tensor(NULL);
 Eigen::Map<Tensor3D> _map_to_3D_stress_tensor(NULL);
 
-Tensor2D _stress_2D;
 Tensor3D _stress_3D;
 
 extern "C" void umat(
@@ -77,39 +72,20 @@ extern "C" void umat(
     } 
 
     // Create maps to data.
-    if (*ntens < 6) {
-        // 2D problem.
+    new (&_map_to_3D_stress_tensor) Eigen::Map<Tensor3D>(stress);  
 
-        // Create maps to pointers.
-        new (&_map_to_2D_stress_tensor) Eigen::Map<Tensor2D>(stress); 
+    // Create a native Eigen type using the map as initialisation.
+    _stress_3D = _map_to_3D_stress_tensor;
 
-        // Create a native Eigen type using the map as initialisation.
-        _stress_2D = _map_to_2D_stress_tensor; 
-
-        // Set variables within model.
-        model->set_stress(_stress_2D);
-
-        // Equate map to updated variable in order to map back to input variable.
-        _map_to_2D_stress_tensor = model->get_stress();
-    } else {
-        // 3D problem.
-
-        // Create maps to pointers.
-        new (&_map_to_3D_stress_tensor) Eigen::Map<Tensor3D>(stress);  
-
-        // Create a native Eigen type using the map as initialisation.
-        _stress_3D = _map_to_3D_stress_tensor;
-
-        // Set variables within model.
-        model->set_stress(_stress_3D);
-
-        // Equate map to updated variable in order to map back to input variable.
-        _map_to_3D_stress_tensor = model->get_stress();
-    }
+    // Set variables within model.
+    model->set_stress(_stress_3D);
 
     // Do some work with it... (i.e. stress integration).
     
     // Perform stress integration.
+
+    // Equate map to updated variable in order to map back to input variable.
+    _map_to_3D_stress_tensor = model->get_stress();
     
     // Verify that original stress variable from Abaqus has been updated.
     for (int i=0; i < *ntens; ++i) {
