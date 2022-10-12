@@ -89,7 +89,9 @@ extern "C" void umat(
     model->set_jacobian(Eigen_jacobian);
     model->set_state_variables(state);
     model->compute_invariants();
-
+    model->compute_principal();
+    model->compute_cartesian();
+    
     // Do some work with it... (i.e. stress integration).
     
     // Perform stress integration.

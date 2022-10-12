@@ -6,6 +6,7 @@
 #include <string>
 #include <plog/Log.h>
 #include <Eigen/Eigen>
+#include <unsupported/Eigen/CXX11/Tensor>
 
 class Model {
     public:
@@ -38,6 +39,10 @@ class Model {
         void compute_K(void);
         /** @brief Method to compute the stress invariants. */
         void compute_invariants(void);
+        /** @brief Method to compute the principal stresses and directions. */
+        void compute_principal(void);
+        /** @brief Method to compute the cartesian stress tensor from principal stresses and directions. */
+        void compute_cartesian(void);
 
         virtual ~Model() {}
         
@@ -99,12 +104,22 @@ class Model {
         double p; 
         /** @brief Deviatoric stress. */
         double q; 
+        /** @brief Principal stress tensor. */
+        Eigen::Matrix3d principal_sigma {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
         /** @brief Major principal stress. */
         double sigma_1; 
         /** @brief Intermediate principal stress. */
         double sigma_2; 
         /** @brief Minor principal stress. */
         double sigma_3;
+        /** @brief Principal stress directions. */
+        Eigen::Matrix3d principal_directions;
+        /** @brief Major principal stress direction. */
+        double theta_1; 
+        /** @brief Intermediate principal stress direction. */
+        double theta_2; 
+        /** @brief Minor principal stress direction. */
+        double theta_3;
         /** @brief Mises stress. */
         double mises;
         /** @brief Maximum shear stress. */
