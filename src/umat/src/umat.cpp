@@ -12,6 +12,9 @@ typedef Eigen::Vector<double, 6> Vector6d;
 /** @brief Eigen vector with six indices. */
 typedef Eigen::Matrix<double, 3, 3> Matrix3d;
 
+/** @brief Eigen vector with six indices. */
+typedef Eigen::Matrix<double, 6, 6> Matrix6d;
+
 extern "C" void umat(
     double *stress,
     double *statev,
@@ -73,22 +76,31 @@ extern "C" void umat(
     // Create maps to data.
     Eigen::Map<Vector6d> map_to_stress(stress);
     Eigen::Map<Matrix3d> map_to_jacobian(ddsdde);
+    std::vector<double> state(statev, statev+*nstatv);
+    std::vector<double> parameters(props, props+*nprops);
 
     // Create a native Eigen type using the map as initialisation.
-    Vector6d Eigen_stress = map_to_stress;
+    Vector6d Eigen_sigma = map_to_stress;
     Matrix3d Eigen_jacobian = map_to_jacobian;
 
     // Set variables within model.
-    model->set_stress(Eigen_stress);
+    model->set_parameters(parameters);
+    model->set_sigma(Eigen_sigma);
     model->set_jacobian(Eigen_jacobian);
+    model->set_state_variables(state);
+    model->compute_invariants();
 
     // Do some work with it... (i.e. stress integration).
     
     // Perform stress integration.
 
     // Equate map to updated variable in order to map back to input variable.
-    map_to_stress = model->get_stress();
+    map_to_stress = model->get_sigma();
     map_to_jacobian = model->get_jacobian();
+    std::vector<double> new_state = model->get_state_variables();
+    std::cout << new_state[0] << "\n";
+
+    std::cout << model->get_elastic_matrix() << "\n";
     
     // Verify that original stress variable from Abaqus has been updated.
     for (int i=0; i < *ntens; ++i) {

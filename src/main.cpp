@@ -7,7 +7,7 @@ int main() {
     int ndi = 3;
     int nshr = 3;
     int ntens = 6;
-    double stress[ntens] = {1, 2, 3, 4, 5, 6};
+    double stress[ntens] = {100, 50, 50, 25, 25, 25};
     int nstatv = 2;
     double statev[nstatv] = {7, 8};
     double ddsdde[ndi*nshr] = {3, 2, 1, 6, 5, 4, 9, 8, 7};
@@ -20,8 +20,8 @@ int main() {
     double dtime, temp, dtemp;
     double predef, dpred;
     char cmname[] = "MCC";
-    int nprops = 2;
-    double props[nprops];
+    int nprops = 5;
+    double props[nprops] = {0.3, 0.8, 0.205, 0.044, 1.10};
     double coords[3] = {0.0, 0.0, 0.0};
     double drot;
     double pnewdt, celent;

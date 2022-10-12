@@ -58,7 +58,21 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp",
-        "core": "cpp"
+        "core": "cpp",
+        "csignal": "cpp",
+        "strstream": "cpp",
+        "cfenv": "cpp",
+        "codecvt": "cpp",
+        "condition_variable": "cpp",
+        "unordered_set": "cpp",
+        "optional": "cpp",
+        "source_location": "cpp",
+        "hash_map": "cpp",
+        "future": "cpp",
+        "iomanip": "cpp",
+        "mutex": "cpp",
+        "valarray": "cpp",
+        "variant": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceFolder}/src"
 }
