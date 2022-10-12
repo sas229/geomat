@@ -132,9 +132,6 @@ void Model::compute_principal(void) {
 
     // Principal stress directions.
     T = es.eigenvectors().real();
-    theta_1 = T(0,0);
-    theta_2 = T(1,1);
-    theta_3 = T(2,2);
 }
 
 void Model::compute_cartesian(void) {

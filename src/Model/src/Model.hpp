@@ -182,15 +182,6 @@ class Model {
         /** @brief Principal stress directions. */
         Eigen::Matrix3d T;
 
-        /** @brief Major principal stress direction. */
-        double theta_1; 
-
-        /** @brief Intermediate principal stress direction. */
-        double theta_2; 
-
-        /** @brief Minor principal stress direction. */
-        double theta_3;
-
         /** @brief Mises stress. */
         double mises;
 
