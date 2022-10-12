@@ -29,9 +29,6 @@ void Model::set_sigma(Eigen::VectorXd v) {
 
     // Total stresses given pore pressure, u.
     sigma = (sigma_prime.array() + (delta.array()*u)).matrix();
-
-    // Deviatoric stress tensor, s.
-    s = (sigma.array()-(delta.array()*p)).matrix();
 }
 
 void Model::set_jacobian(Eigen::MatrixXd m) {
@@ -96,6 +93,9 @@ void Model::compute_invariants(void) {
     p = 1.0/3.0*sigma.trace();
     p_prime = 1.0/3.0*sigma_prime.trace();
 
+    // Deviatoric stress tensor, s.
+    s = (sigma.array()-(delta.array()*p)).matrix();
+
     // Deviatoric stress invariants.
     J_1 = s.trace(); // Ought to be zero...
     J_2 = (std::pow(I_1,2)/3.0) - I_2; // Keep one of these...
@@ -132,6 +132,14 @@ void Model::compute_principal(void) {
 
     // Principal stress directions.
     T = es.eigenvectors().real();
+
+    // Lode angle.
+    theta_c = 1.0/3.0*std::acos(J_3/2.0*std::pow((3.0/J_2), 3.0/2.0));
+    theta_s = pi/6.0 - theta_c;
+    theta_s_bar = -theta_s;
+    std::cout << "theta_c = " << theta_c << "\n";
+    std::cout << "theta_s = " << theta_s << "\n";
+    std::cout << "theta_s_bar = " << theta_s_bar << "\n";
 }
 
 void Model::compute_cartesian(void) {

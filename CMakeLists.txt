@@ -10,6 +10,12 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 message(${CMAKE_CXX_FLAGS})
 
+add_executable(umat_test src/main.cpp)
+
+target_include_directories(umat_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+target_link_libraries(umat_test PRIVATE umat Model MCC SMCC)
+
 add_subdirectory(${PROJECT_SOURCE_DIR}/docs)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src)
 

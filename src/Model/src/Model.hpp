@@ -70,7 +70,7 @@ class Model {
         int n_state_variables;
 
         /** @brief Effective stress in Voigt notation:
-         * \f[(\sigma_{11}^{\prime},\sigma_{22}^{\prime},\sigma_{33}^{\prime},\tau_{12},\tau_{13},\tau_{23})\f]. */
+         * \f[\left[\sigma_{11}^{\prime},\sigma_{22}^{\prime},\sigma_{33}^{\prime},\tau_{12},\tau_{13},\tau_{23}\right]^T\f]. */
         Eigen::VectorXd sigma_prime_v;
 
         /** @brief Effective stress tensor:
@@ -187,6 +187,24 @@ class Model {
 
         /** @brief Maximum shear stress. */
         double max_shear;  
+
+        /** @brief Constant \f$ \pi = 2 * \arccos{0.0} \f$ */
+        double pi = 2*std::acos(0.0);
+
+        /** @brief Lode angle from cosine relationship:
+         * \f[ \theta_c=\arccos{\left[\frac{J_3}{2}\left(\frac{3}{J_2}\right)^{3/2}\right]} \f]
+         * where \f$ J_2 \f$ and \f$ J_3 \f$ are the second and third deviatoric stress invariants, respectively. */
+        double theta_c;
+
+        /** @brief Lode angle from negative sine relationship:
+         * \f[ \theta_s=\frac{\pi}{6}-\theta_c \f]
+         * where \f$ \theta_c \f$ is the Lode angle from the cosine relationship. */
+        double theta_s;
+
+        /** @brief Lode angle from sine relationship:
+         * \f[ \bar{\theta_s}=-\theta_s=-\frac{\pi}{6}+\theta_c\f]
+         * where \f$ \theta_s \f$ and \f$ \theta_c \f$ are the Lode angle derived from the sine and cosine relationships, respectively. */
+        double theta_s_bar;
 
         /** @brief Bulk modulus. */
         double K = 0.0;

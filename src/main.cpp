@@ -7,7 +7,7 @@ int main() {
     int ndi = 3;
     int nshr = 3;
     int ntens = 6;
-    double stress[ntens] = {100, 50, 50, 25, 25, 25};
+    double stress[ntens] = {100, 150, 100, 0, 0, 0};
     int nstatv = 2;
     double statev[nstatv] = {7, 8};
     double ddsdde[ndi*nshr] = {3, 2, 1, 6, 5, 4, 9, 8, 7};
