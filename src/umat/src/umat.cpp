@@ -85,32 +85,20 @@ extern "C" void umat(
 
     // Set variables within model.
     model->set_parameters(parameters);
+    
     model->set_sigma(Eigen_sigma);
     model->set_jacobian(Eigen_jacobian);
+
     model->set_state_variables(state);
-    model->compute_invariants();
+    model->compute_stress_invariants();
     
     // Do some work with it... (i.e. stress integration).
     
-    // Perform stress integration.
+    // model->solve()
 
     // Equate map to updated variable in order to map back to input variable.
     map_to_stress = model->get_sigma();
     map_to_jacobian = model->get_jacobian();
-    std::vector<double> new_state = model->get_state_variables();
-    std::cout << new_state[0] << "\n";
-
-    std::cout << model->get_elastic_matrix() << "\n";
-    
-    // Verify that original stress variable from Abaqus has been updated.
-    for (int i=0; i < *ntens; ++i) {
-        std::cout << stress[i] << " ";
-    }
-    std::cout << "\n"; 
-
-    // Verify that original stress variable from Abaqus has been updated.
-    for (int i=0; i < 9; ++i) {
-        std::cout << ddsdde[i] << " ";
-    }
-    std::cout << "\n";  
+    state = model->get_state_variables();
+    statev = state.data();
 }
