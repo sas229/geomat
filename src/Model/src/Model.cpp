@@ -12,24 +12,30 @@ void Model::set_n_state_variables(int i) {
     n_state_variables = i;
 }
 
-void Model::set_sigma(Eigen::VectorXd s) {
-    sigma_v = s;
+void Model::set_sigma(Eigen::VectorXd v) {
+    sigma_prime_v = v;
     // sigma(0) = 100.12; // Modified just to show the maps work - to be deleted later.
     
     // Assemble stress tensor for invariant calculation.
-    sigma(0,0) = sigma_v(0);
-    sigma(1,1) = sigma_v(1);
-    sigma(2,2) = sigma_v(2);
+    sigma_prime(0,0) = sigma_prime_v(0);
+    sigma_prime(1,1) = sigma_prime_v(1);
+    sigma_prime(2,2) = sigma_prime_v(2);
     // The ordering for the terms below is specific to Abaqus. 
     // Consider something more conventional by adding an interface to 
     // convert for Abaqus usage.
-    sigma(0,1) = sigma(1,0) = sigma_v(3); 
-    sigma(0,2) = sigma(2,0) = sigma_v(4);
-    sigma(1,2) = sigma(2,1) = sigma_v(5);
+    sigma_prime(0,1) = sigma_prime(1,0) = sigma_prime_v(3); 
+    sigma_prime(0,2) = sigma_prime(2,0) = sigma_prime_v(4);
+    sigma_prime(1,2) = sigma_prime(2,1) = sigma_prime_v(5);
+
+    // Total stresses given pore pressure, u.
+    sigma = (sigma_prime.array() + (delta.array()*u)).matrix();
+
+    // Deviatoric stress tensor, s.
+    s = (sigma.array()-(delta.array()*p)).matrix();
 }
 
-void Model::set_jacobian(Eigen::MatrixXd j) {
-    jacobian = j;
+void Model::set_jacobian(Eigen::MatrixXd m) {
+    jacobian = m;
     jacobian(0,2) = 10.99; // Modified just to show the maps work - to be deleted later.
 }
 
@@ -46,7 +52,7 @@ int Model::get_n_state_variables(void) {
 }
 
 Eigen::VectorXd Model::get_sigma(void) {
-    return sigma_v;
+    return sigma_prime_v;
 }
 
 Eigen::MatrixXd Model::get_jacobian(void) {
@@ -83,15 +89,12 @@ void Model::compute_K(void) {
 void Model::compute_invariants(void) {
     // Stress invariants.
     I_1 = sigma.trace();
-    I_2 = 1.0/2.0*(std::pow(sigma.trace(),2) - ((sigma.array().pow(2)).matrix().trace())); // Keep one of these...
-    I_2 = (sigma(1,1)*sigma(2,2)) + (sigma(2,2)*sigma(0,0)) + (sigma(0,0)*sigma(1,1)); // Keep one of these...
+    I_2 = 1.0/2.0*(std::pow(sigma.trace(),2) - ((sigma.array().pow(2)).matrix().trace()));
     I_3 = sigma.determinant();
     
     // Mean stress.
-    p = I_1/3.0;
-
-    // Deviatoric stress tensor, s.
-    s = (sigma.array()-(delta*p)).matrix();
+    p = 1.0/3.0*sigma.trace();
+    p_prime = 1.0/3.0*sigma_prime.trace();
 
     // Deviatoric stress invariants.
     J_1 = s.trace(); // Ought to be zero...
@@ -100,8 +103,10 @@ void Model::compute_invariants(void) {
     J_2 = 1.0/2.0*(std::pow(sigma(0,0)-p,2) + std::pow(sigma(1,1)-p,2) + std::pow(sigma(2,2)-p,2)); // Keep one of these...
     J_3 = s.determinant();
 
-    // Deviatoric stress.
-    q = std::pow(3*J_2, 0.5);
+    // Deviatoric stress using principal stresses.
+    compute_principal();
+    q = std::sqrt(1.0/2.0*((pow((sigma_1-sigma_2),2) + pow((sigma_2-sigma_3),2) + pow((sigma_1-sigma_3),2))));
+    std::cout << "q = " << q << "\n";
     
     // von Mises criterion.
     mises = std::sqrt(3.0*J_2);
@@ -116,7 +121,7 @@ void Model::compute_principal(void) {
         
     // Principal stress magnitudes.
     Eigen::Vector3d principal_stresses = es.eigenvalues().real();
-    principal_sigma = principal_stresses.asDiagonal();
+    S = principal_stresses.asDiagonal();
 
     // Sort principal stresses to allocate major, intermediate and minor appropriately.
     Eigen::Vector3d ordered_principal {principal_stresses.data()};
@@ -126,12 +131,12 @@ void Model::compute_principal(void) {
     sigma_3 = ordered_principal(2);
 
     // Principal stress directions.
-    principal_directions = es.eigenvectors().real();
-    theta_1 = principal_directions(0,0);
-    theta_2 = principal_directions(1,1);
-    theta_3 = principal_directions(2,2);
+    T = es.eigenvectors().real();
+    theta_1 = T(0,0);
+    theta_2 = T(1,1);
+    theta_3 = T(2,2);
 }
 
 void Model::compute_cartesian(void) {
-    sigma = principal_directions*principal_sigma*principal_directions.transpose();
+    sigma = T*S*T.transpose();
 }
