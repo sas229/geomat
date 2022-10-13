@@ -2,7 +2,9 @@
 
 void Elastic::compute_isotropic_linear_elastic_matrix(void) {
     // Check elastic paramaters are initialised.
-    PLOG_ERROR_IF(E == 0.0 || nu == 0.0) << "One or more elasticity parameters is zero.";
+    PLOG_ERROR_IF(std::isnan(E)) << "Young's modulus, E, not initialised.";
+    PLOG_ERROR_IF(std::isnan(nu)) << "Poisson's ratio, nu, not initialised.";
+    assert(!std::isnan(E) && !std::isnan(nu));
 
     // Fill elastic matrix with isotropic linear elastic coefficients.
     double C = E/((1.0+nu)*(1.0-2.0*nu));
@@ -14,7 +16,12 @@ void Elastic::compute_isotropic_linear_elastic_matrix(void) {
 
 void Elastic::compute_anisotropic_linear_elastic_matrix(void) {
     // Check elastic paramaters are initialised.
-    PLOG_ERROR_IF(E_v == 0.0 || E_h == 0.0 || G_v == 0.0 || nu_h == 0.0 || nu_v == 0.0) << "One or more elasticity parameters is zero.";
+    PLOG_ERROR_IF(std::isnan(E_h)) << "Young's modulus in vertical direction, E_h, not initialised.";
+    PLOG_ERROR_IF(std::isnan(E_v)) << "Young's modulus in horizontal direction, E_v, not initialised.";
+    PLOG_ERROR_IF(std::isnan(G_h)) << "Shear modulus in horizontal direction, G_h, not initialised.";
+    PLOG_ERROR_IF(std::isnan(nu_v)) << "Poisson's ratio in vertical direction, nu_v, not initialised.";
+    PLOG_ERROR_IF(std::isnan(nu_h)) << "Poisson's ratio in horizontal direction, nu_h, not initialised.";
+    assert(!std::isnan(E_v) && !std::isnan(E_h) && !std::isnan(G_h) && !std::isnan(nu_v) && !std::isnan(nu_v));
 
     // Fill elastic matrix with anisotropic linear elastic coefficients.
     D_e(0,0) = D_e(1,1) += 1/E_h; 
@@ -28,7 +35,10 @@ void Elastic::compute_anisotropic_linear_elastic_matrix(void) {
 
 void Elastic::compute_simplified_anisotropic_linear_elastic_matrix(void) {
     // Check elastic paramaters are initialised.
-    PLOG_ERROR_IF(alpha == 0.0 || E_v == 0.0 || nu_h == 0.0) << "One or more elasticity parameters is zero.";
+    PLOG_ERROR_IF(std::isnan(alpha)) << "Square root of ratio of Young's moduli, alpha, not initialised.";
+    PLOG_ERROR_IF(std::isnan(E_v)) << "Young's modulus in horizontal direction, E_v, not initialised.";
+    PLOG_ERROR_IF(std::isnan(nu_h)) << "Poisson's ratio in horizontal direction, nu_h, not initialised.";
+    assert(!std::isnan(alpha) && !std::isnan(E_v) && !std::isnan(nu_h));
 
     // Fill elastic matrix with anisotropic linear elastic coefficients.
     double C = 1/E_v;

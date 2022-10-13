@@ -3,9 +3,13 @@
 
 #include <iostream>
 #include <plog/Log.h>
+#include <cmath>
+#include <limits>
+#include <cassert>
 #include <Eigen/Eigen>
 #include "Elastic.hpp"
 
+/** @brief Elastic class with methods to generate the elastic matrix in various forms. */
 class Elastic {
 
     public: 
@@ -70,43 +74,43 @@ class Elastic {
     protected:
 
         /** @brief Bulk modulus. */
-        double K = 0.0;
+        double K = std::numeric_limits<double>::quiet_NaN();
 
         /** @brief Bulk modulus in horizontal direction. */
-        double K_h = 0.0;
+        double K_h = std::numeric_limits<double>::quiet_NaN();
 
         /** @brief Bulk modulus in vertical direction. */
-        double K_v = 0.0;
+        double K_v = std::numeric_limits<double>::quiet_NaN();
 
         /** @brief Shear modulus. */
-        double G = 0.0;
+        double G = std::numeric_limits<double>::quiet_NaN();
 
         /** @brief Shear modulus in horizontal direction. */
-        double G_h = 0.0;
+        double G_h = std::numeric_limits<double>::quiet_NaN();
 
         /** @brief Shear modulus in vertical direction. */
-        double G_v = 0.0;
+        double G_v = std::numeric_limits<double>::quiet_NaN();
 
         /** @brief Young's modulus. */
-        double E = 0.0;
+        double E = std::numeric_limits<double>::quiet_NaN();
 
         /** @brief Young's modulus in horizontal direction. */
-        double E_h = 0.0;
+        double E_h = std::numeric_limits<double>::quiet_NaN();
 
         /** @brief Young's modulus in vertical direction. */
-        double E_v = 0.0;
+        double E_v = std::numeric_limits<double>::quiet_NaN();
 
         /** @brief Poisson's ratio. */
-        double nu = 0.0; 
+        double nu = std::numeric_limits<double>::quiet_NaN(); 
 
         /** @brief Poisson's ratio in horizontal direction. */
-        double nu_h = 0.0; 
+        double nu_h = std::numeric_limits<double>::quiet_NaN(); 
 
         /** @brief Poisson's ratio in vertical direction. */
-        double nu_v = 0.0;       
+        double nu_v = std::numeric_limits<double>::quiet_NaN();       
 
         /** @brief Square root of ratio of Young's moduli \f$ \sqrt{E_{h}/E_{v}} \f$. */
-        double alpha = 0.0;
+        double alpha = std::numeric_limits<double>::quiet_NaN();
 
         /** @brief Elastic matrix. */
         Eigen::Matrix<double, 6, 6> D_e = Eigen::Matrix<double, 6, 6>::Zero();
