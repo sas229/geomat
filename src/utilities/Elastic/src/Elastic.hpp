@@ -1,6 +1,7 @@
 #ifndef ELASTIC_H
 #define ELASTIC_H
 
+#include <iostream>
 #include <plog/Log.h>
 #include <Eigen/Eigen>
 #include "Elastic.hpp"

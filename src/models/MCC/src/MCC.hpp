@@ -24,9 +24,6 @@ class MCC : public Model, public Elastic {
 
     protected:
     
-        /** @brief Parameter: Poisson's ratio \f$ \nu \f$. */
-        double nu;
-
         /** @brief Parameter: frictional constant. */
         double M;
 
