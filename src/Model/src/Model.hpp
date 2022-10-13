@@ -7,8 +7,12 @@
 #include <plog/Log.h>
 #include <Eigen/Eigen>
 
+/** @brief The Model class contains methods and attributes that are common to all genera of constitutive model. 
+ * The Model class is the base class from which all constitutive models are derived. */
 class Model {
+
     public:
+
         /** @brief Method to set stress tensor in Voigt notation. */
         void set_sigma(Eigen::VectorXd s);
         
@@ -23,17 +27,6 @@ class Model {
         
         /** @brief Method to get state variables. */
         std::vector<double> get_state_variables(void);
-        
-        /** @brief Method to compute the stress invariants. */
-        void compute_stress_invariants(void);
-
-        /** @brief Method to compute the principal stresses and directions. */
-        void compute_principal_stresses(void);
-        
-        /** @brief Method to compute the cartesian stress tensor from principal stresses and directions, derived via: 
-         * \f[ \sigma_{i j}^{\prime} = T S T^{T} \f] 
-         * where \f$ T \f$ is the principal stress direction tensor and \f$ S \f$ is the principal stress tensor.*/
-        void compute_cartesian_stresses(void);
 
         /** @brief Virtual method to set state variables. */
         virtual void set_state_variables(std::vector<double> s) {};
@@ -41,6 +34,7 @@ class Model {
         /** @brief Virtual method to set model parameters. */
         virtual void set_parameters(std::vector<double> s) {};
 
+        /** @brief Virtual destructor for Model class. */
         virtual ~Model() {}
         
     protected:
@@ -62,6 +56,17 @@ class Model {
         
         /** @brief Method to get number of state variables. */
         int get_n_state_variables(void);
+
+        /** @brief Method to compute the stress invariants. */
+        void compute_stress_invariants(void);
+
+        /** @brief Method to compute the principal stresses and directions. */
+        void compute_principal_stresses(void);
+        
+        /** @brief Method to compute the cartesian stress tensor from principal stresses and directions, derived via: 
+         * \f[ \sigma_{i j}^{\prime} = T_{i j} S_{i j} T_{i j}^{T} \f] 
+         * where \f$ T_{i j} \f$ is the principal stress direction tensor and \f$ S_{i j} \f$ is the principal stress tensor.*/
+        void compute_cartesian_stresses(void);
 
         /** @brief Name of model. */
         std::string name;
@@ -182,16 +187,20 @@ class Model {
         /** @brief Minor principal stress. */
         double sigma_3;
 
-        /** @brief Principal stress directions. */
+        /** @brief Principal stress directions tensor \f$ T_{i j} \f$. */
         Eigen::Matrix3d T;
 
-        /** @brief Mises stress. */
+        /** @brief Mises stress:
+         * \f[ \sigma_{m} = \sqrt{3 J_2}\f]
+         * where \f$ J_2 \f$ is the second deviatoric stress invariant. */
         double mises;
 
-        /** @brief Maximum shear stress. */
+        /** @brief Maximum shear stress:
+         * \f[ \sigma_{max} = \frac{\max(\left|\sigma_1 - \sigma_2\right|, \left|\sigma_1 - \sigma_3\right|, \left|\sigma_2 - \sigma_3\right|)}{2}\f]
+         * where \f$ \sigma_1 \f$, \f$ \sigma_2 \f$ and \f$ \sigma_3 \f$ are the principal stresses. */
         double max_shear;  
 
-        /** @brief Constant \f$ \pi = 2 * \arccos{0.0} \f$ */
+        /** @brief Constant \f$ \pi \f$. */
         double pi = 2*std::acos(0.0);
 
         /** @brief Lode angle from cosine relationship:

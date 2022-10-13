@@ -6,6 +6,10 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+def setup(app):
+    app.add_css_file('style.css')
+
+
 from sphinx.builders.html import StandaloneHTMLBuilder
 import subprocess
 
@@ -15,6 +19,9 @@ subprocess.call('doxygen Doxyfile.in', shell=True)
 project = 'umat'
 copyright = '2022, Sam Stanier'
 author = 'Sam Stanier'
+
+def setup(app):
+    app.add_css_file('style.css')
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -63,7 +70,8 @@ html_theme_options = {
 # html_logo = ''
 # github_url = ''
 # html_baseurl = ''
-# html_static_path = ['_static']
+html_static_path = ['_static']
+# html_theme_options = {'body_max_width': '80%'}
 
 # -- Breathe configuration -------------------------------------------------
 
@@ -72,3 +80,4 @@ breathe_projects = {
 }
 breathe_default_project = "umat"
 breathe_default_members = ('members', 'undoc-members')
+

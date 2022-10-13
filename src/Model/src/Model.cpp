@@ -13,11 +13,8 @@ void Model::set_n_state_variables(int i) {
 }
 
 void Model::set_sigma(Eigen::VectorXd v) {
-    // Need to think carefully about sign conventions. Abaqus (and most other FEA packages) take tension as positive.
-    // So far I have also taken tension as positive. Soil mechanics generally does the opposite...
-
-    // Stress in Voigt notation form.
-    sigma_prime_v = v;
+    // Stress in Voigt notation form - change sign to use compression positive soil mechanics convention.
+    sigma_prime_v = -v;
     
     // Assemble stress tensor for invariant calculation.
     sigma_prime(0,0) = sigma_prime_v(0);
@@ -31,7 +28,6 @@ void Model::set_sigma(Eigen::VectorXd v) {
     sigma_prime(1,2) = sigma_prime(2,1) = sigma_prime_v(5);
 
     // Total stresses given pore pressure, u.
-    u = -20;
     sigma = (sigma_prime.array() + (delta.array()*u)).matrix();
 }
 
@@ -52,7 +48,8 @@ int Model::get_n_state_variables(void) {
 }
 
 Eigen::VectorXd Model::get_sigma(void) {
-    return sigma_prime_v;
+    // Change sign back to tension positive sign convention.
+    return -sigma_prime_v;
 }
 
 Eigen::MatrixXd Model::get_jacobian(void) {

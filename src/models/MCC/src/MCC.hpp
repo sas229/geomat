@@ -1,6 +1,7 @@
 #ifndef MCC_H
 #define MCC_H
 
+#include <plog/Log.h>
 #include <Eigen/Eigen>
 #include "Model.hpp"
 #include "Elastic.hpp"

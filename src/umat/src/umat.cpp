@@ -61,8 +61,8 @@ extern "C" void umat(
         plog::init(plog::debug, log_filename);
 
         // Instantiate model.
-        PLOG_DEBUG << *ndi << "D problem defined with " << *ntens << " stress variables.";
-        PLOG_DEBUG << "Attempting to instantiate " << cmname << " model.";
+        PLOG_INFO << *ndi << "D problem defined with " << *ntens << " stress variables.";
+        PLOG_INFO << "Attempting to instantiate " << cmname << " model.";
         if (strcmp(cmname, "MCC") == 0) {
             model.reset(new MCC);   
         } else if (strcmp(cmname, "SMCC") == 0) {
@@ -90,7 +90,6 @@ extern "C" void umat(
     model->set_jacobian(Eigen_jacobian);
 
     model->set_state_variables(state);
-    model->compute_stress_invariants();
     
     // Do some work with it... (i.e. stress integration).
     
