@@ -47,12 +47,12 @@ class Elastic {
 
         /** @brief Method to compute the simplified anisotropic linear elastic matrix after Graham and Houlsby (1983):
          * \f[ D_e = \frac{1}{E_v} \left[\begin{array}{cccccc}
-                1 / \alpha^2 & -\nu_h / E_v \alpha^2 & -\nu_h / E_v \alpha & 0 & 0 & 0 \\
-                -\nu_h / E_v \alpha^2 & 1 / E_v \alpha^2 & -\nu_h / E_v \alpha & 0 & 0 & 0 \\
-                -\nu_h / E_v \alpha & -\nu_h / E_v \alpha & 1 / E_v & 0 & 0 & 0 \\
-                0 & 0 & 0 & 2\left(1+\nu_h\right) / E_v \alpha & 0 & 0 \\
-                0 & 0 & 0 & 0 & 2\left(1+\nu_h\right) / E_v \alpha & 0 \\
-                0 & 0 & 0 & 0 & 0 & 2\left(1+\nu_h\right) / E_v \alpha^2
+                1 / \alpha^2 & -\nu_h / \alpha^2 & -\nu_h / \alpha & 0 & 0 & 0 \\
+                -\nu_h / \alpha^2 & 1 / \alpha^2 & -\nu_h / \alpha & 0 & 0 & 0 \\
+                -\nu_h / \alpha & -\nu_h \alpha & 1 & 0 & 0 & 0 \\
+                0 & 0 & 0 & 2\left(1+\nu_h\right) / \alpha & 0 & 0 \\
+                0 & 0 & 0 & 0 & 2\left(1+\nu_h\right) / \alpha & 0 \\
+                0 & 0 & 0 & 0 & 0 & 2\left(1+\nu_h\right) / \alpha^2
                 \end{array}\right] \f]
          * where \f$ E_v \f$ is the Young's modulus in the vertical direction and \f$ \alpha \f$ is the square root of
          * the ratio of the Young's moduli in the horizontal and vertical directions. */
