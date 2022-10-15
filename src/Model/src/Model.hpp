@@ -17,29 +17,53 @@ class Model {
         virtual ~Model() {}
 
         // Setters.
-
-        /** @brief Method to set stress tensor in Voigt notation. */
-        void set_sigma(Eigen::VectorXd s);
         
-        /** @brief Method to set Jacobian matrix. */
+        /** 
+         * @brief Method to set Jacobian matrix. 
+         */
         void set_jacobian(Eigen::MatrixXd j);
 
-        /** @brief Virtual method to set state variables. */
-        virtual void set_state_variables(std::vector<double> s) {};
-        
-        /** @brief Virtual method to set model parameters. */
+        /** 
+         * @brief Virtual method to set model parameters. 
+         */
         virtual void set_parameters(std::vector<double> s) {};
+
+        /** 
+         * @brief Method to set effective stress tensor in Voigt notation. 
+         */
+        void set_sigma_prime(Eigen::VectorXd s);
+
+        /** 
+         * @brief Virtual method to set state variables. 
+         */
+        virtual void set_state_variables(std::vector<double> s) {};
+
+        /** 
+         * @brief Method to set strain increment in Voigt notation. 
+         */
+        void set_strain_increment(Eigen::VectorXd s);
         
         // Getters.
 
-        /** @brief Method to get stress tensor in Voigt notation. */
-        Eigen::VectorXd get_sigma(void);
-        
-        /** @brief Method to get Jacobian matrix. */
+        /**
+         * @brief Method to get Jacobian matrix. 
+         */
         Eigen::MatrixXd get_jacobian(void);
+
+        /** 
+         * @brief Method to get effective stress tensor in Voigt notation. 
+         */
+        Eigen::VectorXd get_sigma_prime(void);
         
-        /** @brief Method to get state variables. */
+        /** 
+         * @brief Method to get state variables. 
+         */
         std::vector<double> get_state_variables(void);
+
+        /** 
+         * @brief Method to get strain increment in Voigt notation.
+         */
+        Eigen::VectorXd get_strain_increment(void);
 
     // protected:
 
@@ -282,7 +306,7 @@ class Model {
 
         /** 
          * @brief Effective stress in Voigt notation:
-         * \f[\left[\sigma_{1 1}^{\prime},\sigma_{2 2}^{\prime},\sigma_{3 3}^{\prime},\tau_{1 2},\tau_{1 3},\tau_{2 3}\right]^T\f]. 
+         * \f[ \sigma^{\prime} = \left[\sigma_{1 1}^{\prime}, \sigma_{2 2}^{\prime}, \sigma_{3 3}^{\prime}, \tau_{1 2}, \tau_{1 3}, \tau_{2 3}\right]^T\f]. 
          */
         Eigen::VectorXd sigma_prime_v;
 
@@ -310,6 +334,25 @@ class Model {
          * @brief Deviatoric stress tensor. 
          */
         Eigen::Matrix3d s;
+
+        /** 
+         * @brief Strain increment in Voigt notation:
+         * \f[ \Delta \epsilon = \left[\Delta \epsilon_{1 1}, \Delta \epsilon_{2 2}, \Delta \epsilon_{3 3}, \Delta \epsilon_{1 2}, \Delta \epsilon_{1 3}, \Delta \epsilon_{2 3}\right]^T\f]. 
+         */
+        Eigen::VectorXd delta_epsilon_v;
+
+        /** 
+         * @brief Strain increment tensor:
+         * \f[ \Delta \epsilon_{i j} = 
+         *      \left[\begin{array}{lll}
+         *      \Delta \epsilon_{1 1} & \Delta \epsilon_{1 2} & \Delta \epsilon_{1 3} \\
+         *      \Delta \epsilon_{2 1} & \Delta \epsilon_{2 2} & \Delta \epsilon_{2 3} \\
+         *      \Delta \epsilon_{3 1} & \Delta \epsilon_{3 2} & \Delta \epsilon_{3 3}
+         *      \end{array}\right] \f]
+         * where \f$ \Delta \epsilon_{1 1} \f$, \f$ \Delta \epsilon_{2 2} \f$ and \f$ \Delta \epsilon_{3 3} \f$ are the axial strain increments, 
+         * and  \f$ \Delta \epsilon_{1 2} \f$, \f$ \Delta \epsilon_{1 3} \f$ and \f$ \Delta \epsilon_{2 3} \f$ are the shear strain increments, respectively. 
+         */
+        Eigen::Matrix3d delta_epsilon;
         
         /** 
          * @brief Kronecker delta tensor:

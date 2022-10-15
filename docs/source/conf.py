@@ -28,18 +28,10 @@ def setup(app):
 
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.autosectionlabel',
-    'sphinx.ext.todo',
     'sphinx.ext.coverage',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.ifconfig',
-    'sphinx.ext.viewcode',
-    'sphinx_sitemap',
-    'sphinx.ext.inheritance_diagram',
-    'breathe',
     'sphinx.ext.napoleon', 
-    'sphinx.ext.mathjax'
+    'sphinx.ext.mathjax',
+    'breathe'
 ]
 
 templates_path = ['_templates']
@@ -60,7 +52,7 @@ html_theme_options = {
     
     'logo_only': False,
 
-    # Toc options
+    # Toc options.
     'collapse_navigation': True,
     'sticky_navigation': True,
     'navigation_depth': 4,
@@ -71,13 +63,11 @@ html_theme_options = {
 # github_url = ''
 # html_baseurl = ''
 html_static_path = ['_static']
-# html_theme_options = {'body_max_width': '80%'}
 
-# -- Breathe configuration -------------------------------------------------
+# Breathe configuration.
 
 breathe_projects = {
 	"umat": "../../build/xml"
 }
 breathe_default_project = "umat"
-breathe_default_members = ('members', 'undoc-members')
-
+breathe_default_members = ('members', 'protected-members', 'private-members')

@@ -14,27 +14,31 @@ void Model::set_n_state_variables(int i) {
     n_state_variables = i;
 }
 
-void Model::set_sigma(Eigen::VectorXd v) {
+void Model::set_jacobian(Eigen::MatrixXd m) {
+    jacobian = m;
+}
+
+void Model::set_sigma_prime(Eigen::VectorXd sigma_prime) {
     // Stress in Voigt notation form - change sign to use compression positive soil mechanics convention.
-    sigma_prime_v = -v;
+    this->sigma_prime_v = -sigma_prime;
     
     // Assemble stress tensor for invariant calculation.
-    sigma_prime(0,0) = sigma_prime_v(0);
-    sigma_prime(1,1) = sigma_prime_v(1);
-    sigma_prime(2,2) = sigma_prime_v(2);
+    this->sigma_prime(0,0) = this->sigma_prime_v(0);
+    this->sigma_prime(1,1) = this->sigma_prime_v(1);
+    this->sigma_prime(2,2) = this->sigma_prime_v(2);
     // The ordering for the terms below is specific to Abaqus. 
     // Consider something more conventional by adding an interface to 
     // convert for Abaqus usage.
-    sigma_prime(0,1) = sigma_prime(1,0) = sigma_prime_v(3); 
-    sigma_prime(0,2) = sigma_prime(2,0) = sigma_prime_v(4);
-    sigma_prime(1,2) = sigma_prime(2,1) = sigma_prime_v(5);
+    this->sigma_prime(0,1) = this->sigma_prime(1,0) = this->sigma_prime_v(3); 
+    this->sigma_prime(0,2) = this->sigma_prime(2,0) = this->sigma_prime_v(4);
+    this->sigma_prime(1,2) = this->sigma_prime(2,1) = this->sigma_prime_v(5);
 
     // Total stresses given pore pressure, u.
-    sigma = (sigma_prime.array() + (delta.array()*u)).matrix();
+    this->sigma = (this->sigma_prime.array() + (this->delta.array()*this->u)).matrix();
 }
 
-void Model::set_jacobian(Eigen::MatrixXd m) {
-    jacobian = m;
+void Model::set_strain_increment(Eigen::VectorXd strain_increment) {
+    this->delta_epsilon_v = -strain_increment;
 }
 
 // Getters.
@@ -51,7 +55,7 @@ int Model::get_n_state_variables(void) {
     return n_state_variables;
 }
 
-Eigen::VectorXd Model::get_sigma(void) {
+Eigen::VectorXd Model::get_sigma_prime(void) {
     // Change sign back to tension positive sign convention.
     return -sigma_prime_v;
 }

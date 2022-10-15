@@ -1,18 +1,23 @@
 #include "umat.hpp"
 
-/** @brief Boolean indicating whether the current increment is the first call to the umat function. */
+/** 
+ * @brief Boolean indicating whether the current increment is the first call to the umat function. 
+ */
 bool first_call = true;
 
-/** @brief Unique pointer to store the memory address of the chosen model. */
+/** 
+ * @brief Unique pointer to store the memory address of the chosen model. 
+ */
 std::unique_ptr<Model> model;
 
-/** @brief Eigen vector with six indices. */
+/** 
+ * @brief Eigen vector with six indices. 
+ */
 typedef Eigen::Vector<double, 6> Vector6d;
 
-/** @brief Eigen vector with six indices. */
-typedef Eigen::Matrix<double, 3, 3> Matrix3d;
-
-/** @brief Eigen vector with six indices. */
+/** 
+ * @brief Eigen vector with six indices. 
+ */
 typedef Eigen::Matrix<double, 6, 6> Matrix6d;
 
 extern "C" void umat(
@@ -75,18 +80,18 @@ extern "C" void umat(
 
     // Create maps to data.
     Eigen::Map<Vector6d> map_to_stress(stress);
-    Eigen::Map<Matrix3d> map_to_jacobian(ddsdde);
+    Eigen::Map<Eigen::Matrix3d> map_to_jacobian(ddsdde);
     std::vector<double> state(statev, statev+*nstatv);
     std::vector<double> parameters(props, props+*nprops);
 
     // Create a native Eigen type using the map as initialisation.
     Vector6d Eigen_sigma = map_to_stress;
-    Matrix3d Eigen_jacobian = map_to_jacobian;
+    Eigen::Matrix3d Eigen_jacobian = map_to_jacobian;
 
     // Set variables within model.
     model->set_parameters(parameters);
     
-    model->set_sigma(Eigen_sigma);
+    model->set_sigma_prime(Eigen_sigma);
     model->set_jacobian(Eigen_jacobian);
 
     model->set_state_variables(state);
@@ -102,7 +107,7 @@ extern "C" void umat(
     // model->solve()
 
     // Equate map to updated variable in order to map back to input variable.
-    map_to_stress = model->get_sigma();
+    map_to_stress = model->get_sigma_prime();
     map_to_jacobian = model->get_jacobian();
     state = model->get_state_variables();
     statev = state.data();
