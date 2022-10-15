@@ -90,6 +90,12 @@ extern "C" void umat(
     model->set_jacobian(Eigen_jacobian);
 
     model->set_state_variables(state);
+
+    model->update_stress_invariants();
+    model->update_principal_stresses();
+    double c, s, s_bar;
+    model->compute_lode(850.0, 9000.0, c, s, s_bar);
+    model->update_lode();
     
     // Do some work with it... (i.e. stress integration).
     
