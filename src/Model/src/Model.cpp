@@ -90,7 +90,7 @@ Eigen::Matrix3d Model::compute_cartesian_stresses(Eigen::Matrix3d T, Eigen::Matr
 }
 
 Eigen::Matrix3d Model::compute_delta_epsilon_vol(Eigen::Matrix3d delta_epsilon) {
-    return eye.array()*delta_epsilon.trace();
+    return delta_epsilon.trace()*eye;
 }
 
 void Model::compute_lode(double J_2, double J_3, double &theta_c, double &theta_s, double &theta_s_bar) {
@@ -141,18 +141,18 @@ double Model::compute_q(Eigen::Matrix3d sigma) {
     return q;
 }
 
-Eigen::Matrix3d Model::compute_s(Eigen::Matrix3d sigma, double _p) {
-    return (sigma.array()-(eye.array()*_p)).matrix();
+Eigen::Matrix3d Model::compute_s(Eigen::Matrix3d sigma, double p) {
+    return sigma - p*eye;
 }
 
 Eigen::Matrix3d Model::compute_sigma(Eigen::Matrix3d sigma_prime, double u) {
-    return (sigma_prime.array() + (eye.array()*u)).matrix();
+    return sigma_prime + u*eye;
 }
 
 void Model::compute_stress_invariants(Eigen::Matrix3d sigma, double &I_1, double &I_2, double &I_3, double &J_1, double &J_2, double &J_3) {
     // Stress invariants.
     I_1 = sigma.trace();
-    I_2 = 1.0/2.0*(std::pow(sigma.trace(),2) - ((sigma.array().pow(2)).matrix().trace()));
+    I_2 = 1.0/2.0*(std::pow(sigma.trace(),2) - (sigma.cwiseProduct(sigma)).trace());
     I_3 = sigma.determinant();
 
     // Mean stress.
@@ -206,11 +206,11 @@ void Model::update_q(void) {
 }
 
 void Model::update_s(void) {
-    Model::compute_s(this->sigma, this->p);
+    this->s = Model::compute_s(this->sigma, this->p);
 }
 
 void Model::update_sigma(void) {
-    Model::compute_sigma(this->sigma_prime, this->u);
+    this->sigma = Model::compute_sigma(this->sigma_prime, this->u);
 }
 
 void Model::update_stress_invariants(void) {
