@@ -33,7 +33,7 @@ class Elastic {
                 0 & 0 & 0 & 0 & 0 & \frac{1-2 \nu}{2}
                 \end{array}\right] \f]
          * where \f$ E \f$ is the Young's modulus and \f$ \nu \f$ is Poisson's ratio. */
-        void compute_isotropic_linear_elastic_matrix(void);
+        void compute_isotropic_linear_elastic_matrix(double E, double nu, Eigen::Matrix<double, 6, 6> &D_e);
 
         /** @brief Method to compute the anisotropic linear elastic matrix:
          * \f[ D_e = \left[\begin{array}{cccccc}
@@ -47,8 +47,8 @@ class Elastic {
          * where \f$ E_h \f$ and \f$ E_v \f$ are the Young's moduli in the horizontal and vertical directions, respectively,
          * \f$ \nu_h \f$ and \f$ \nu_v \f$ are the Poisson's ratio in the horizontal and vertical directions, respectively, 
          * and \f$ G_h \f$ is the shear modulus in the horizontal direction. */
-        void compute_anisotropic_linear_elastic_matrix(void);
-
+        void compute_anisotropic_linear_elastic_matrix(double E_h, double E_v, double G_h, double nu_v, double nu_h, Eigen::Matrix<double, 6, 6> &D_e);
+       
         /** @brief Method to compute the simplified anisotropic linear elastic matrix after Graham and Houlsby (1983):
          * \f[ D_e = \frac{1}{E_v} \left[\begin{array}{cccccc}
                 1 / \alpha^2 & -\nu_h / \alpha^2 & -\nu_h / \alpha & 0 & 0 & 0 \\
@@ -60,7 +60,13 @@ class Elastic {
                 \end{array}\right] \f]
          * where \f$ E_v \f$ is the Young's modulus in the vertical direction and \f$ \alpha \f$ is the square root of
          * the ratio of the Young's moduli in the horizontal and vertical directions. */
-        void compute_simplified_anisotropic_linear_elastic_matrix(void);
+        void compute_simplified_anisotropic_linear_elastic_matrix(double alpha, double E_v, double nu_h, Eigen::Matrix<double, 6, 6> &D_e);
+
+        void update_isotropic_linear_elastic_matrix(void);
+        
+        void update_anisotropic_linear_elastic_matrix(void);
+
+        void update_simplified_anisotropic_linear_elastic_matrix(void);
 
         /** @brief Method to compute the shear modulus from bulk modulus and Poisson's ratio. */
         void compute_G_given_E_and_nu(void);

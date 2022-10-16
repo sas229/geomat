@@ -93,15 +93,30 @@ class Model {
 
         /**
          * @brief Method to compute the cartesian stress tensor from principal stresses and directions as: 
-         * \f[ \sigma_{i j}^{\prime} = T_{i j} S_{i j} T_{i j}^{T} \f] 
-         * where \f$ T_{i j} \f$ is the principal stress direction tensor and \f$ S_{i j} \f$ is the principal stress tensor.
+         * \f[ \boldsymbol{\sigma}^{\prime} = \mathbf{T S T}^\intercal \f] 
+         * where \f$ \mathbf{T} \f$ is the principal stress direction tensor and \f$ \mathbf{S} \f$ is the principal stress tensor.
          * 
          * @param[in] T Principal stress direction tensor.
          * @param[in] S Principal stress tensor.
          * @returns Cartesian stress tensor.
          */
         Eigen::Matrix3d compute_cartesian_stresses(Eigen::Matrix3d T, Eigen::Matrix3d S);
-        
+
+        /** 
+         * @brief Method to compute the volumetric strain increment tensor:
+         * \f[ \boldsymbol{\Delta \epsilon_{vol}} = \Delta \epsilon_{vol} \mathbf{I} =
+         *      \left[\begin{array}{lll}
+         *      \Delta \epsilon_{vol} & 0 & 0 \\
+         *      0 & \Delta \epsilon_{vol} & 0 \\
+         *      0 & 0 & \Delta \epsilon_{vol}
+         *      \end{array}\right] \f] 
+         * where \f$ \mathbf{I} \f$ is the identity matrix and \f$ \Delta \epsilon_{vol} \f$
+         *  is the volumetric strain increment calculated as:
+         * \f[ \Delta \epsilon_{vol} = \operatorname{tr} \left( \boldsymbol{\Delta \epsilon} \right)\f] 
+         * where \f$ \boldsymbol{\Delta \epsilon} \f$ is the strain increment tensor. 
+         */
+        Eigen::Matrix3d compute_delta_epsilon_vol(Eigen::Matrix3d delta_epsilon);
+
         /** 
          * @brief Function to compute Lode's angle with cosine definition \f$ \theta_c \f$ as:
          * \f[ \theta_c=\arccos{\left[\frac{J_3}{2}\left(\frac{3}{J_2}\right)^{3/2}\right]} \f]
@@ -143,18 +158,18 @@ class Model {
 
         /** 
          * @brief Mean stress calculated via:
-         * \f[ p=\frac{1}{3} \operatorname{tr}\left(\sigma_{i j}\right) \f]
-         * where \f$\sigma_{i j} \f$ is the stress tensor.
+         * \f[ p=\frac{1}{3} \operatorname{tr}\left( \boldsymbol{\sigma} \right) \f]
+         * where \f$ \boldsymbol{\sigma} \f$ is the total stress tensor.
          * 
-         * @param[in] sigma Stress tensor.
+         * @param[in] sigma Total stress tensor.
          * @returns Mean stress.
          */
         double compute_p(Eigen::Matrix3d sigma);
 
         /** 
          * @brief Mean effective stress calculated via:
-         * \f[ p^{\prime}=\frac{1}{3} \operatorname{tr}\left(\sigma_{i j}^{\prime}\right) \f]
-         * where \f$\sigma_{i j}^{\prime} \f$ is the effective stress tensor.
+         * \f[ p^{\prime}=\frac{1}{3} \operatorname{tr}\left( \boldsymbol{\sigma}^{\prime} \right) \f]
+         * where \f$ \boldsymbol{\sigma}^{\prime} \f$ is the effective stress tensor.
          * 
          * @param[in] sigma_prime Effective stress tensor.
          * @returns Mean effective stress.
@@ -166,7 +181,7 @@ class Model {
          * are computed as the eigenvalues \f$ \lambda \f$ of the stress tensor via the characteristic
          * equation:
          * 
-         * \f[ \left|\sigma_{i j}-\lambda \delta_{i j}\right|=-\lambda^3+I_1 \lambda^2-I_2 \lambda+I_3=0 \f]
+         * \f[ -\lambda^3+I_1 \lambda^2-I_2 \lambda+I_3=0 \f]
          * 
          * The major principal stress \f$ \sigma_1 \f$ is the maximum eigenvalue, the intermediate principal stress  
          * \f$ \sigma_2 \f$ is the intermediate eigenvalue and the minor principal stress \f$ \sigma_3 \f$ is the 
@@ -186,13 +201,13 @@ class Model {
         /** 
          * @brief Function to compute the deviatoric stress via:
          * \f[ q = \sqrt{\frac{1}{2} \left[
-         * \left(\sigma_{1 1}^{\prime} -\sigma_{2 2}^{\prime}\right)^2 +
-         * \left(\sigma_{2 2}^{\prime} -\sigma_{3 3}^{\prime}\right)^2 +
-         * \left(\sigma_{3 3}^{\prime} -\sigma_{1 1}^{\prime}\right)^2 +
+         * \left(\sigma_{1 1} -\sigma_{2 2}\right)^2 +
+         * \left(\sigma_{2 2} -\sigma_{3 3}\right)^2 +
+         * \left(\sigma_{3 3} -\sigma_{1 1}\right)^2 +
          * 6 \left( \tau_{1 2}^2 + \tau_{1 3}^2 + \tau_{2 3}^2 \right)
          * \right]} \f] 
-         * where \f$ \sigma_{1 1}^\prime \f$, \f$ \sigma_{2 2}^\prime \f$, \f$ \sigma_{3 3}^\prime \f$, \f$ \tau_{1 2} \f$, \f$ \tau_{1 3} \f$
-         * and \f$ \tau_{2 3} \f$ are the components of the effective stress tensor \f$ \sigma_{i j}^{\prime} \f$. 
+         * where \f$ \sigma_{1 1} \f$, \f$ \sigma_{2 2} \f$, \f$ \sigma_{3 3} \f$, \f$ \tau_{1 2} \f$, \f$ \tau_{1 3} \f$
+         * and \f$ \tau_{2 3} \f$ are the components of the stress tensor \f$ \boldsymbol{\sigma} \f$. 
          * 
          * @param[in] sigma
          * @returns Deviatoric stress. 
@@ -201,8 +216,8 @@ class Model {
 
         /** 
          * @brief Function to compute the deviatoric stress tensor as: 
-         * \f[ s = \sigma_{i j} - p \delta_{i j} \f]
-         * where \f$ p \f$ is the mean stress and \f$ \delta_{i j} \f$ is the Kronecker delta.
+         * \f[ s =  \boldsymbol{\sigma} - p \mathbf{I} \f]
+         * where \f$ p \f$ is the mean stress and \f$ \mathbf{I} \f$ is the identity matrix.
          *  
          * @param[in] sigma Stress tensor.
          * @param[in] p Mean stress.
@@ -210,17 +225,29 @@ class Model {
          */
         Eigen::Matrix3d compute_s(Eigen::Matrix3d sigma, double p);
 
+        /** 
+         * @brief Function to compute the total stress tensor as: 
+         * \f[ \boldsymbol{\sigma} = \boldsymbol{\sigma}^{\prime} + u \mathbf{I} \f]
+         * where \f$ \boldsymbol{\sigma}^{\prime} \f$ is the effective stress tensor, 
+         * \f$ u \f$ is the pore pressure and \f$ \mathbf{I} \f$ is the identity matrix.
+         *  
+         * @param[in] sigma_prime Stress tensor.
+         * @param[in] u Pore pressure.
+         * @returns Total stress tensor.
+         */
+        Eigen::Matrix3d compute_sigma(Eigen::Matrix3d sigma_prime, double u);
+
         /** @brief Method to compute the stress invariants. The first, second and third stress invariants 
          * \f$ I_1 \f$, \f$ I_2 \f$ and \f$ I_3 \f$ are calculated as:
-         * \f[ I_1=\operatorname{tr}\left(\sigma_{i j}\right) \f] 
-         * \f[ I_2=\frac{1}{2}\left\{\left[\operatorname{tr}\left(\sigma_{i j}\right)\right]^2-\operatorname{tr}\left(\sigma_{i j}^2\right)\right\} \f]
-         * \f[ I_3=\operatorname{det} \left(\sigma_{i j}\right) \f]
-         * where \f$\sigma_{i j} \f$ is the total stress tensor. The first, second and third deviatoric stress invariants
+         * \f[ I_1=\operatorname{tr}\left( \boldsymbol{\sigma}\right) \f] 
+         * \f[ I_2=\frac{1}{2}\left\{\left[\operatorname{tr}\left( \boldsymbol{\sigma}\right)\right]^2-\operatorname{tr}\left( \boldsymbol{\sigma}^2\right)\right\} \f]
+         * \f[ I_3=\operatorname{det} \left( \boldsymbol{\sigma}\right) \f]
+         * where \f$ \boldsymbol{\sigma} \f$ is the total stress tensor. The first, second and third deviatoric stress invariants
          * \f$ J_1 \f$, \f$ J_2 \f$ and \f$ J_3 \f$ are calculated as:
-         * \f[ J_1=\operatorname{tr}\left(s_{i j}\right)=0\f]
-         * \f[ J_2=\frac{1}{2} \operatorname{tr}\left(s_{i j}^2\right) \f]
-         * \f[ J_3=\operatorname{det} \left(s_{i j}\right) \f]
-         * where \f$ s_{i j} \f$ is the deviatoric stress tensor, which can be computed via compute_s().
+         * \f[ J_1=\operatorname{tr}\left(\mathbf{s}\right)=0\f]
+         * \f[ J_2=\frac{1}{2} \operatorname{tr}\left(\mathbf{s}^2\right) \f]
+         * \f[ J_3=\operatorname{det} \left(\mathbf{s}\right) \f]
+         * where \f$ \mathbf{s} \f$ is the deviatoric stress tensor, which can be computed via compute_s().
          * 
          * @param[in] sigma Total stress tensor.
          * @param[out] I_1 First stress invariant.
@@ -238,6 +265,11 @@ class Model {
          * @brief Method to update the cartesian stress tensor class attribute #sigma_prime via compute_cartesian_stresses(). 
          */
         void update_cartesian_stresses(void);
+
+        /**
+         * @brief Method to update the volumetric strain increment tensor class attribute #delta_epsilon_vol via compute_delta_epsilon_vol(). 
+         */
+        void update_delta_epsilon_vol(void);
         
         /** 
          * @brief Method to update Lode's angle class attributes #theta_c, #theta_s and #theta_s_bar via 
@@ -283,6 +315,11 @@ class Model {
         void update_s(void);
 
         /** 
+         * @brief Method to update the total stress tensor class attribute #s via compute_sigma(). 
+         */
+        void update_sigma(void);
+
+        /** 
          * @brief Method to compute the stress invariant class attributes #I_1, #I_2, #I_3, #J_1, #J_2 and #J_3 via compute_stress_invariants(). 
          */
         void update_stress_invariants(void);
@@ -306,13 +343,13 @@ class Model {
 
         /** 
          * @brief Effective stress in Voigt notation:
-         * \f[ \sigma^{\prime} = \left[\sigma_{1 1}^{\prime}, \sigma_{2 2}^{\prime}, \sigma_{3 3}^{\prime}, \tau_{1 2}, \tau_{1 3}, \tau_{2 3}\right]^T\f]. 
+         * \f[ \boldsymbol{\tilde{\sigma}}^{\prime} = \left[\sigma_{1 1}^{\prime}, \sigma_{2 2}^{\prime}, \sigma_{3 3}^{\prime}, \tau_{1 2}, \tau_{1 3}, \tau_{2 3}\right]^T\f]
          */
-        Eigen::VectorXd sigma_prime_v;
+        Eigen::VectorXd sigma_prime_tilde;
 
         /** 
          * @brief Effective stress tensor:
-         * \f[ \sigma_{i j}^{\prime} = 
+         * \f[  \boldsymbol{\sigma}^{\prime} = 
          *      \left[\begin{array}{lll}
          *      \sigma_{1 1}^{\prime} & \tau_{1 2} & \tau_{1 3} \\
          *      \tau_{2 1} & \sigma_{2 2}^{\prime} & \tau_{2 3} \\
@@ -325,8 +362,8 @@ class Model {
 
         /** 
          * @brief Total stress tensor:
-         *  \f[ \sigma_{i j}=\sigma_{i j}^{\prime}+u\delta_{i j} \f]
-         * where \f$ u \f$ is the pore pressure and \f$ \delta_{i j} \f$ is the Kronecker delta.
+         *  \f[  \boldsymbol{\sigma}= \boldsymbol{\sigma}^{\prime}+u\mathbf{I} \f]
+         * where \f$ u \f$ is the pore pressure and \f$ \mathbf{I} \f$ is the identity matrix.
          */
         Eigen::Matrix3d sigma;
 
@@ -337,13 +374,13 @@ class Model {
 
         /** 
          * @brief Strain increment in Voigt notation:
-         * \f[ \Delta \epsilon = \left[\Delta \epsilon_{1 1}, \Delta \epsilon_{2 2}, \Delta \epsilon_{3 3}, \Delta \epsilon_{1 2}, \Delta \epsilon_{1 3}, \Delta \epsilon_{2 3}\right]^T\f]. 
+         * \f[ \Delta \tilde{\epsilon} = \left[\Delta \epsilon_{1 1}, \Delta \epsilon_{2 2}, \Delta \epsilon_{3 3}, \Delta \epsilon_{1 2}, \Delta \epsilon_{1 3}, \Delta \epsilon_{2 3}\right]^T\f]. 
          */
-        Eigen::VectorXd delta_epsilon_v;
+        Eigen::VectorXd delta_epsilon_tilde;
 
         /** 
          * @brief Strain increment tensor:
-         * \f[ \Delta \epsilon_{i j} = 
+         * \f[ \Delta \boldsymbol{\epsilon} = 
          *      \left[\begin{array}{lll}
          *      \Delta \epsilon_{1 1} & \Delta \epsilon_{1 2} & \Delta \epsilon_{1 3} \\
          *      \Delta \epsilon_{2 1} & \Delta \epsilon_{2 2} & \Delta \epsilon_{2 3} \\
@@ -353,17 +390,29 @@ class Model {
          * and  \f$ \Delta \epsilon_{1 2} \f$, \f$ \Delta \epsilon_{1 3} \f$ and \f$ \Delta \epsilon_{2 3} \f$ are the shear strain increments, respectively. 
          */
         Eigen::Matrix3d delta_epsilon;
+
+        /** 
+         * @brief Volumetric strain increment tensor:
+         * \f[ \Delta \boldsymbol{\epsilon}_{vol} = 
+         *      \left[\begin{array}{lll}
+         *      \Delta \epsilon_{vol} & 0 & 0 \\
+         *      0 & \Delta \epsilon_{vol} & 0 \\
+         *      0 & 0 & \Delta \epsilon_{vol}
+         *      \end{array}\right] \f]
+         * where \f$ \Delta \epsilon_{vol} \f$ is the volumetric strain increment. 
+         */
+        Eigen::Matrix3d delta_epsilon_vol;
         
         /** 
-         * @brief Kronecker delta tensor:
-         * \f[ \delta_{i j} = 
+         * @brief Identity matrix:
+         * \f[ \mathbf{I} = 
          *      \left[\begin{array}{lll}
          *      1 & 0 & 0 \\
          *      0 & 1 & 0 \\
          *      0 & 0 & 1
          *      \end{array}\right] \f] 
          */
-        Eigen::Matrix3d delta {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+        Eigen::Matrix3d eye {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
          
         /** 
          * @brief Pore pressure. Computed for undrained (bulk modulus) approach, otherwise provided as a state variable.
@@ -426,8 +475,8 @@ class Model {
         double q; 
 
         /** 
-         * @brief Principal stress tensor \f$ S_{i j} \f$: 
-         * \f[ S_{i j} = 
+         * @brief Principal stress tensor \f$ \mathbf{S} \f$: 
+         * \f[ \mathbf{S} = 
          *      \left[\begin{array}{lll}
          *      \sigma_{1} & 0 & 0 \\
          *      0 & \sigma_{2} & 0 \\

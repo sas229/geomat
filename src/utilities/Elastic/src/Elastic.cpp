@@ -1,6 +1,6 @@
 #include "Elastic.hpp"
 
-void Elastic::compute_isotropic_linear_elastic_matrix(void) {
+void Elastic::compute_isotropic_linear_elastic_matrix(double E, double nu, Eigen::Matrix<double, 6, 6> &D_e) {
     // Check elastic paramaters are initialised.
     PLOG_ERROR_IF(std::isnan(E)) << "Young's modulus, E, not initialised.";
     PLOG_ERROR_IF(std::isnan(nu)) << "Poisson's ratio, nu, not initialised.";
@@ -14,7 +14,7 @@ void Elastic::compute_isotropic_linear_elastic_matrix(void) {
     PLOG_INFO << "Isotropic linear elastic matrix computed.";
 }
 
-void Elastic::compute_anisotropic_linear_elastic_matrix(void) {
+void Elastic::compute_anisotropic_linear_elastic_matrix(double E_h, double E_v, double G_h, double nu_v, double nu_h, Eigen::Matrix<double, 6, 6> &D_e) {
     // Check elastic paramaters are initialised.
     PLOG_ERROR_IF(std::isnan(E_h)) << "Young's modulus in vertical direction, E_h, not initialised.";
     PLOG_ERROR_IF(std::isnan(E_v)) << "Young's modulus in horizontal direction, E_v, not initialised.";
@@ -33,7 +33,7 @@ void Elastic::compute_anisotropic_linear_elastic_matrix(void) {
     PLOG_INFO << "Anisotropic linear elastic matrix computed.";
 }
 
-void Elastic::compute_simplified_anisotropic_linear_elastic_matrix(void) {
+void Elastic::compute_simplified_anisotropic_linear_elastic_matrix(double alpha, double E_v, double nu_h, Eigen::Matrix<double, 6, 6> &D_e) {
     // Check elastic paramaters are initialised.
     PLOG_ERROR_IF(std::isnan(alpha)) << "Square root of ratio of Young's moduli, alpha, not initialised.";
     PLOG_ERROR_IF(std::isnan(E_v)) << "Young's modulus in horizontal direction, E_v, not initialised.";
@@ -49,6 +49,18 @@ void Elastic::compute_simplified_anisotropic_linear_elastic_matrix(void) {
     D_e(3,3) = D_e(4,4) += C*2.0*(1.0+nu_h)/alpha;
     D_e(5,5) = C*2.0*(1.0+nu_h)/std::pow(alpha,2);
     PLOG_INFO << "Simplified anisotropic linear elastic matrix computed.";
+}
+
+void Elastic::update_isotropic_linear_elastic_matrix(void) {
+    Elastic::compute_isotropic_linear_elastic_matrix(this->E, this->nu, this->D_e);
+}
+
+void Elastic::update_anisotropic_linear_elastic_matrix(void) {
+    Elastic::compute_anisotropic_linear_elastic_matrix(this->E_h, this->E_v, this->G_h, this->nu_h, this->nu_v, this->D_e);
+}
+
+void Elastic::update_simplified_anisotropic_linear_elastic_matrix(void) {
+    Elastic::compute_simplified_anisotropic_linear_elastic_matrix(this->alpha, this->E_v, this->nu_h, this->D_e);
 }
 
 Eigen::Matrix<double, 6, 6> Elastic::get_elastic_matrix(void) {

@@ -20,25 +20,40 @@ void Model::set_jacobian(Eigen::MatrixXd m) {
 
 void Model::set_sigma_prime(Eigen::VectorXd sigma_prime) {
     // Stress in Voigt notation form - change sign to use compression positive soil mechanics convention.
-    this->sigma_prime_v = -sigma_prime;
+    this->sigma_prime_tilde = -sigma_prime;
     
     // Assemble stress tensor for invariant calculation.
-    this->sigma_prime(0,0) = this->sigma_prime_v(0);
-    this->sigma_prime(1,1) = this->sigma_prime_v(1);
-    this->sigma_prime(2,2) = this->sigma_prime_v(2);
+    this->sigma_prime(0,0) = this->sigma_prime_tilde(0);
+    this->sigma_prime(1,1) = this->sigma_prime_tilde(1);
+    this->sigma_prime(2,2) = this->sigma_prime_tilde(2);
     // The ordering for the terms below is specific to Abaqus. 
     // Consider something more conventional by adding an interface to 
     // convert for Abaqus usage.
-    this->sigma_prime(0,1) = this->sigma_prime(1,0) = this->sigma_prime_v(3); 
-    this->sigma_prime(0,2) = this->sigma_prime(2,0) = this->sigma_prime_v(4);
-    this->sigma_prime(1,2) = this->sigma_prime(2,1) = this->sigma_prime_v(5);
+    this->sigma_prime(0,1) = this->sigma_prime(1,0) = this->sigma_prime_tilde(3); 
+    this->sigma_prime(0,2) = this->sigma_prime(2,0) = this->sigma_prime_tilde(4);
+    this->sigma_prime(1,2) = this->sigma_prime(2,1) = this->sigma_prime_tilde(5);
 
     // Total stresses given pore pressure, u.
-    this->sigma = (this->sigma_prime.array() + (this->delta.array()*this->u)).matrix();
+    update_sigma();
 }
 
-void Model::set_strain_increment(Eigen::VectorXd strain_increment) {
-    this->delta_epsilon_v = -strain_increment;
+void Model::set_strain_increment(Eigen::VectorXd delta_epsilon) {
+    // Strain increment in Voigt notation form - change sign to use compression positive soil mechanics convention.
+    this->delta_epsilon_tilde = -delta_epsilon;
+
+    // Assemble strain tensor for invariant calculation.
+    this->delta_epsilon(0,0) = this->delta_epsilon_tilde(0);
+    this->delta_epsilon(1,1) = this->delta_epsilon_tilde(1);
+    this->delta_epsilon(2,2) = this->delta_epsilon_tilde(2);
+    // The ordering for the terms below is specific to Abaqus. 
+    // Consider something more conventional by adding an interface to 
+    // convert for Abaqus usage.
+    this->delta_epsilon(0,1) = this->delta_epsilon(1,0) = this->delta_epsilon_tilde(3); 
+    this->delta_epsilon(0,2) = this->delta_epsilon(2,0) = this->delta_epsilon_tilde(4);
+    this->delta_epsilon(1,2) = this->delta_epsilon(2,1) = this->delta_epsilon_tilde(5);
+
+    // Volumetric and deviatoric strain increments.
+
 }
 
 // Getters.
@@ -57,7 +72,7 @@ int Model::get_n_state_variables(void) {
 
 Eigen::VectorXd Model::get_sigma_prime(void) {
     // Change sign back to tension positive sign convention.
-    return -sigma_prime_v;
+    return -sigma_prime_tilde;
 }
 
 Eigen::MatrixXd Model::get_jacobian(void) {
@@ -72,6 +87,10 @@ std::vector<double> Model::get_state_variables(void) {
 
 Eigen::Matrix3d Model::compute_cartesian_stresses(Eigen::Matrix3d T, Eigen::Matrix3d S) {
     return T*S*T.transpose();
+}
+
+Eigen::Matrix3d Model::compute_delta_epsilon_vol(Eigen::Matrix3d delta_epsilon) {
+    return eye.array()*delta_epsilon.trace();
 }
 
 void Model::compute_lode(double J_2, double J_3, double &theta_c, double &theta_s, double &theta_s_bar) {
@@ -115,15 +134,19 @@ void Model::compute_principal_stresses(Eigen::Matrix3d sigma_prime, double &sigm
     T = es.eigenvectors().real();
 }
 
-double Model::compute_q(Eigen::Matrix3d _sigma) {
+double Model::compute_q(Eigen::Matrix3d sigma) {
     double q = std::sqrt(1.0/2.0*(
-        (std::pow((_sigma(0,0)-_sigma(1,1)),2) + std::pow((_sigma(1,1)-_sigma(2,2)),2) + std::pow((_sigma(2,2)-_sigma(0,0)),2)) 
-        + 6.0*(std::pow(_sigma(0,1),2) + std::pow(_sigma(0,2),2) + std::pow(_sigma(1,2),2))));
+        (std::pow((sigma(0,0)-sigma(1,1)),2) + std::pow((sigma(1,1)-sigma(2,2)),2) + std::pow((sigma(2,2)-sigma(0,0)),2)) 
+        + 6.0*(std::pow(sigma(0,1),2) + std::pow(sigma(0,2),2) + std::pow(sigma(1,2),2))));
     return q;
 }
 
-Eigen::Matrix3d Model::compute_s(Eigen::Matrix3d _sigma, double _p) {
-    return (_sigma.array()-(delta.array()*_p)).matrix();
+Eigen::Matrix3d Model::compute_s(Eigen::Matrix3d sigma, double _p) {
+    return (sigma.array()-(eye.array()*_p)).matrix();
+}
+
+Eigen::Matrix3d Model::compute_sigma(Eigen::Matrix3d sigma_prime, double u) {
+    return (sigma_prime.array() + (eye.array()*u)).matrix();
 }
 
 void Model::compute_stress_invariants(Eigen::Matrix3d sigma, double &I_1, double &I_2, double &I_3, double &J_1, double &J_2, double &J_3) {
@@ -148,6 +171,10 @@ void Model::compute_stress_invariants(Eigen::Matrix3d sigma, double &I_1, double
 
 void Model::update_cartesian_stresses(void) {
     this->sigma = Model::compute_cartesian_stresses(this->T, this->S);
+}
+
+void Model::update_delta_epsilon_vol(void) {
+    this->delta_epsilon_vol = Model::compute_delta_epsilon_vol(this->delta_epsilon);
 }
 
 void Model::update_lode(void) {
@@ -180,6 +207,10 @@ void Model::update_q(void) {
 
 void Model::update_s(void) {
     Model::compute_s(this->sigma, this->p);
+}
+
+void Model::update_sigma(void) {
+    Model::compute_sigma(this->sigma_prime, this->u);
 }
 
 void Model::update_stress_invariants(void) {

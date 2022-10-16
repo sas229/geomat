@@ -9,17 +9,26 @@ class SMCC : public Model{
 
     public: 
 
-        /** @brief SMCC model constructor. */
+        /** 
+         * @brief SMCC model constructor. 
+         */
         SMCC();
-        /** @brief SMCC model destructor. */
+
+        /** 
+         * @brief SMCC model destructor. 
+         */
         virtual ~SMCC() {}
 
-        /** @brief Method to set state variables. */
-        void set_state_variables(std::vector<double> s);
+        /** 
+         * @brief Method to set state variables. 
+         */
+        void set_state_variables(std::vector<double> state);
         
     protected:
 
-        /** @brief State variable: lambda_star. */
+        /** 
+         * @brief State variable: lambda_star. 
+         */
         double lambda_star;
         
 };
