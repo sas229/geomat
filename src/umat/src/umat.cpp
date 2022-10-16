@@ -10,16 +10,6 @@ bool first_call = true;
  */
 std::unique_ptr<Model> model;
 
-/** 
- * @brief Eigen vector with six indices. 
- */
-typedef Eigen::Vector<double, 6> Vector6d;
-
-/** 
- * @brief Eigen vector with six indices. 
- */
-typedef Eigen::Matrix<double, 6, 6> Matrix6d;
-
 extern "C" void umat(
     double *stress,
     double *statev,
@@ -102,6 +92,12 @@ extern "C" void umat(
     model->compute_lode(850.0, 9000.0, c, s, s_bar);
     model->update_lode();
     
+    // Custom Tensor class test. Needs to be extended for 6x6 as well as 3x3.
+    Tensor stress_tensor_test = Tensor::Zero();
+    stress_tensor_test(1,1) = 200;
+    std::cout << stress_tensor_test << "\n";
+    std::cout << stress_tensor_test.voigt() << "\n";
+
     // Do some work with it... (i.e. stress integration).
     
     // model->solve()

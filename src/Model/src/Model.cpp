@@ -14,11 +14,11 @@ void Model::set_n_state_variables(int i) {
     n_state_variables = i;
 }
 
-void Model::set_jacobian(Eigen::MatrixXd m) {
+void Model::set_jacobian(Eigen::Matrix3d m) {
     jacobian = m;
 }
 
-void Model::set_sigma_prime(Eigen::VectorXd sigma_prime) {
+void Model::set_sigma_prime(Vector6d sigma_prime) {
     // Stress in Voigt notation form - change sign to use compression positive soil mechanics convention.
     this->sigma_prime_tilde = -sigma_prime;
     
@@ -37,7 +37,7 @@ void Model::set_sigma_prime(Eigen::VectorXd sigma_prime) {
     update_sigma();
 }
 
-void Model::set_strain_increment(Eigen::VectorXd delta_epsilon) {
+void Model::set_strain_increment(Vector6d delta_epsilon) {
     // Strain increment in Voigt notation form - change sign to use compression positive soil mechanics convention.
     this->delta_epsilon_tilde = -delta_epsilon;
 
@@ -70,12 +70,12 @@ int Model::get_n_state_variables(void) {
     return n_state_variables;
 }
 
-Eigen::VectorXd Model::get_sigma_prime(void) {
+Vector6d Model::get_sigma_prime(void) {
     // Change sign back to tension positive sign convention.
     return -sigma_prime_tilde;
 }
 
-Eigen::MatrixXd Model::get_jacobian(void) {
+Eigen::Matrix3d Model::get_jacobian(void) {
     return jacobian;
 }
 
@@ -85,11 +85,11 @@ std::vector<double> Model::get_state_variables(void) {
 
 // Computers.
 
-Eigen::Matrix3d Model::compute_cartesian_stresses(Eigen::Matrix3d T, Eigen::Matrix3d S) {
+Tensor Model::compute_cartesian_stresses(Tensor T, Tensor S) {
     return T*S*T.transpose();
 }
 
-Eigen::Matrix3d Model::compute_delta_epsilon_vol(Eigen::Matrix3d delta_epsilon) {
+Tensor Model::compute_delta_epsilon_vol(Tensor delta_epsilon) {
     return delta_epsilon.trace()*eye;
 }
 
@@ -107,21 +107,23 @@ double Model::compute_mises_stress(double J_2) {
     return std::sqrt(3.0*J_2);
 }
 
-double Model::compute_p(Eigen::Matrix3d sigma) {
+double Model::compute_p(Tensor sigma) {
     return 1.0/3.0*sigma.trace();
 }
 
-double Model::compute_p_prime(Eigen::Matrix3d sigma_prime) {
+double Model::compute_p_prime(Tensor sigma_prime) {
     return Model::compute_p(sigma_prime);
 }
 
-void Model::compute_principal_stresses(Eigen::Matrix3d sigma_prime, double &sigma_1, double &sigma_2, double &sigma_3, Eigen::Matrix3d &S, Eigen::Matrix3d &T) {
+void Model::compute_principal_stresses(Tensor sigma_prime, double &sigma_1, double &sigma_2, double &sigma_3, Tensor &S, Tensor &T) {
     // Solve eigenvalues and eigevectors..
     Eigen::EigenSolver<Eigen::MatrixXd> es(sigma_prime);
         
     // Principal stress magnitudes.
     Eigen::Vector3d principal_stresses = es.eigenvalues().real();
-    S = principal_stresses.asDiagonal();
+    S(0,0) = principal_stresses(0);
+    S(1,1) = principal_stresses(1);
+    S(2,2) = principal_stresses(2);
 
     // Sort principal stresses to allocate major, intermediate and minor appropriately.
     Eigen::Vector3d ordered_principal {principal_stresses.data()};
@@ -134,22 +136,22 @@ void Model::compute_principal_stresses(Eigen::Matrix3d sigma_prime, double &sigm
     T = es.eigenvectors().real();
 }
 
-double Model::compute_q(Eigen::Matrix3d sigma) {
+double Model::compute_q(Tensor sigma) {
     double q = std::sqrt(1.0/2.0*(
         (std::pow((sigma(0,0)-sigma(1,1)),2) + std::pow((sigma(1,1)-sigma(2,2)),2) + std::pow((sigma(2,2)-sigma(0,0)),2)) 
         + 6.0*(std::pow(sigma(0,1),2) + std::pow(sigma(0,2),2) + std::pow(sigma(1,2),2))));
     return q;
 }
 
-Eigen::Matrix3d Model::compute_s(Eigen::Matrix3d sigma, double p) {
+Tensor Model::compute_s(Tensor sigma, double p) {
     return sigma - p*eye;
 }
 
-Eigen::Matrix3d Model::compute_sigma(Eigen::Matrix3d sigma_prime, double u) {
+Tensor Model::compute_sigma(Tensor sigma_prime, double u) {
     return sigma_prime + u*eye;
 }
 
-void Model::compute_stress_invariants(Eigen::Matrix3d sigma, double &I_1, double &I_2, double &I_3, double &J_1, double &J_2, double &J_3) {
+void Model::compute_stress_invariants(Tensor sigma, double &I_1, double &I_2, double &I_3, double &J_1, double &J_2, double &J_3) {
     // Stress invariants.
     I_1 = sigma.trace();
     I_2 = 1.0/2.0*(std::pow(sigma.trace(),2) - (sigma.cwiseProduct(sigma)).trace());
@@ -159,7 +161,7 @@ void Model::compute_stress_invariants(Eigen::Matrix3d sigma, double &I_1, double
     double p = compute_p_prime(sigma);
     
     // Deviatoric stress tensor, s.
-    Eigen::Matrix3d s = compute_s(sigma, p);
+    Tensor s = compute_s(sigma, p);
 
     // Deviatoric stress invariants.
     J_1 = s.trace(); // Is always zero...

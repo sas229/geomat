@@ -12,6 +12,7 @@
 #include <plog/Log.h>
 #include <plog/Initializers/RollingFileInitializer.h>
 
+#include "Tensor.hpp"
 #include "Model.hpp"
 #include "MCC.hpp"
 #include "SMCC.hpp"
