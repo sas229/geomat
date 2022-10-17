@@ -48,6 +48,18 @@ extern "C" void umat(
     int *kspt,
     int *kstep,
     int *kinc) {   
+    // Create maps to data.
+    Eigen::Map<Vector6d> map_to_stress(stress);
+    Eigen::Map<Vector6d> map_to_strain_increment(dstran);
+    Eigen::Map<Eigen::Matrix3d> map_to_jacobian(ddsdde);
+    std::vector<double> state(statev, statev+*nstatv);
+    std::vector<double> parameters(props, props+*nprops);
+
+    // Create a native Eigen type using the map as initialisation.
+    Voigt Eigen_sigma = map_to_stress;
+    Voigt Eigen_dstran = map_to_strain_increment;
+    Eigen::Matrix3d Eigen_jacobian = map_to_jacobian;
+
     // On first call, initialise logger and instantiate model.
     if (first_call) {
         // Initialise logger.
@@ -59,52 +71,39 @@ extern "C" void umat(
         PLOG_INFO << *ndi << "D problem defined with " << *ntens << " stress variables.";
         PLOG_INFO << "Attempting to instantiate " << cmname << " model.";
         if (strcmp(cmname, "MCC") == 0) {
-            model.reset(new MCC);   
+            model.reset(new MCC(parameters, state));   
         } else if (strcmp(cmname, "SMCC") == 0) {
             model.reset(new SMCC);    
         } else {
             PLOG_FATAL << "Model name given not implemented. Check name given in CAE / input file.";
+            assert(true);
         }
         first_call = false;
     } 
 
-    // Create maps to data.
-    Eigen::Map<Vector6d> map_to_stress(stress);
-    Eigen::Map<Eigen::Matrix3d> map_to_jacobian(ddsdde);
-    std::vector<double> state(statev, statev+*nstatv);
-    std::vector<double> parameters(props, props+*nprops);
-
-    // Create a native Eigen type using the map as initialisation.
-    Vector6d Eigen_sigma = map_to_stress;
-    Eigen::Matrix3d Eigen_jacobian = map_to_jacobian;
-
-    // Set variables within model.
-    model->set_parameters(parameters);
-    
+    // Set variables within model.    
     model->set_sigma_prime(Eigen_sigma);
+    model->set_strain_increment(Eigen_dstran);
     model->set_jacobian(Eigen_jacobian);
-
-    model->set_state_variables(state);
 
     model->update_stress_invariants();
     model->update_principal_stresses();
     double c, s, s_bar;
     model->compute_lode(850.0, 9000.0, c, s, s_bar);
     model->update_lode();
-    
-    // Custom Tensor class test. Needs to be extended for 6x6 as well as 3x3.
-    Tensor stress_tensor_test = Tensor::Zero();
-    stress_tensor_test(1,1) = 200;
-    std::cout << stress_tensor_test << "\n";
-    std::cout << stress_tensor_test.voigt() << "\n";
 
     // Do some work with it... (i.e. stress integration).
     
-    // model->solve()
+    model->solve();
 
     // Equate map to updated variable in order to map back to input variable.
     map_to_stress = model->get_sigma_prime();
     map_to_jacobian = model->get_jacobian();
-    state = model->get_state_variables();
     statev = state.data();
+    std::cout << "Updated stress after sign change:\n" << map_to_stress << "\n";
+    std::cout << "From C array:\n";
+    for (auto i=0; i<6; i++) {
+        std::cout << stress[i] << "\n";
+    }
+    std::cout << "statev[0]: " << statev[0] << "\n";
 }

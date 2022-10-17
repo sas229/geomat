@@ -6,13 +6,14 @@
 #include <vector>
 #include <typeinfo>
 #include <memory>
+#include <cassert>
 
 #include <Eigen/Eigen>
 
 #include <plog/Log.h>
 #include <plog/Initializers/RollingFileInitializer.h>
 
-#include "Tensor.hpp"
+#include "Types.hpp"
 #include "Model.hpp"
 #include "MCC.hpp"
 #include "SMCC.hpp"

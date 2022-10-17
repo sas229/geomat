@@ -6,7 +6,7 @@
 #include <string>
 #include <plog/Log.h>
 #include <Eigen/Eigen>
-#include "Tensor.hpp"
+#include "Types.hpp"
 
 /** @brief The Model class contains methods and attributes that are common to all genera of constitutive model. 
  * The Model class is the base class from which all constitutive models are derived. */
@@ -25,24 +25,14 @@ class Model {
         void set_jacobian(Eigen::Matrix3d j);
 
         /** 
-         * @brief Virtual method to set model parameters. 
-         */
-        virtual void set_parameters(std::vector<double> s) {};
-
-        /** 
          * @brief Method to set effective stress tensor in Voigt notation. 
          */
-        void set_sigma_prime(Vector6d s);
-
-        /** 
-         * @brief Virtual method to set state variables. 
-         */
-        virtual void set_state_variables(std::vector<double> s) {};
+        void set_sigma_prime(Voigt s);
 
         /** 
          * @brief Method to set strain increment in Voigt notation. 
          */
-        void set_strain_increment(Vector6d s);
+        void set_strain_increment(Voigt delta_epsilon);
         
         // Getters.
 
@@ -54,17 +44,17 @@ class Model {
         /** 
          * @brief Method to get effective stress tensor in Voigt notation. 
          */
-        Vector6d get_sigma_prime(void);
-        
-        /** 
-         * @brief Method to get state variables. 
-         */
-        std::vector<double> get_state_variables(void);
+        Voigt get_sigma_prime(void);
 
         /** 
          * @brief Method to get strain increment in Voigt notation.
          */
-        Vector6d get_strain_increment(void);
+        Voigt get_strain_increment(void);
+
+        /**
+         * @brief Method to solve stress increment given the current strain increment.
+         */
+        virtual void solve(void) {};
 
     // protected:
 
@@ -73,22 +63,10 @@ class Model {
         /** @brief Method to set name of model. */
         void set_name(std::string name);
 
-        /** @brief Method to set number of model parameters. */
-        void set_n_parameters(int i);
-        
-        /** @brief Method to set number of state variables. */
-        void set_n_state_variables(int i);
-
         // Getters.
 
         /** @brief Method to get name of model. */
         std::string get_name(void);
-        
-        /** @brief Method to get number of model parameters. */
-        int get_n_parameters(void);
-        
-        /** @brief Method to get number of state variables. */
-        int get_n_state_variables(void);
 
         // Computers.
 
@@ -101,7 +79,7 @@ class Model {
          * @param[in] S Principal stress tensor.
          * @returns Cartesian stress tensor.
          */
-        Tensor compute_cartesian_stresses(Tensor T, Tensor S);
+        Cauchy compute_cartesian_stresses(Cauchy T, Cauchy S);
 
         /** 
          * @brief Method to compute the volumetric strain increment tensor:
@@ -116,7 +94,7 @@ class Model {
          * \f[ \Delta \epsilon_{vol} = \operatorname{tr} \left( \boldsymbol{\Delta \epsilon} \right)\f] 
          * where \f$ \boldsymbol{\Delta \epsilon} \f$ is the strain increment tensor. 
          */
-        Tensor compute_delta_epsilon_vol(Tensor delta_epsilon);
+        Cauchy compute_delta_epsilon_vol(Cauchy delta_epsilon);
 
         /** 
          * @brief Function to compute Lode's angle with cosine definition \f$ \theta_c \f$ as:
@@ -165,7 +143,7 @@ class Model {
          * @param[in] sigma Total stress tensor.
          * @returns Mean stress.
          */
-        double compute_p(Tensor sigma);
+        double compute_p(Cauchy sigma);
 
         /** 
          * @brief Mean effective stress calculated via:
@@ -175,7 +153,7 @@ class Model {
          * @param[in] sigma_prime Effective stress tensor.
          * @returns Mean effective stress.
          */
-        double compute_p_prime(Tensor sigma_prime);
+        double compute_p_prime(Cauchy sigma_prime);
 
         /** 
          * @brief Method to compute the principal stresses and directions. The principal stresses
@@ -197,7 +175,7 @@ class Model {
          * @param[out] S Principal stress tensor.
          * @param[out] T Principal stress direction tensor. 
          */
-        void compute_principal_stresses(Tensor sigma_prime, double &sigma_1, double &sigma_2, double &sigma_3, Tensor &S, Tensor &T);
+        void compute_principal_stresses(Cauchy sigma_prime, double &sigma_1, double &sigma_2, double &sigma_3, Cauchy &S, Cauchy &T);
 
         /** 
          * @brief Function to compute the deviatoric stress via:
@@ -213,7 +191,7 @@ class Model {
          * @param[in] sigma
          * @returns Deviatoric stress. 
          */
-        double compute_q(Tensor sigma);
+        double compute_q(Cauchy sigma);
 
         /** 
          * @brief Function to compute the deviatoric stress tensor as: 
@@ -224,7 +202,7 @@ class Model {
          * @param[in] p Mean stress.
          * @returns Deviatoric stress tensor.
          */
-        Tensor compute_s(Tensor sigma, double p);
+        Cauchy compute_s(Cauchy sigma, double p);
 
         /** 
          * @brief Function to compute the total stress tensor as: 
@@ -236,7 +214,7 @@ class Model {
          * @param[in] u Pore pressure.
          * @returns Total stress tensor.
          */
-        Tensor compute_sigma(Tensor sigma_prime, double u);
+        Cauchy compute_sigma(Cauchy sigma_prime, double u);
 
         /** @brief Method to compute the stress invariants. The first, second and third stress invariants 
          * \f$ I_1 \f$, \f$ I_2 \f$ and \f$ I_3 \f$ are calculated as:
@@ -258,7 +236,7 @@ class Model {
          * @param[out] J_2 Second deviatoric stress invariant.
          * @param[out] J_3 Third deviatoric stress invariant.
          */
-        void compute_stress_invariants(Tensor sigma, double &I_1, double &I_2, double &I_3, double &J_1, double &J_2, double &J_3);
+        void compute_stress_invariants(Cauchy sigma, double &I_1, double &I_2, double &I_3, double &J_1, double &J_2, double &J_3);
 
         //  Updaters.
         
@@ -346,7 +324,7 @@ class Model {
          * @brief Effective stress in Voigt notation:
          * \f[ \boldsymbol{\tilde{\sigma}}^{\prime} = \left[\sigma_{1 1}^{\prime}, \sigma_{2 2}^{\prime}, \sigma_{3 3}^{\prime}, \tau_{1 2}, \tau_{1 3}, \tau_{2 3}\right]^T\f]
          */
-        Vector6d sigma_prime_tilde;
+        Voigt sigma_prime_tilde;
 
         /** 
          * @brief Effective stress tensor:
@@ -359,25 +337,25 @@ class Model {
          * where \f$ \sigma_{1 1}^{\prime} \f$, \f$ \sigma_{2 2}^{\prime} \f$ and \f$ \sigma_{3 3}^{\prime} \f$ are the effective axial stresses, 
          * and  \f$ \tau_{1 2} \f$, \f$ \tau_{1 3} \f$ and \f$ \tau_{2 3} \f$ are the shear streses, respectively. 
          */
-        Tensor sigma_prime = Tensor::Zero();
+        Cauchy sigma_prime = Cauchy::Zero();
 
         /** 
          * @brief Total stress tensor:
          *  \f[  \boldsymbol{\sigma}= \boldsymbol{\sigma}^{\prime}+u\mathbf{I} \f]
          * where \f$ u \f$ is the pore pressure and \f$ \mathbf{I} \f$ is the identity matrix.
          */
-        Tensor sigma = Tensor::Zero();
+        Cauchy sigma = Cauchy::Zero();
 
         /** 
          * @brief Deviatoric stress tensor. 
          */
-        Tensor s = Tensor::Zero();
+        Cauchy s = Cauchy::Zero();
 
         /** 
          * @brief Strain increment in Voigt notation:
          * \f[ \Delta \tilde{\epsilon} = \left[\Delta \epsilon_{1 1}, \Delta \epsilon_{2 2}, \Delta \epsilon_{3 3}, \Delta \epsilon_{1 2}, \Delta \epsilon_{1 3}, \Delta \epsilon_{2 3}\right]^T\f]. 
          */
-        Vector6d delta_epsilon_tilde;
+        Voigt delta_epsilon_tilde;
 
         /** 
          * @brief Strain increment tensor:
@@ -390,7 +368,7 @@ class Model {
          * where \f$ \Delta \epsilon_{1 1} \f$, \f$ \Delta \epsilon_{2 2} \f$ and \f$ \Delta \epsilon_{3 3} \f$ are the axial strain increments, 
          * and  \f$ \Delta \epsilon_{1 2} \f$, \f$ \Delta \epsilon_{1 3} \f$ and \f$ \Delta \epsilon_{2 3} \f$ are the shear strain increments, respectively. 
          */
-        Tensor delta_epsilon = Tensor::Zero();
+        Cauchy delta_epsilon = Cauchy::Zero();
 
         /** 
          * @brief Volumetric strain increment tensor:
@@ -402,7 +380,7 @@ class Model {
          *      \end{array}\right] \f]
          * where \f$ \Delta \epsilon_{vol} \f$ is the volumetric strain increment. 
          */
-        Tensor delta_epsilon_vol;
+        Cauchy delta_epsilon_vol;
         
         /** 
          * @brief Identity matrix:
@@ -425,10 +403,10 @@ class Model {
          */
         Eigen::Matrix3d jacobian;
 
-        /** 
-         * @brief Array of state variables. 
-         */
-        std::vector<double> state;
+        // /** 
+        //  * @brief Array of state variables. 
+        //  */
+        // std::vector<double> &state;
         
         /** 
          * @brief First stress invariant.
@@ -485,7 +463,7 @@ class Model {
          *      \end{array}\right] \f]
          * where \f$ \sigma_1 \f$, \f$ \sigma_2 \f$ and \f$ \sigma_3 \f$ are the major, intermediate and minor principal stresses, respectively. 
          */
-        Tensor S = Tensor::Zero();
+        Cauchy S = Cauchy::Zero();
 
         /** 
          * @brief Major principal stress. 
@@ -505,7 +483,7 @@ class Model {
         /** 
          * @brief Principal stress directions tensor \f$ T_{i j} \f$. 
          */
-        Tensor T = Tensor::Zero();
+        Cauchy T = Cauchy::Zero();
 
         /** 
          * @brief Mises stress:

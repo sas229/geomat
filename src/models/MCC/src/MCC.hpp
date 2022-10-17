@@ -3,7 +3,9 @@
 
 #include <plog/Log.h>
 #include <Eigen/Eigen>
+#include <cassert>
 #include "Model.hpp"
+#include "Types.hpp"
 #include "Elastic.hpp"
 
 class MCC : public Model, public Elastic {
@@ -13,44 +15,76 @@ class MCC : public Model, public Elastic {
         /** 
          * @brief MCC model constructor. 
          */
-        MCC();
+        MCC(std::vector<double> parameters, std::vector<double> state);
 
         /** 
          * @brief MCC model destructor. 
          */
         virtual ~MCC() {}
-        
-        /** 
-         * @brief Method to set the model parameters. 
-         */
-        void set_parameters(std::vector<double> parameters);
 
-        /** 
-         * @brief Method to set state variables. 
+        /**
+         * @brief Compute the current value of the yield surface function.
+         * 
+         * @return f
          */
-        void set_state_variables(std::vector<double> state);
+        double compute_f(Cauchy sigma_prime);
+
+        /**
+         * @brief Method to solve stress increment given the current strain increment.
+         */
+        void solve(void);
 
     protected:
+
+        /** 
+         * @brief Elastic matrix. 
+         */
+        Constitutive D_e = Constitutive::Zero();
+        
+        /** 
+         * @brief Parameters. 
+         */
+        std::vector<double> parameters {0.0, 0.0, 0.0, 0.0, 0.0};
+
+        /** 
+         * @brief State variables. 
+         */
+        std::vector<double> state {0.0, 0.0};
     
         /** 
          * @brief Parameter: frictional constant. 
          */
-        double M;
+        const double &M = parameters[0];
+        
+        /** 
+         * @brief Parameter: Poisson's ratio. 
+         */
+        const double &nu = parameters[1];
 
         /** 
-         * @brief State variable: intercept of NCL. 
+         * @brief Parameter: intercept of NCL. 
          */
-        double N;
+        const double &N = parameters[2];
 
         /** 
          * @brief Parameter: slope of the NCL in ln(e)-ln(p') space. 
          */
-        double lambda_star;
+        const double &lambda_star = parameters[3];
 
         /** 
          * @brief Parameter: slope of the RCL in ln(e)-ln(p') space. 
          */
-        double kappa_star;
+        const double &kappa_star = parameters[4];
+
+        /** 
+         * @brief State variable: voids ratio. 
+         */
+        double &e  = state[0];
+
+        /** 
+         * @brief State variable: preconsolidation pressure. 
+         */
+        double &p_c = state[1];
 
 };
 

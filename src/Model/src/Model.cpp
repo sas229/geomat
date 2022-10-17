@@ -6,54 +6,30 @@ void Model::set_name(std::string s) {
     name = s;
 }
 
-void Model::set_n_parameters(int i) {
-    n_parameters = i;
-}
-
-void Model::set_n_state_variables(int i) {
-    n_state_variables = i;
-}
-
 void Model::set_jacobian(Eigen::Matrix3d m) {
     jacobian = m;
 }
 
-void Model::set_sigma_prime(Vector6d sigma_prime) {
+void Model::set_sigma_prime(Voigt sigma_prime) {
     // Stress in Voigt notation form - change sign to use compression positive soil mechanics convention.
     this->sigma_prime_tilde = -sigma_prime;
-    
-    // Assemble stress tensor for invariant calculation.
-    this->sigma_prime(0,0) = this->sigma_prime_tilde(0);
-    this->sigma_prime(1,1) = this->sigma_prime_tilde(1);
-    this->sigma_prime(2,2) = this->sigma_prime_tilde(2);
-    // The ordering for the terms below is specific to Abaqus. 
-    // Consider something more conventional by adding an interface to 
-    // convert for Abaqus usage.
-    this->sigma_prime(0,1) = this->sigma_prime(1,0) = this->sigma_prime_tilde(3); 
-    this->sigma_prime(0,2) = this->sigma_prime(2,0) = this->sigma_prime_tilde(4);
-    this->sigma_prime(1,2) = this->sigma_prime(2,1) = this->sigma_prime_tilde(5);
+    this->sigma_prime = this->sigma_prime_tilde.cauchy();
 
     // Total stresses given pore pressure, u.
     update_sigma();
+
+    // Mean and deviatoric stress.
+    update_p_prime();
+    update_q();
 }
 
-void Model::set_strain_increment(Vector6d delta_epsilon) {
+void Model::set_strain_increment(Voigt delta_epsilon) {
     // Strain increment in Voigt notation form - change sign to use compression positive soil mechanics convention.
     this->delta_epsilon_tilde = -delta_epsilon;
-
-    // Assemble strain tensor for invariant calculation.
-    this->delta_epsilon(0,0) = this->delta_epsilon_tilde(0);
-    this->delta_epsilon(1,1) = this->delta_epsilon_tilde(1);
-    this->delta_epsilon(2,2) = this->delta_epsilon_tilde(2);
-    // The ordering for the terms below is specific to Abaqus. 
-    // Consider something more conventional by adding an interface to 
-    // convert for Abaqus usage.
-    this->delta_epsilon(0,1) = this->delta_epsilon(1,0) = this->delta_epsilon_tilde(3); 
-    this->delta_epsilon(0,2) = this->delta_epsilon(2,0) = this->delta_epsilon_tilde(4);
-    this->delta_epsilon(1,2) = this->delta_epsilon(2,1) = this->delta_epsilon_tilde(5);
+    this->delta_epsilon = this->delta_epsilon_tilde.cauchy();
 
     // Volumetric and deviatoric strain increments.
-
+    
 }
 
 // Getters.
@@ -62,15 +38,7 @@ std::string Model::get_name(void) {
     return name;
 }
 
-int Model::get_n_parameters(void) {
-    return n_parameters;
-}
-
-int Model::get_n_state_variables(void) {
-    return n_state_variables;
-}
-
-Vector6d Model::get_sigma_prime(void) {
+Voigt Model::get_sigma_prime(void) {
     // Change sign back to tension positive sign convention.
     return -sigma_prime_tilde;
 }
@@ -79,17 +47,13 @@ Eigen::Matrix3d Model::get_jacobian(void) {
     return jacobian;
 }
 
-std::vector<double> Model::get_state_variables(void) {
-    return state;
-}
-
 // Computers.
 
-Tensor Model::compute_cartesian_stresses(Tensor T, Tensor S) {
+Cauchy Model::compute_cartesian_stresses(Cauchy T, Cauchy S) {
     return T*S*T.transpose();
 }
 
-Tensor Model::compute_delta_epsilon_vol(Tensor delta_epsilon) {
+Cauchy Model::compute_delta_epsilon_vol(Cauchy delta_epsilon) {
     return delta_epsilon.trace()*eye;
 }
 
@@ -107,15 +71,15 @@ double Model::compute_mises_stress(double J_2) {
     return std::sqrt(3.0*J_2);
 }
 
-double Model::compute_p(Tensor sigma) {
+double Model::compute_p(Cauchy sigma) {
     return 1.0/3.0*sigma.trace();
 }
 
-double Model::compute_p_prime(Tensor sigma_prime) {
+double Model::compute_p_prime(Cauchy sigma_prime) {
     return Model::compute_p(sigma_prime);
 }
 
-void Model::compute_principal_stresses(Tensor sigma_prime, double &sigma_1, double &sigma_2, double &sigma_3, Tensor &S, Tensor &T) {
+void Model::compute_principal_stresses(Cauchy sigma_prime, double &sigma_1, double &sigma_2, double &sigma_3, Cauchy &S, Cauchy &T) {
     // Solve eigenvalues and eigevectors..
     Eigen::EigenSolver<Eigen::MatrixXd> es(sigma_prime);
         
@@ -136,22 +100,22 @@ void Model::compute_principal_stresses(Tensor sigma_prime, double &sigma_1, doub
     T = es.eigenvectors().real();
 }
 
-double Model::compute_q(Tensor sigma) {
+double Model::compute_q(Cauchy sigma) {
     double q = std::sqrt(1.0/2.0*(
         (std::pow((sigma(0,0)-sigma(1,1)),2) + std::pow((sigma(1,1)-sigma(2,2)),2) + std::pow((sigma(2,2)-sigma(0,0)),2)) 
         + 6.0*(std::pow(sigma(0,1),2) + std::pow(sigma(0,2),2) + std::pow(sigma(1,2),2))));
     return q;
 }
 
-Tensor Model::compute_s(Tensor sigma, double p) {
+Cauchy Model::compute_s(Cauchy sigma, double p) {
     return sigma - p*eye;
 }
 
-Tensor Model::compute_sigma(Tensor sigma_prime, double u) {
+Cauchy Model::compute_sigma(Cauchy sigma_prime, double u) {
     return sigma_prime + u*eye;
 }
 
-void Model::compute_stress_invariants(Tensor sigma, double &I_1, double &I_2, double &I_3, double &J_1, double &J_2, double &J_3) {
+void Model::compute_stress_invariants(Cauchy sigma, double &I_1, double &I_2, double &I_3, double &J_1, double &J_2, double &J_3) {
     // Stress invariants.
     I_1 = sigma.trace();
     I_2 = 1.0/2.0*(std::pow(sigma.trace(),2) - (sigma.cwiseProduct(sigma)).trace());
@@ -161,7 +125,7 @@ void Model::compute_stress_invariants(Tensor sigma, double &I_1, double &I_2, do
     double p = compute_p_prime(sigma);
     
     // Deviatoric stress tensor, s.
-    Tensor s = compute_s(sigma, p);
+    Cauchy s = compute_s(sigma, p);
 
     // Deviatoric stress invariants.
     J_1 = s.trace(); // Is always zero...

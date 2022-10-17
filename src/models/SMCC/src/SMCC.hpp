@@ -18,11 +18,6 @@ class SMCC : public Model{
          * @brief SMCC model destructor. 
          */
         virtual ~SMCC() {}
-
-        /** 
-         * @brief Method to set state variables. 
-         */
-        void set_state_variables(std::vector<double> state);
         
     protected:
 

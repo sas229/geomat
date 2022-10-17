@@ -16,10 +16,31 @@ Base Class
     :protected-members:
     :private-members:
 
-Utility Classes
----------------
+Utilities
+---------
 
-The following classes contain utility functions that can be used to develop constitutive models. 
+The following typdefs and classes contain utility functions that can be used to develop constitutive models. 
+
+Types
+^^^^^
+
+.. doxygentypedef:: Vector6d
+   :project: umat
+
+.. doxygentypedef:: Constitutive
+   :project: umat
+
+.. doxygenclass:: Cauchy
+    :project: umat
+    :members:
+    :protected-members:
+    :private-members:
+
+.. doxygenclass:: Voigt
+    :project: umat
+    :members:
+    :protected-members:
+    :private-members:
 
 Elastic
 ^^^^^^^

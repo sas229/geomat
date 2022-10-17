@@ -1,80 +1,38 @@
 #include "Elastic.hpp"
 
-void Elastic::compute_isotropic_linear_elastic_matrix(double E, double nu, Eigen::Matrix<double, 6, 6> &D_e) {
-    // Check elastic paramaters are initialised.
-    PLOG_ERROR_IF(std::isnan(E)) << "Young's modulus, E, not initialised.";
-    PLOG_ERROR_IF(std::isnan(nu)) << "Poisson's ratio, nu, not initialised.";
-    assert(!std::isnan(E) && !std::isnan(nu));
+Constitutive Elastic::compute_isotropic_linear_elastic_matrix(double K, double G) {
+    // Check elastic paramaters are valid.
+    PLOG_ERROR_IF(K <= 0.0) << "Bulk modulus less than or equal to zero.";
+    PLOG_ERROR_IF(G <= 0.0) << "Shear modulus less than or equal to zero.";
+    assert(K > 0.0 && G > 0.0);
 
     // Fill elastic matrix with isotropic linear elastic coefficients.
-    double C = E/((1.0+nu)*(1.0-2.0*nu));
-    D_e(0,0) = D_e(1,1) = D_e(2,2) += C*(1.0-nu); 
-    D_e(0,1) = D_e(0,2) = D_e(1,2) = D_e(1,0) = D_e(2,0) = D_e(2,1) += C*nu;
-    D_e(3,3) = D_e(4,4) = D_e(5,5) += C*(1.0-2.0*nu)/2.0; 
+    Constitutive D_e = Constitutive::Zero();
+    D_e(0,0) = D_e(1,1) = D_e(2,2) += K + 4.0/3.0*G; 
+    D_e(0,1) = D_e(0,2) = D_e(1,2) = D_e(1,0) = D_e(2,0) = D_e(2,1) += K - 2.0/3.0*G;
+    D_e(3,3) = D_e(4,4) = D_e(5,5) += G; 
     PLOG_INFO << "Isotropic linear elastic matrix computed.";
-}
 
-void Elastic::compute_anisotropic_linear_elastic_matrix(double E_h, double E_v, double G_h, double nu_v, double nu_h, Eigen::Matrix<double, 6, 6> &D_e) {
-    // Check elastic paramaters are initialised.
-    PLOG_ERROR_IF(std::isnan(E_h)) << "Young's modulus in vertical direction, E_h, not initialised.";
-    PLOG_ERROR_IF(std::isnan(E_v)) << "Young's modulus in horizontal direction, E_v, not initialised.";
-    PLOG_ERROR_IF(std::isnan(G_h)) << "Shear modulus in horizontal direction, G_h, not initialised.";
-    PLOG_ERROR_IF(std::isnan(nu_v)) << "Poisson's ratio in vertical direction, nu_v, not initialised.";
-    PLOG_ERROR_IF(std::isnan(nu_h)) << "Poisson's ratio in horizontal direction, nu_h, not initialised.";
-    assert(!std::isnan(E_v) && !std::isnan(E_h) && !std::isnan(G_h) && !std::isnan(nu_v) && !std::isnan(nu_v));
-
-    // Fill elastic matrix with anisotropic linear elastic coefficients.
-    D_e(0,0) = D_e(1,1) += 1/E_h; 
-    D_e(2,2) += 1/E_v; 
-    D_e(0,1) = D_e(1,0) = -nu_h/E_h;
-    D_e(2,0) = D_e(0,2) = D_e(2,1) = D_e(1,2) = -nu_v/E_v;
-    D_e(3,3) = D_e(4,4) += 1/G_v;
-    D_e(5,5) = 2.0*(1+nu_h)/E_h;
-    PLOG_INFO << "Anisotropic linear elastic matrix computed.";
-}
-
-void Elastic::compute_simplified_anisotropic_linear_elastic_matrix(double alpha, double E_v, double nu_h, Eigen::Matrix<double, 6, 6> &D_e) {
-    // Check elastic paramaters are initialised.
-    PLOG_ERROR_IF(std::isnan(alpha)) << "Square root of ratio of Young's moduli, alpha, not initialised.";
-    PLOG_ERROR_IF(std::isnan(E_v)) << "Young's modulus in horizontal direction, E_v, not initialised.";
-    PLOG_ERROR_IF(std::isnan(nu_h)) << "Poisson's ratio in horizontal direction, nu_h, not initialised.";
-    assert(!std::isnan(alpha) && !std::isnan(E_v) && !std::isnan(nu_h));
-
-    // Fill elastic matrix with anisotropic linear elastic coefficients.
-    double C = 1/E_v;
-    D_e(0,0) = D_e(1,1) += C*1/std::pow(alpha,2); 
-    D_e(2,2) = C*1;
-    D_e(0,1) = D_e(1,0) = C*-nu_h/std::pow(alpha,2);
-    D_e(2,0) = D_e(0,2) = D_e(2,1) = D_e(1,2) = C*-nu_h/alpha;
-    D_e(3,3) = D_e(4,4) += C*2.0*(1.0+nu_h)/alpha;
-    D_e(5,5) = C*2.0*(1.0+nu_h)/std::pow(alpha,2);
-    PLOG_INFO << "Simplified anisotropic linear elastic matrix computed.";
-}
-
-void Elastic::update_isotropic_linear_elastic_matrix(void) {
-    Elastic::compute_isotropic_linear_elastic_matrix(this->E, this->nu, this->D_e);
-}
-
-void Elastic::update_anisotropic_linear_elastic_matrix(void) {
-    Elastic::compute_anisotropic_linear_elastic_matrix(this->E_h, this->E_v, this->G_h, this->nu_h, this->nu_v, this->D_e);
-}
-
-void Elastic::update_simplified_anisotropic_linear_elastic_matrix(void) {
-    Elastic::compute_simplified_anisotropic_linear_elastic_matrix(this->alpha, this->E_v, this->nu_h, this->D_e);
-}
-
-Eigen::Matrix<double, 6, 6> Elastic::get_elastic_matrix(void) {
     return D_e;
 }
 
-void Elastic::compute_G_given_E_and_nu(void) {
-    G = E/(2.0*(1.0+nu));
+Cauchy Elastic::compute_elastic_trial_stress(Cauchy sigma_prime, double alpha, Voigt delta_epsilon_tilde, double kappa, double nu) {
+    Voigt delta_epsilon_tilde_trial = alpha*delta_epsilon_tilde;
+    double delta_epsilon_e_vol = delta_epsilon_tilde_trial.cauchy().trace();
+    double p_prime_trial = 1.0/3.0*sigma_prime.trace();
+    double K_trial;
+    // Breakout the below definitions of K and G into separate methods...
+    if (delta_epsilon_e_vol != 0.0) {
+        K_trial = (p_prime_trial/delta_epsilon_e_vol)*(std::exp(delta_epsilon_e_vol/kappa)-1);
+    } else {
+        K_trial = p_prime_trial/kappa;
+    }
+    double G_trial = (3.0*(1-2.0*nu)*K_trial)/(2.0*(1.0+nu));
+    Constitutive D_e_trial = compute_isotropic_linear_elastic_matrix(K_trial, G_trial);
+    Voigt delta_sigma_prime_tilde_trial = compute_elastic_stress_increment(D_e_trial, delta_epsilon_tilde_trial);
+    return sigma_prime + delta_sigma_prime_tilde_trial.cauchy();
 }
 
-void Elastic::compute_E_given_G_and_nu(void) {
-    E = G*(2.0*(1.0+nu));
-}
-
-void Elastic::compute_K_given_E_and_nu(void) {
-    K = E/(3.0*(1.0-2.0*nu));
+Voigt Elastic::compute_elastic_stress_increment(Constitutive D_e, Voigt delta_epsilon_tilde) {
+    return D_e*delta_epsilon_tilde;
 }
