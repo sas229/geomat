@@ -309,16 +309,6 @@ class Model {
          * @brief Name of model. 
          */
         std::string name;
-        
-        /** 
-         * @brief Number of model parameters. 
-         */
-        int n_parameters;
-        
-        /** 
-         * @brief Number of state variables. 
-         */
-        int n_state_variables;
 
         /** 
          * @brief Effective stress in Voigt notation:

@@ -11,8 +11,6 @@ Constitutive Elastic::compute_isotropic_linear_elastic_matrix(double K, double G
     D_e(0,0) = D_e(1,1) = D_e(2,2) += K + 4.0/3.0*G; 
     D_e(0,1) = D_e(0,2) = D_e(1,2) = D_e(1,0) = D_e(2,0) = D_e(2,1) += K - 2.0/3.0*G;
     D_e(3,3) = D_e(4,4) = D_e(5,5) += G; 
-    PLOG_INFO << "Isotropic linear elastic matrix computed.";
-
     return D_e;
 }
 
@@ -29,4 +27,9 @@ Cauchy Elastic::compute_isotropic_linear_elastic_trial_stress(Cauchy sigma_prime
 
 Voigt Elastic::compute_elastic_stress_increment(Constitutive D_e, Voigt delta_epsilon_tilde) {
     return D_e*delta_epsilon_tilde;
+}
+
+void Elastic::solve(void) {
+    Voigt delta_sigma_tilde = D_e*delta_epsilon_tilde;
+    sigma_prime += delta_sigma_tilde.cauchy();
 }

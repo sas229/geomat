@@ -1,7 +1,6 @@
 #include "Elastoplastic.hpp"
 
 void Elastoplastic::solve(void) {
-    std::cout << "Solving current strain increment.\n";
     alpha = compute_alpha();
 }
 
@@ -17,7 +16,7 @@ double Elastoplastic::compute_alpha(void) {
     Cauchy sigma_prime_0 = sigma_prime;
     Cauchy sigma_prime_1 = sigma_prime;
     Cauchy sigma_prime_n = sigma_prime;
-    double f_0, f_1, f_n = tolerance;
+    double f, f_0, f_1, f_n = tolerance;
 
     // First trial state: no strain increment.
     sigma_prime_0 = compute_isotropic_linear_elastic_trial_stress(sigma_prime, alpha_0, delta_epsilon_tilde);
@@ -55,6 +54,7 @@ double Elastoplastic::compute_alpha(void) {
         iterations += 1;
     }
     alpha = alpha_n;
-    PLOG_INFO << "Pegasus method iterations = " << iterations << "; " << "alpha = " << alpha << "; " << "f_n = " << f_n << ".";
+    f = f_n;
+    PLOG_INFO << "Performed " << iterations << " Pegasus iterations: " << "alpha = " << alpha << "; " << "f_n = " << f << ".";
     return alpha;
 }

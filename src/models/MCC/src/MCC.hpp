@@ -46,12 +46,7 @@ class MCC : public Elastoplastic {
         double compute_G(double K);
 
     protected:
-
-        /** 
-         * @brief Elastic matrix. 
-         */
-        Constitutive D_e = Constitutive::Zero();
-        
+       
         /** 
          * @brief Parameters. 
          */

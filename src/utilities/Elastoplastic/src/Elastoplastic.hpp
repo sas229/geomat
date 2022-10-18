@@ -28,7 +28,7 @@ class Elastoplastic : public Elastic {
         virtual ~Elastoplastic() {}
         
         /**
-         *  @brief Solve current strain increment using refined explivit approach of Sloan et al. (2001). 
+         *  @brief Solve current strain increment using refined explicit approach of Sloan et al. (2001). 
          */
         void solve(void);
 

@@ -11,7 +11,7 @@
 #include "Model.hpp"
 
 /**
- * @brief Elastic class with methods to generate the elastic matrix in various forms.
+ * @brief Elastic class with methods to generate the elastic matrix in various forms. Inherits Model base class.
  */
 class Elastic : public Model {
 
@@ -44,7 +44,7 @@ class Elastic : public Model {
        Constitutive compute_isotropic_linear_elastic_matrix(double K, double G);
 
        /**
-        * @brief Compute the isotropic linear elastic trial stress state.
+        * @brief Method to compute the isotropic linear elastic trial stress state.
         * 
         * @param[in] sigma_prime Effective stress tensor.
         * @param[in] alpha Elastic fraction of strain increment. 
@@ -62,10 +62,33 @@ class Elastic : public Model {
         */
        Voigt compute_elastic_stress_increment(Constitutive D_e, Voigt delta_epsilon_tilde);
        
+       /**
+        * @brief Method to compute the bulk modulus.
+        * 
+        * @param delta_epsilon_vol 
+        * @param p_prime 
+        * @return double 
+        */
        virtual double compute_K(double delta_epsilon_vol, double p_prime) = 0;
        
+       /**
+        * @brief Method to compute the shear modulus.
+        * 
+        * @param K Bulk modulus. 
+        * @return double 
+        */
        virtual double compute_G(double K) = 0;
+
+       /**
+         *  @brief Solve current strain increment. 
+         */
+        void solve(void);
        
+       /**
+        * @brief Elastic constitutive matrix.
+        */
+       Constitutive D_e = Constitutive::Zero();
+
        /**
         * @brief Bulk modulus.
         */
