@@ -31,7 +31,7 @@ class MCC : public Elastoplastic {
         /**
          * @brief Overridden method to compute the bulk modulus.
          * 
-         * @param delta_epsilon_vol Elastic volumetric strain.
+         * @param delta_epsilon_e_vol Elastic volumetric strain increment.
          * @param p_prime Mean effective stress.
          * @return K
          */

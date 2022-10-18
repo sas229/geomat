@@ -57,6 +57,12 @@ Modified Cam Clay (MCC)
 
 The Modified Cam Clay (MCC) model is implemented here. Theory to go here...
 
+.. doxygenfile:: MCC_Model.hpp
+    :project: umat
+
+.. .. doxygendefine:: PI
+..     :project: umat
+
 .. doxygenclass:: MCC
     :project: umat
     :members:

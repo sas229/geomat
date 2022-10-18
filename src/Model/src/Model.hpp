@@ -392,12 +392,7 @@ class Model {
          * @brief Jacobian matrix. 
          */
         Eigen::Matrix3d jacobian;
-
-        // /** 
-        //  * @brief Array of state variables. 
-        //  */
-        // std::vector<double> &state;
-        
+    
         /** 
          * @brief First stress invariant.
          */

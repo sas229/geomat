@@ -71,3 +71,4 @@ breathe_projects = {
 }
 breathe_default_project = "umat"
 breathe_default_members = ('members', 'protected-members', 'private-members')
+breathe_show_define_initializer = True
