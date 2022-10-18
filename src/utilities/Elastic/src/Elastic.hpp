@@ -7,11 +7,13 @@
 #include <limits>
 #include <cassert>
 #include <Eigen/Eigen>
-#include "Elastic.hpp"
 #include "Types.hpp"
+#include "Model.hpp"
 
-/** @brief Elastic class with methods to generate the elastic matrix in various forms. */
-class Elastic {
+/**
+ * @brief Elastic class with methods to generate the elastic matrix in various forms.
+ */
+class Elastic : public Model {
 
     public: 
 
@@ -42,16 +44,14 @@ class Elastic {
        Constitutive compute_isotropic_linear_elastic_matrix(double K, double G);
 
        /**
-        * @brief Compute the elastic trial stress state.
+        * @brief Compute the isotropic linear elastic trial stress state.
         * 
         * @param[in] sigma_prime Effective stress tensor.
         * @param[in] alpha Elastic fraction of strain increment. 
         * @param[in] delta_epsilon_tilde Strain increment.
-        * @param[in] kappa Slope of the recompression line.
-        * @param[in] nu Poisson's ratio.
         * @return Elastic trial stress tensor.
         */
-       Cauchy compute_elastic_trial_stress(Cauchy sigma_prime, double alpha, Voigt delta_epsilon_tilde, double kappa, double nu);
+       Cauchy compute_isotropic_linear_elastic_trial_stress(Cauchy sigma_prime, double alpha, Voigt delta_epsilon_tilde);
 
        /**
         * @brief Method to compute the elastic stress increment given an elastic matrix and a strain increment.
@@ -61,7 +61,21 @@ class Elastic {
         * @return Stress increment.
         */
        Voigt compute_elastic_stress_increment(Constitutive D_e, Voigt delta_epsilon_tilde);
-        
+       
+       virtual double compute_K(double delta_epsilon_vol, double p_prime) = 0;
+       
+       virtual double compute_G(double K) = 0;
+       
+       /**
+        * @brief Bulk modulus.
+        */
+       double K;
+       
+       /**
+        * @brief Shear modulus.
+        */
+       double G;
+
 };
 
 #endif

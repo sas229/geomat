@@ -16,7 +16,7 @@
 #include "Types.hpp"
 #include "Model.hpp"
 #include "MCC.hpp"
-#include "SMCC.hpp"
+// #include "SMCC.hpp"
 
 /** @brief Interface to allow Abaqus to call umat material models via a C++ implementation.
  * 

@@ -72,8 +72,8 @@ extern "C" void umat(
         PLOG_INFO << "Attempting to instantiate " << cmname << " model.";
         if (strcmp(cmname, "MCC") == 0) {
             model.reset(new MCC(parameters, state));   
-        } else if (strcmp(cmname, "SMCC") == 0) {
-            model.reset(new SMCC);    
+        // } else if (strcmp(cmname, "SMCC") == 0) {
+        //     model.reset(new SMCC);    
         } else {
             PLOG_FATAL << "Model name given not implemented. Check name given in CAE / input file.";
             assert(true);

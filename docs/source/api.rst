@@ -67,14 +67,14 @@ The Modified Cam Clay (MCC) model is implemented here.
     :protected-members:
     :private-members:
 
-Soft Modified Cam Clay (MCC)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. Soft Modified Cam Clay (MCC)
+.. ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The Soft Modified Cam Clay (MCC) model is implemented here.
+.. The Soft Modified Cam Clay (MCC) model is implemented here.
 
-.. doxygenclass:: SMCC
-    :project: umat
-    :members:
-    :protected-members:
-    :private-members:
+.. .. doxygenclass:: SMCC
+..     :project: umat
+..     :members:
+..     :protected-members:
+..     :private-members:
 

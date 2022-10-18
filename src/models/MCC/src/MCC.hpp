@@ -4,11 +4,10 @@
 #include <plog/Log.h>
 #include <Eigen/Eigen>
 #include <cassert>
-#include "Model.hpp"
 #include "Types.hpp"
-#include "Elastic.hpp"
+#include "Elastoplastic.hpp"
 
-class MCC : public Model, public Elastic {
+class MCC : public Elastoplastic {
 
     public: 
 
@@ -23,16 +22,28 @@ class MCC : public Model, public Elastic {
         virtual ~MCC() {}
 
         /**
-         * @brief Compute the current value of the yield surface function.
+         * @brief Overridden method to compute the current value of the yield surface function.
          * 
          * @return f
          */
-        double compute_f(Cauchy sigma_prime);
+        double compute_f(Cauchy sigma_prime) override;
 
         /**
-         * @brief Method to solve stress increment given the current strain increment.
+         * @brief Overridden method to compute the bulk modulus.
+         * 
+         * @param delta_epsilon_vol Elastic volumetric strain.
+         * @param p_prime Mean effective stress.
+         * @return K
          */
-        void solve(void);
+        double compute_K(double delta_epsilon_vol, double p_prime);
+
+        /**
+         * @brief Overrident method to compute the shear modulus.
+         * 
+         * @param K Bulk modulus.
+         * @return double 
+         */
+        double compute_G(double K);
 
     protected:
 
