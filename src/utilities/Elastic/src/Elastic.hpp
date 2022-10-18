@@ -3,8 +3,6 @@
 
 #include <iostream>
 #include <plog/Log.h>
-#include <cmath>
-#include <limits>
 #include <cassert>
 #include <Eigen/Eigen>
 #include "Types.hpp"
@@ -15,7 +13,7 @@
  */
 class Elastic : public Model {
 
-    public: 
+    protected: 
 
         /** @brief Elastic model constructor. */
         Elastic() {}
@@ -83,7 +81,7 @@ class Elastic : public Model {
          *  @brief Solve current strain increment. 
          */
         void solve(void);
-       
+
        /**
         * @brief Elastic constitutive matrix.
         */

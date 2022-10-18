@@ -15,7 +15,7 @@
  */
 class Elastoplastic : public Elastic {
 
-    public: 
+    protected: 
 
         /** 
          * @brief Elastoplastic model constructor.
@@ -46,6 +46,8 @@ class Elastoplastic : public Elastic {
          * @return double 
          */
         double compute_alpha(void);
+
+    private:
 
         /**
          * @brief Elastic fraction of strain increment.

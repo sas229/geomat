@@ -1,9 +1,5 @@
 #include "MCC.hpp"
-#include "MCC_Model.hpp"
-
-using std::exp;
-using std::pow;
-using std::sqrt;
+#include "MCC_Definition.hpp"
 
 MCC::MCC(std::vector<double> parameters, std::vector<double> state) : parameters(parameters), state(state) {
     set_name("MCC");
@@ -16,6 +12,7 @@ MCC::MCC(std::vector<double> parameters, std::vector<double> state) : parameters
 }
 
 double MCC::compute_f(Cauchy sigma_prime) {
+    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     double q = compute_q(sigma_prime);
     double p_prime = compute_p_prime(sigma_prime);
     double YIELD;
@@ -23,6 +20,7 @@ double MCC::compute_f(Cauchy sigma_prime) {
 }
 
 double MCC::compute_K(double delta_epsilon_e_vol, double p_prime) {
+    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     if (delta_epsilon_e_vol != 0.0) {
         BULK_MODULUS_SECANT;
     } else {
@@ -32,6 +30,7 @@ double MCC::compute_K(double delta_epsilon_e_vol, double p_prime) {
 }
 
 double MCC::compute_G(double K) {
+    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     SHEAR_MODULUS;
     return G;
 }

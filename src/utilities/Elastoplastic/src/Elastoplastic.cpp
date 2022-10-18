@@ -7,7 +7,7 @@ void Elastoplastic::solve(void) {
 double Elastoplastic::compute_alpha(void) {
     // Pegasus algorithm.
     int iterations = 0;
-    int max_iterations = 100;
+    int max_iterations = 10;
     double tolerance = 1e-10;
     double alpha;
     double alpha_n;
@@ -30,7 +30,7 @@ double Elastoplastic::compute_alpha(void) {
     if (f_1 > 0.0) {
         PLOG_INFO << "Plastic increment: finding alpha via the Pegasus algorithm.";
     } else {
-        PLOG_INFO << "Fully elastic increment.";
+        PLOG_INFO << "Fully elastic increment; alpha = 1.0.";
         alpha = 1.0;
         return alpha;
     }
@@ -55,6 +55,12 @@ double Elastoplastic::compute_alpha(void) {
     }
     alpha = alpha_n;
     f = f_n;
-    PLOG_INFO << "Performed " << iterations << " Pegasus iterations: " << "alpha = " << alpha << "; " << "f_n = " << f << ".";
+    if (std::abs(f) >= tolerance) {
+        PLOG_FATAL << "Performed " << max_iterations << " Pegasus iterations: alpha = " << alpha << "; f = " << f << " > tolerance = " << tolerance << ".";
+        assert(false);
+    } else{
+        PLOG_INFO << "Performed " << iterations << " Pegasus iterations: " << "alpha = " << alpha << "; " << "f = " << f << " < tolerance = " << tolerance << ".";
+        assert(alpha >= 0.0 && alpha <= 1.0);
+    }
     return alpha;
 }
