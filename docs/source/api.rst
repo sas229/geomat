@@ -52,6 +52,20 @@ Models
 The following models have been implemented using this framework. Each model inherits one of the "Abstract Classes" based 
 on the genera of constitutive behaviour required.
 
+Linear Elastic
+^^^^^^^^^^^^^^
+
+The Linear Elastic model is implemented here. Theory to go here...
+
+.. doxygenfile:: LinearElastic_Definition.hpp
+    :project: umat
+
+.. doxygenclass:: LinearElastic
+    :project: umat
+    :members:
+    :protected-members:
+    :private-members:
+
 Modified Cam Clay (MCC)
 ^^^^^^^^^^^^^^^^^^^^^^^
 

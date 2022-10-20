@@ -36,8 +36,9 @@ void Elastic::solve(void) {
     D_e = compute_isotropic_linear_elastic_matrix(K, G);
 
     // Update stress state.
-    Voigt delta_sigma_tilde = D_e*delta_epsilon_tilde;
-    sigma_prime += delta_sigma_tilde.cauchy();
+    Voigt delta_sigma_prime_tilde = D_e*delta_epsilon_tilde;
+    sigma_prime_tilde += delta_sigma_prime_tilde;
+    sigma_prime = sigma_prime_tilde.cauchy();
 
     // Take the Jacobian as the tangent stiffness.
     jacobian = D_e;

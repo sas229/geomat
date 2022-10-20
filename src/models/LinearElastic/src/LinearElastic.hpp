@@ -34,7 +34,7 @@ class LinearElastic : public Elastic {
          * @brief Overriden method to compute the shear modulus.
          * 
          * @param K Bulk modulus.
-         * @return double 
+         * @return G
          */
         double compute_G(double K);
 

@@ -98,7 +98,11 @@ extern "C" void umat(
     // Equate map to updated variable in order to map back to input variable.
     std::cout << "Stress prior to update:\n" << map_to_stress << "\n";
     map_to_stress = model->get_sigma_prime();
+    std::cout << "Updated stress after remapping:\n" << map_to_stress << "\n";
+
+    // The map to the jacobian below somehow overwrites the stress state in the LinearElastic model class!!!
     map_to_jacobian = model->get_jacobian();
+    
     statev = state.data();
     // std::cout << "Jacobian:\n" << map_to_jacobian << "\n";
     std::cout << "Updated stress after sign change:\n" << map_to_stress << "\n";
