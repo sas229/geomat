@@ -15,24 +15,21 @@ double MCC::compute_f(Cauchy sigma_prime) {
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     double q = compute_q(sigma_prime);
     double p_prime = compute_p_prime(sigma_prime);
-    double YIELD;
-    return f;
+    return YIELD;
 }
 
 double MCC::compute_K(double delta_epsilon_e_vol, double p_prime) {
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     if (delta_epsilon_e_vol != 0.0) {
-        BULK_MODULUS_SECANT;
+        return BULK_MODULUS_SECANT;
     } else {
-        BULK_MODULUS_TANGENT;
+        return BULK_MODULUS_TANGENT;
     }
-    return K;
 }
 
 double MCC::compute_G(double K) {
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
-    SHEAR_MODULUS;
-    return G;
+    return SHEAR_MODULUS;
 }
 
 void MCC::compute_derivatives(Cauchy sigma_prime, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, double &dg_dp_prime, double &H, std::vector<double> &B_state) {

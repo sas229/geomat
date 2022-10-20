@@ -14,12 +14,12 @@ message(${CMAKE_CXX_FLAGS})
 # Create test executable.
 add_executable(umat_test src/main.cpp)
 target_include_directories(umat_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_link_libraries(umat_test PRIVATE umat Model MCC)
+target_link_libraries(umat_test PRIVATE umat Model LinearElastic MCC)
 
 # Create library for usage with Abaqus.
 add_library(umat_library SHARED src/umat/src/umat.cpp)
 target_include_directories(umat_library PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/umat)
-target_link_libraries(umat_library PRIVATE Model MCC)
+target_link_libraries(umat_library PRIVATE Model LinearElastic MCC)
 
 # Add subdirectories of documentation and source code.
 add_subdirectory(${PROJECT_SOURCE_DIR}/docs)

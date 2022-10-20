@@ -12,6 +12,7 @@
 #include <plog/Initializers/RollingFileInitializer.h>
 #include "Types.hpp"
 #include "Model.hpp"
+#include "LinearElastic.hpp"
 #include "MCC.hpp"
 // #include "SMCC.hpp"
 

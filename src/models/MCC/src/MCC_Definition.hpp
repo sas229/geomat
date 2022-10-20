@@ -8,7 +8,7 @@
  * where \f$ p^{\prime} \f$ is the effective mean stress, \f$ \Delta \epsilon_{e}^{vol} \f$ is the elastic volumetric strain increment
  * and \f$ \kappa^{*} \f$ is the slope of the recompression line in \f$ \ln \left( e \right)-\ln \left( p^{\prime} \right)\f$ space.
  */
-#define BULK_MODULUS_SECANT K = (p_prime/delta_epsilon_e_vol)*(exp(delta_epsilon_e_vol/kappa_star)-1)
+#define BULK_MODULUS_SECANT (p_prime/delta_epsilon_e_vol)*(exp(delta_epsilon_e_vol/kappa_star)-1)
 
 /**
  * @brief Tangent bulk modulus definition:
@@ -18,7 +18,7 @@
  * where \f$ p^{\prime} \f$ is the mean effective stress and \f$ \kappa^{*} \f$ is the slope 
  * of the recompression line in \f$ \ln \left( e \right)-\ln \left( p^{\prime} \right)\f$ space.
  */
-#define BULK_MODULUS_TANGENT K = p_prime/kappa_star
+#define BULK_MODULUS_TANGENT p_prime/kappa_star
 
 /**
  * @brief Shear modulus definition:
@@ -27,7 +27,7 @@
  * 
  * where \f$ \nu \f$ is Poisson's ratio and \f$ K \f$ is the bulk modulus.
  */
-#define SHEAR_MODULUS G = (3.0*(1-2.0*nu)*K)/(2.0*(1.0+nu))
+#define SHEAR_MODULUS (3.0*(1-2.0*nu)*K)/(2.0*(1.0+nu))
 
 // Plastic definitions.
 
@@ -39,21 +39,21 @@
  * where \f$ q \f$ is the deviatoric stress, \f$ p^{\prime} \f$ is the mean effective stress, 
  * \f$ M\f$ is the frictional constant and \f$ p_c \f$ is the preconsolidation pressure.
  */
-#define YIELD f = pow(q,2) + pow(M,2)*p_prime*(p_prime-p_c)
+#define YIELD pow(q,2) + pow(M,2)*p_prime*(p_prime-p_c)
 
 /**
  * @brief Derivatives of the yield surface with respect to the effective stress state:
  * 
  * \f[ \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} = \frac{M^2\left(2 p^{\prime}-p_c \right)}{3} \mathbf{1} + 3 \operatorname{dev}(\boldsymbol{\sigma}^{\prime}) \f]
  */
-#define DF_DSIGMA_PRIME df_dsigma_prime = pow(M,2)*(2*p_prime-p_c)*1.0/3.0*eye + 3.0*s
+#define DF_DSIGMA_PRIME pow(M,2)*(2*p_prime-p_c)*1.0/3.0*eye + 3.0*s
 
 /**
  * @brief Derivativee of the yield surface with respect to the preconsolidation pressure:
  * 
  * \f[ \frac{\partial f}{\partial p_c} = -(M^2 p^{\prime})\f] 
  */
-#define DF_DP_C df_dp_c = -(pow(M,2)*p_prime)
+#define DF_DP_C -(pow(M,2)*p_prime)
 
 /**
  * @brief Derivatives of the plastic potential function with respect to the effective stress state. 
@@ -68,11 +68,11 @@
  * 
  * \f[ \frac{\partial g}{\partial p^{\prime}} = M^2 \left( 2 p^{\prime} p_c \right) \f]
  */
-#define DG_DP_PRIME dg_dp_prime = M**2*(2*p_prime-p_c)
+#define DG_DP_PRIME M**2*(2*p_prime-p_c)
 
 /**
  * @brief Hardening modulus.
  *  
  * \f[ H = \frac{M^2 p^{\prime} p_c}{\lambda^*-\kappa^*} \operatorname{tr}\left( \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} \right) \f]
  */
-#define HARDENING_MODULUS H = (pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*df_dsigma_prime.trace()
+#define HARDENING_MODULUS (pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*df_dsigma_prime.trace()

@@ -61,25 +61,25 @@ class Elastic : public Model {
        Voigt compute_elastic_stress_increment(Constitutive D_e, Voigt delta_epsilon_tilde);
        
        /**
-        * @brief Method to compute the bulk modulus.
+        * @brief Method to compute the bulk modulus. The default implementation simply passes the parameter K.
         * 
         * @param delta_epsilon_vol 
         * @param p_prime 
         * @return double 
         * 
-        * @note Must be overriden by model implementations.
+        * @note Can be overriden by model implementations.
         */
-       virtual double compute_K(double delta_epsilon_vol, double p_prime) = 0;
+       virtual double compute_K(double delta_epsilon_vol = 0.0, double p_prime = 0.0) = 0;
        
        /**
-        * @brief Method to compute the shear modulus.
+        * @brief Method to compute the shear modulus. The default implementation simply passes the parameter G.
         * 
         * @param K Bulk modulus. 
         * @return double 
         * 
-        * @note Must be overriden by model implementations.
+        * @note Can be overriden by model implementations.
         */
-       virtual double compute_G(double K) = 0;
+       virtual double compute_G(double K = 0.0) = 0;
 
        /**
          *  @brief Solve current strain increment. 

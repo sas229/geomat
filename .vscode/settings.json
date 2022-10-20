@@ -72,7 +72,8 @@
         "iomanip": "cpp",
         "mutex": "cpp",
         "valarray": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "cassert": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceFolder}",
 }

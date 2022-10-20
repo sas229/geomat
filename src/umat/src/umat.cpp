@@ -70,10 +70,10 @@ extern "C" void umat(
         // Instantiate model.
         PLOG_INFO << *ndi << "D problem defined with " << *ntens << " stress variables.";
         PLOG_INFO << "Attempting to instantiate " << cmname << " model.";
-        if (strcmp(cmname, "MCC") == 0) {
+        if (strcmp(cmname, "LinearElastic") == 0) {
+            model.reset(new LinearElastic(parameters, state));    
+        } else if (strcmp(cmname, "MCC") == 0) {
             model.reset(new MCC(parameters, state));   
-        // } else if (strcmp(cmname, "SMCC") == 0) {
-        //     model.reset(new SMCC);    
         } else {
             PLOG_FATAL << "Model name given not implemented. Check name given in CAE / input file.";
             assert(true);
@@ -104,5 +104,7 @@ extern "C" void umat(
     for (auto i=0; i<6; i++) {
         std::cout << stress[i] << "\n";
     }
-    std::cout << "statev[0]: " << statev[0] << "\n";
+    if (*nstatv > 0) {
+        std::cout << "statev[0]: " << statev[0] << "\n";
+    }   
 }

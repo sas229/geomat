@@ -35,7 +35,7 @@ class MCC : public Elastoplastic {
          * @param p_prime Mean effective stress.
          * @return K
          */
-        double compute_K(double delta_epsilon_vol, double p_prime);
+        double compute_K(double delta_epsilon_e_vol, double p_prime);
 
         /**
          * @brief Overriden method to compute the shear modulus.
