@@ -16,6 +16,11 @@ typedef Eigen::Vector<double, 6> Vector6d;
 typedef Eigen::Matrix<double, 6, 6> Constitutive;
 
 /** 
+ * @brief Eigen square matrix with six indices for storing the Jacobian matrix. 
+ */
+typedef Eigen::Matrix<double, 6, 6> Jacobian;
+
+/** 
  * @brief Custom Cauchy type derived from Eigen::Matrix3d type. 
  * Method added to return the tensor in Voigt notation form. 
  */

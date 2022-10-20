@@ -30,14 +30,16 @@ Voigt Elastic::compute_elastic_stress_increment(Constitutive D_e, Voigt delta_ep
 }
 
 void Elastic::solve(void) {
+    // Compute elastic matrix. 
     double K = compute_K();
     double G = compute_G();
     D_e = compute_isotropic_linear_elastic_matrix(K, G);
+
+    // Update stress state.
     Voigt delta_sigma_tilde = D_e*delta_epsilon_tilde;
     sigma_prime += delta_sigma_tilde.cauchy();
-    std::cout << D_e << "\n";
-    std::cout << delta_sigma_tilde << "\n";
-    std::cout << delta_epsilon_tilde << "\n";
-    std::cout << sigma_prime << "\n";
+
+    // Take the Jacobian as the tangent stiffness.
+    jacobian = D_e;
 }
 

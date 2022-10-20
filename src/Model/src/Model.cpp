@@ -6,7 +6,7 @@ void Model::set_name(std::string s) {
     name = s;
 }
 
-void Model::set_jacobian(Eigen::Matrix3d m) {
+void Model::set_jacobian(Jacobian m) {
     jacobian = m;
 }
 
@@ -43,7 +43,7 @@ Voigt Model::get_sigma_prime(void) {
     return -sigma_prime_tilde;
 }
 
-Eigen::Matrix3d Model::get_jacobian(void) {
+Jacobian Model::get_jacobian(void) {
     return jacobian;
 }
 

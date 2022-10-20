@@ -22,7 +22,7 @@ class Model {
         /** 
          * @brief Method to set Jacobian matrix. 
          */
-        void set_jacobian(Eigen::Matrix3d j);
+        void set_jacobian(Jacobian j);
 
         /** 
          * @brief Method to set effective stress tensor in Voigt notation. 
@@ -39,7 +39,7 @@ class Model {
         /**
          * @brief Method to get Jacobian matrix. 
          */
-        Eigen::Matrix3d get_jacobian(void);
+        Jacobian get_jacobian(void);
 
         /** 
          * @brief Method to get effective stress tensor in Voigt notation. 
@@ -393,7 +393,7 @@ class Model {
         /** 
          * @brief Jacobian matrix. 
          */
-        Cauchy jacobian;
+        Jacobian jacobian = Jacobian::Zero();
     
         /** 
          * @brief First stress invariant.

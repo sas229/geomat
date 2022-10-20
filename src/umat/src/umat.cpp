@@ -51,14 +51,14 @@ extern "C" void umat(
     // Create maps to data.
     Eigen::Map<Vector6d> map_to_stress(stress);
     Eigen::Map<Vector6d> map_to_strain_increment(dstran);
-    Eigen::Map<Eigen::Matrix3d> map_to_jacobian(ddsdde);
+    Eigen::Map<Eigen::Matrix<double, 6, 6>> map_to_jacobian(ddsdde);
     std::vector<double> state(statev, statev+*nstatv);
     std::vector<double> parameters(props, props+*nprops);
 
     // Create a native Eigen type using the map as initialisation.
     Voigt Eigen_sigma = map_to_stress;
     Voigt Eigen_dstran = map_to_strain_increment;
-    Eigen::Matrix3d Eigen_jacobian = map_to_jacobian;
+    Jacobian Eigen_jacobian = map_to_jacobian;
 
     // On first call, initialise logger and instantiate model.
     if (first_call) {
@@ -96,9 +96,11 @@ extern "C" void umat(
     model->solve();
 
     // Equate map to updated variable in order to map back to input variable.
+    std::cout << "Stress prior to update:\n" << map_to_stress << "\n";
     map_to_stress = model->get_sigma_prime();
     map_to_jacobian = model->get_jacobian();
     statev = state.data();
+    // std::cout << "Jacobian:\n" << map_to_jacobian << "\n";
     std::cout << "Updated stress after sign change:\n" << map_to_stress << "\n";
     std::cout << "From C array:\n";
     for (auto i=0; i<6; i++) {

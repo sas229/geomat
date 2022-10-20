@@ -9,7 +9,6 @@ LinearElastic::LinearElastic(std::vector<double> parameters, std::vector<double>
     PLOG_FATAL_IF(state.size() != state_required) << state.size() << " parameters supplied when " << state_required << " expected.";
     assert(parameters.size() == parameters_required && state.size() == state_required);
     PLOG_INFO << name << " model instantiated with " << parameters.size() << " parameters and " << state.size() << " state variables."; 
-    std::cout << K << "\n";
 }
 
 double LinearElastic::compute_K(double delta_epsilon_e_vol, double p_prime) {
