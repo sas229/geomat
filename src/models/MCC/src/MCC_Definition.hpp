@@ -40,3 +40,39 @@
  * \f$ M\f$ is the frictional constant and \f$ p_c \f$ is the preconsolidation pressure.
  */
 #define YIELD f = pow(q,2) + pow(M,2)*p_prime*(p_prime-p_c)
+
+/**
+ * @brief Derivatives of the yield surface with respect to the effective stress state:
+ * 
+ * \f[ \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} = \frac{M^2\left(2 p^{\prime}-p_c \right)}{3} \mathbf{1} + 3 \operatorname{dev}(\boldsymbol{\sigma}^{\prime}) \f]
+ */
+#define DF_DSIGMA_PRIME df_dsigma_prime = pow(M,2)*(2*p_prime-p_c)*1.0/3.0*eye + 3.0*s
+
+/**
+ * @brief Derivativee of the yield surface with respect to the preconsolidation pressure:
+ * 
+ * \f[ \frac{\partial f}{\partial p_c} = -(M^2 p^{\prime})\f] 
+ */
+#define DF_DP_C df_dp_c = -(pow(M,2)*p_prime)
+
+/**
+ * @brief Derivatives of the plastic potential function with respect to the effective stress state. 
+ * Equal to the derivates for the yield surface if associated flow:
+ * 
+ * \f[ \frac{\partial g}{\partial \boldsymbol{\sigma}^{\prime}} = \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} \f]
+ */
+#define DG_DSIGMA_PRIME DF_DSIGMA_PRIME
+
+/**
+ * @brief Derivative of the plastic potential function with respect to the effective mean stress:
+ * 
+ * \f[ \frac{\partial g}{\partial p^{\prime}} = M^2 \left( 2 p^{\prime} p_c \right) \f]
+ */
+#define DG_DP_PRIME dg_dp_prime = M**2*(2*p_prime-p_c)
+
+/**
+ * @brief Hardening modulus.
+ *  
+ * \f[ H = \frac{M^2 p^{\prime} p_c}{\lambda^*-\kappa^*} \operatorname{tr}\left( \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} \right) \f]
+ */
+#define HARDENING_MODULUS H = (pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*df_dsigma_prime.trace()

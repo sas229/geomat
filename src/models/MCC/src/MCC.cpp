@@ -34,3 +34,8 @@ double MCC::compute_G(double K) {
     SHEAR_MODULUS;
     return G;
 }
+
+void MCC::compute_derivatives(Cauchy sigma_prime, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, double &dg_dp_prime, double &H, std::vector<double> &B_state) {
+    // Calculate the derivatives in here.
+    df_dsigma_prime = DF_DSIGMA_PRIME;
+}

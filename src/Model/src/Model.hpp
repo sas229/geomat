@@ -53,6 +53,8 @@ class Model {
 
         /**
          * @brief Method to solve stress increment given the current strain increment.
+         * 
+         * @note Must be overriden by constitutive behaviour classes (e.g. Elastic, Elastoplastic).
          */
         virtual void solve(void) {};
 
@@ -381,7 +383,7 @@ class Model {
          *      0 & 0 & 1
          *      \end{array}\right] \f] 
          */
-        Eigen::Matrix3d eye = Eigen::Matrix3d::Identity();
+        Cauchy eye = Cauchy::Identity();
          
         /** 
          * @brief Pore pressure. Computed for undrained (bulk modulus) approach, otherwise provided as a state variable.
@@ -391,7 +393,7 @@ class Model {
         /** 
          * @brief Jacobian matrix. 
          */
-        Eigen::Matrix3d jacobian;
+        Cauchy jacobian;
     
         /** 
          * @brief First stress invariant.

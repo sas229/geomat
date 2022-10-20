@@ -7,12 +7,9 @@
 #include <typeinfo>
 #include <memory>
 #include <cassert>
-
 #include <Eigen/Eigen>
-
 #include <plog/Log.h>
 #include <plog/Initializers/RollingFileInitializer.h>
-
 #include "Types.hpp"
 #include "Model.hpp"
 #include "MCC.hpp"
@@ -69,7 +66,7 @@
  * @param[in,out] kspt Section point number within the current layer.
  * @param[in,out] kstep Procedure type key; nlgeom boolean; linear perturbation boolean.
  * @param[in,out] kinc Increment number.
- * */
+ */
 extern "C" void umat(
     double *stress,
     double *statev,

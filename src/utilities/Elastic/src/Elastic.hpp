@@ -66,6 +66,8 @@ class Elastic : public Model {
         * @param delta_epsilon_vol 
         * @param p_prime 
         * @return double 
+        * 
+        * @note Must be overriden by model implementations.
         */
        virtual double compute_K(double delta_epsilon_vol, double p_prime) = 0;
        
@@ -74,6 +76,8 @@ class Elastic : public Model {
         * 
         * @param K Bulk modulus. 
         * @return double 
+        * 
+        * @note Must be overriden by model implementations.
         */
        virtual double compute_G(double K) = 0;
 

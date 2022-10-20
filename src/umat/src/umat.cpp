@@ -93,7 +93,6 @@ extern "C" void umat(
     model->update_lode();
 
     // Do some work with it... (i.e. stress integration).
-    
     model->solve();
 
     // Equate map to updated variable in order to map back to input variable.

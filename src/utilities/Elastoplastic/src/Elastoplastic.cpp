@@ -1,42 +1,41 @@
 #include "Elastoplastic.hpp"
 
 void Elastoplastic::solve(void) {
-    alpha = compute_alpha();
-}
-
-double Elastoplastic::compute_alpha(void) {
-    // Pegasus algorithm.
-    int iterations = 0;
-    int max_iterations = 10;
-    double tolerance = 1e-10;
+    // Check increment type.
     double alpha;
-    double alpha_n;
-    double alpha_0 = 0.0;
-    double alpha_1 = 1.0;
-    Cauchy sigma_prime_0 = sigma_prime;
-    Cauchy sigma_prime_1 = sigma_prime;
-    Cauchy sigma_prime_n = sigma_prime;
-    double f, f_0, f_1, f_n = tolerance;
 
-    // First trial state: no strain increment.
-    sigma_prime_0 = compute_isotropic_linear_elastic_trial_stress(sigma_prime, alpha_0, delta_epsilon_tilde);
-    f_0 = compute_f(sigma_prime_0);
+    // Current stress state.
+    double f_0 = compute_f(sigma_prime);
 
-    // Second trial state: fully elastic strain increment.
-    sigma_prime_1 = compute_isotropic_linear_elastic_trial_stress(sigma_prime, alpha_1, delta_epsilon_tilde);
-    f_1 = compute_f(sigma_prime_1);
+    // Fully elastic increment trial stress state.
+    Cauchy sigma_prime_1 = compute_isotropic_linear_elastic_trial_stress(sigma_prime, 1.0, delta_epsilon_tilde);
+    double f_1 = compute_f(sigma_prime_1);
 
-    // Check if plastic increment.
-    if (f_1 > 0.0) {
-        PLOG_INFO << "Plastic increment: finding alpha via the Pegasus algorithm.";
-    } else {
+    // Check increment type.
+    if (f_1 <= FTOL) {
         PLOG_INFO << "Fully elastic increment; alpha = 1.0.";
         alpha = 1.0;
-        return alpha;
+    } else if (std::abs(f_0) <= FTOL and f_1> FTOL) {
+        PLOG_INFO << "Check potential for elastoplastic unloading-reloading.";
+    } else if (f_0 < -FTOL && f_1 > FTOL) {
+        PLOG_INFO << "Plastic increment: finding alpha via the Pegasus algorithm.";
+        alpha = compute_alpha(0.0, 1.0, f_0, f_1);
+    } else {
+        PLOG_FATAL << "Illegal stress state.";
+        assert(false);
     }
+    std::cout << "alpha = " << alpha << "\n";
+}
+
+double Elastoplastic::compute_alpha(double alpha_0, double alpha_1, double f_0, double f_1) {
+    // Pegasus algorithm.
+    int iterations = 0;
+    double alpha_n;
+    double f_n = FTOL;
+    Cauchy sigma_prime_n = sigma_prime;
 
     // Iterate to find optimal alpha if a plastic increment.
-    while (iterations < max_iterations && std::abs(f_n) >= tolerance) {
+    while (iterations < MAXITS && std::abs(f_n) >= FTOL) {
         alpha_n = alpha_1 - f_1*(alpha_1-alpha_0)/(f_1-f_0);  
             
         sigma_prime_n = compute_isotropic_linear_elastic_trial_stress(sigma_prime, alpha_n, delta_epsilon_tilde);
@@ -53,13 +52,13 @@ double Elastoplastic::compute_alpha(void) {
         f_0 = f_n;
         iterations += 1;
     }
-    alpha = alpha_n;
-    f = f_n;
-    if (std::abs(f) >= tolerance) {
-        PLOG_FATAL << "Performed " << max_iterations << " Pegasus iterations: alpha = " << alpha << "; f = " << f << " > tolerance = " << tolerance << ".";
+    double alpha = alpha_n;
+    double f = f_n;
+    if (std::abs(f) >= FTOL) {
+        PLOG_FATAL << "Performed " << MAXITS << " Pegasus iterations: alpha = " << alpha << "; |f| = " << std::abs(f) << " > tolerance = " << FTOL << ".";
         assert(false);
     } else{
-        PLOG_INFO << "Performed " << iterations << " Pegasus iterations: " << "alpha = " << alpha << "; " << "f = " << f << " < tolerance = " << tolerance << ".";
+        PLOG_INFO << "Performed " << iterations << " Pegasus iterations: " << "alpha = " << alpha << "; " << "|f| = " << std::abs(f) << " < tolerance = " << FTOL << ".";
         assert(alpha >= 0.0 && alpha <= 1.0);
     }
     return alpha;

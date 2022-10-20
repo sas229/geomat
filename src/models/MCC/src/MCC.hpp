@@ -38,12 +38,24 @@ class MCC : public Elastoplastic {
         double compute_K(double delta_epsilon_vol, double p_prime);
 
         /**
-         * @brief Overrident method to compute the shear modulus.
+         * @brief Overriden method to compute the shear modulus.
          * 
          * @param K Bulk modulus.
          * @return double 
          */
         double compute_G(double K);
+
+        /** 
+         * @brief Method to compute the derivatives for the constituive model implemented.
+         * 
+         * @param[in] sigma_prime Effective stress tensor.
+         * @param[in,out] df_dsigma_prime Derivatives of yield function with respect to the stress state.
+         * @param[in,out] dg_dsigma_prime Derivatives of plastic potential function with respect to the stress state.
+         * @param[in,out] dg_dp_prime Derivative of plastic potential function with respect to the effective mean stress.
+         * @param[in,out] H Hardening modulus.
+         * @param[in,out] B_state Vector of state variable update scalars.
+         */
+        void compute_derivatives(Cauchy sigma_prime, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, double &dg_dp_prime, double &H, std::vector<double> &B_state);
 
     protected:
        
