@@ -10,7 +10,7 @@ int main() {
     double stress[ntens] = {-1000, -1000, -1000, 0, 0, 0};
     int nstatv = 0;
     double statev[nstatv] = {};
-    double ddsdde[ndi*nshr] = {};
+    double ddsdde[ntens*ntens] = {0};
     double sse, spd, scd, rpl;
     double ddsddt[ntens], drplde[ntens];
     double drpldt;
@@ -40,7 +40,7 @@ int main() {
     // double stress[ntens] = {-1000, -1000, -1000, 0, 0, 0};
     // int nstatv = 2;
     // double statev[nstatv] = {2.0, 1200};
-    // double ddsdde[ndi*nshr] = {3, 2, 1, 6, 5, 4, 9, 8, 7};
+    // double ddsdde[ntens*ntens] = {0};
     // double sse, spd, scd, rpl;
     // double ddsddt[ntens], drplde[ntens];
     // double drpldt;

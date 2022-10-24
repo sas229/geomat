@@ -51,14 +51,12 @@ extern "C" void umat(
     // Create maps to data.
     Eigen::Map<Vector6d> map_to_stress(stress);
     Eigen::Map<Vector6d> map_to_strain_increment(dstran);
-    Eigen::Map<Eigen::Matrix<double, 6, 6>> map_to_jacobian(ddsdde);
     std::vector<double> state(statev, statev+*nstatv);
     std::vector<double> parameters(props, props+*nprops);
 
     // Create a native Eigen type using the map as initialisation.
     Voigt Eigen_sigma = map_to_stress;
     Voigt Eigen_dstran = map_to_strain_increment;
-    Jacobian Eigen_jacobian = map_to_jacobian;
 
     // On first call, initialise logger and instantiate model.
     if (first_call) {
@@ -84,13 +82,12 @@ extern "C" void umat(
     // Set variables within model.    
     model->set_sigma_prime(Eigen_sigma);
     model->set_strain_increment(Eigen_dstran);
-    model->set_jacobian(Eigen_jacobian);
 
-    model->update_stress_invariants();
-    model->update_principal_stresses();
-    double c, s, s_bar;
-    model->compute_lode(850.0, 9000.0, c, s, s_bar);
-    model->update_lode();
+    // model->update_stress_invariants();
+    // model->update_principal_stresses();
+    // double c, s, s_bar;
+    // model->compute_lode(850.0, 9000.0, c, s, s_bar);
+    // model->update_lode();
 
     // Do some work with it... (i.e. stress integration).
     model->solve();
@@ -101,10 +98,11 @@ extern "C" void umat(
     std::cout << "Updated stress after remapping:\n" << map_to_stress << "\n";
 
     // The map to the jacobian below somehow overwrites the stress state in the LinearElastic model class!!!
-    map_to_jacobian = model->get_jacobian();
+    Jacobian jacobian = model->get_jacobian();
+    ddsdde = jacobian.data();
     
     statev = state.data();
-    // std::cout << "Jacobian:\n" << map_to_jacobian << "\n";
+    std::cout << "Jacobian:\n" << jacobian << "\n";
     std::cout << "Updated stress after sign change:\n" << map_to_stress << "\n";
     std::cout << "From C array:\n";
     for (auto i=0; i<6; i++) {
