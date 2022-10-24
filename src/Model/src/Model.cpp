@@ -53,8 +53,8 @@ Cauchy Model::compute_cartesian_stresses(Cauchy T, Cauchy S) {
     return T*S*T.transpose();
 }
 
-Cauchy Model::compute_delta_epsilon_vol(Cauchy delta_epsilon) {
-    return delta_epsilon.trace()*eye;
+double Model::compute_delta_epsilon_vol(Cauchy delta_epsilon) {
+    return delta_epsilon.trace();
 }
 
 void Model::compute_lode(double J_2, double J_3, double &theta_c, double &theta_s, double &theta_s_bar) {

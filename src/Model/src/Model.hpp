@@ -84,19 +84,13 @@ class Model {
         Cauchy compute_cartesian_stresses(Cauchy T, Cauchy S);
 
         /** 
-         * @brief Method to compute the volumetric strain increment tensor:
-         * \f[ \boldsymbol{\Delta \epsilon_{vol}} = \Delta \epsilon_{vol} \mathbf{I} =
-         *      \left[\begin{array}{lll}
-         *      \Delta \epsilon_{vol} & 0 & 0 \\
-         *      0 & \Delta \epsilon_{vol} & 0 \\
-         *      0 & 0 & \Delta \epsilon_{vol}
-         *      \end{array}\right] \f] 
-         * where \f$ \mathbf{I} \f$ is the identity matrix and \f$ \Delta \epsilon_{vol} \f$
-         *  is the volumetric strain increment calculated as:
+         * @brief Method to compute the volumetric strain increment:
+         * 
          * \f[ \Delta \epsilon_{vol} = \operatorname{tr} \left( \boldsymbol{\Delta \epsilon} \right)\f] 
+         * 
          * where \f$ \boldsymbol{\Delta \epsilon} \f$ is the strain increment tensor. 
          */
-        Cauchy compute_delta_epsilon_vol(Cauchy delta_epsilon);
+        double compute_delta_epsilon_vol(Cauchy delta_epsilon);
 
         /** 
          * @brief Function to compute Lode's angle with cosine definition \f$ \theta_c \f$ as:
@@ -363,16 +357,11 @@ class Model {
         Cauchy delta_epsilon = Cauchy::Zero();
 
         /** 
-         * @brief Volumetric strain increment tensor:
-         * \f[ \Delta \boldsymbol{\epsilon}_{vol} = 
-         *      \left[\begin{array}{lll}
-         *      \Delta \epsilon_{vol} & 0 & 0 \\
-         *      0 & \Delta \epsilon_{vol} & 0 \\
-         *      0 & 0 & \Delta \epsilon_{vol}
-         *      \end{array}\right] \f]
-         * where \f$ \Delta \epsilon_{vol} \f$ is the volumetric strain increment. 
+         * @brief Volumetric strain increment:
+         * * \f[ \Delta \epsilon_{vol} = \operatorname{tr} \left( \boldsymbol{\Delta \epsilon} \right)\f] 
+         * where \f$ \boldsymbol{\Delta \epsilon} \f$ is the strain increment tensor. 
          */
-        Cauchy delta_epsilon_vol;
+        double delta_epsilon_vol;
         
         /** 
          * @brief Identity matrix:
