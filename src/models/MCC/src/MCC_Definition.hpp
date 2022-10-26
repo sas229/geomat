@@ -49,7 +49,7 @@
 #define DF_DSIGMA_PRIME pow(M,2)*(2*p_prime-p_c)*1.0/3.0*eye + 3.0*s
 
 /**
- * @brief Derivativee of the yield surface with respect to the preconsolidation pressure:
+ * @brief Derivative of the yield surface with respect to the preconsolidation pressure:
  * 
  * \f[ \frac{\partial f}{\partial p_c} = -(M^2 p^{\prime})\f] 
  */

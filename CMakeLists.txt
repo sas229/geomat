@@ -8,7 +8,7 @@ enable_testing()
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -DEIGEN_DONT_PARALLELIZE")
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
-set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 message(${CMAKE_CXX_FLAGS})
 
 # Create test executable.
@@ -17,7 +17,7 @@ target_include_directories(umat_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(umat_test PRIVATE umat Model LinearElastic MCC)
 
 # Create library for usage with Abaqus.
-add_library(umat_library SHARED src/umat/src/umat.cpp)
+add_library(umat_library STATIC src/umat/src/umat.cpp)
 target_include_directories(umat_library PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/umat)
 target_link_libraries(umat_library PRIVATE Model LinearElastic MCC)
 

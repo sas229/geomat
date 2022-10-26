@@ -85,10 +85,11 @@ class Model {
 
         /** 
          * @brief Method to compute the volumetric strain increment:
-         * 
          * \f[ \Delta \epsilon_{vol} = \operatorname{tr} \left( \boldsymbol{\Delta \epsilon} \right)\f] 
-         * 
          * where \f$ \boldsymbol{\Delta \epsilon} \f$ is the strain increment tensor. 
+         * 
+         * @param[in] delta_epsilon Strain increment tensor.
+         * @return Volumetric strain increment.
          */
         double compute_delta_epsilon_vol(Cauchy delta_epsilon);
 

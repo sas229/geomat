@@ -15,7 +15,7 @@ void Elastoplastic::solve(void) {
     if (f_1 <= FTOL) {
         PLOG_INFO << "Fully elastic increment; alpha = 1.0.";
         alpha = 1.0;
-    } else if (std::abs(f_0) <= FTOL and f_1> FTOL) {
+    } else if (std::abs(f_0) <= FTOL && f_1> FTOL) {
         PLOG_INFO << "Check potential for elastoplastic unloading-reloading.";
     } else if (f_0 < -FTOL && f_1 > FTOL) {
         PLOG_INFO << "Plastic increment: finding alpha via the Pegasus algorithm.";
