@@ -1,6 +1,9 @@
-[submodule "src/external/plog/plog"]
-	path = src/external/plog/plog
-	url = https://github.com/SergiusTheBest/plog.git
-[submodule "src/external/Eigen/eigen"]
-	path = src/external/Eigen/eigen
+[submodule "src/external/eigen"]
+	path = src/external/eigen
 	url = https://gitlab.com/libeigen/eigen.git
+[submodule "src/external/Catch2"]
+	path = src/external/Catch2
+	url = https://github.com/catchorg/Catch2.git
+[submodule "src/external/pybind11"]
+	path = src/external/pybind11
+	url = https://github.com/pybind/pybind11.git
