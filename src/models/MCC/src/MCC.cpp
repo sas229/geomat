@@ -32,7 +32,11 @@ double MCC::compute_G(double K) {
     return SHEAR_MODULUS;
 }
 
-void MCC::compute_derivatives(Cauchy sigma_prime, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, double &dg_dp_prime, double &H, std::vector<double> &B_state) {
-    // Calculate the derivatives in here.
+void MCC::compute_derivatives(Cauchy sigma_prime, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H) {
     df_dsigma_prime = DF_DSIGMA_PRIME;
+    a = df_dsigma_prime.voigt();
+    dg_dsigma_prime = DG_DSIGMA_PRIME;
+    b = dg_dsigma_prime.voigt();
+    dg_dp_prime = DG_DP_PRIME;
+    H = HARDENING_MODULUS;    
 }

@@ -50,12 +50,14 @@ class MCC : public Elastoplastic {
          * 
          * @param[in] sigma_prime Effective stress tensor.
          * @param[in,out] df_dsigma_prime Derivatives of yield function with respect to the stress state.
+         * @param[in,out] a Vector of derivatives of yield function with respect to the stress state.
          * @param[in,out] dg_dsigma_prime Derivatives of plastic potential function with respect to the stress state.
+         * @param[in,out] b Vector of derivatives of plastic potential function with respect to the stress state.
          * @param[in,out] dg_dp_prime Derivative of plastic potential function with respect to the effective mean stress.
          * @param[in,out] H Hardening modulus.
          * @param[in,out] B_state Vector of state variable update scalars.
          */
-        void compute_derivatives(Cauchy sigma_prime, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, double &dg_dp_prime, double &H, std::vector<double> &B_state);
+        void compute_derivatives(Cauchy sigma_prime, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H);
 
     protected:
        

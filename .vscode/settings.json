@@ -73,7 +73,11 @@
         "mutex": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "cassert": "cpp"
+        "cassert": "cpp",
+        "bitset": "cpp",
+        "forward_list": "cpp",
+        "regex": "cpp",
+        "typeindex": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceFolder}",
 }

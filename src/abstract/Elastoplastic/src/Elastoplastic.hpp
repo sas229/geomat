@@ -32,12 +32,22 @@ class Elastoplastic : public Elastic {
          */
         void solve(void);
 
+        bool check_unload_reload(Cauchy sigma_prime);
+
         /**
          * @brief Method to compute the elastic fraction of the current strain increment following Sloan et al. (2001).
          * 
          * @return double 
          */
         double compute_alpha(double alpha_0, double alpha_1, double f_0, double f_1);
+
+        /**
+         * @brief Method to compute bounds for alpha for elastoplastic unloading-reloading increment.
+         * 
+         * @param alpha_0 Lower bound for alpha.
+         * @param alpha_1 Upper bound for alpha.
+         */
+        void compute_alpha_bounds(double &alpha_0, double &alpha_1);
 
         /**
          * @brief Pure virtual method to compute the yield surface value given the parameters, current state variables and stress state.
@@ -61,7 +71,7 @@ class Elastoplastic : public Elastic {
          * 
          * @note Must be overriden by model implementations.
          */
-        virtual void compute_derivatives(Cauchy sigma_prime, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, double &dg_dp_prime, double &H, std::vector<double> &B_state) = 0;
+        virtual void compute_derivatives(Cauchy sigma_prime, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b,double &dg_dp_prime, double &H) = 0;
 
     private:
 
@@ -76,9 +86,19 @@ class Elastoplastic : public Elastic {
         Cauchy df_dsigma_prime;
 
         /**
+         * @brief Vector of derivatives of yield function with respect to the stress state.
+         */
+        Voigt a;
+
+        /**
          * @brief Derivatives of plastic potential function with respect to the stress state.
          */
         Cauchy dg_dsigma_prime;
+
+        /**
+         * @brief Vector of derivatives of plastic potential function with respect to the stress state.
+         */
+        Voigt b;
 
         /**
          * @brief Derivative of plastic potential function with respect to the effective mean stress.
@@ -91,11 +111,6 @@ class Elastoplastic : public Elastic {
         double H;
 
         /**
-         * @brief Vector of state variable update scalars.
-         */
-        std::vector<double> B_state;
-
-        /**
          * @brief Yield surface tolerance.
          */
         double FTOL = 1e-10;
@@ -104,6 +119,21 @@ class Elastoplastic : public Elastic {
          * @brief Maximum number of Pegasus method iterations to be performed during yield surface intersection calculations.
          */
         int MAXITS = 10;
+
+        /**
+         * @brief Unload-reload tolerance.
+         */
+        double LTOL = 1e-6;
+
+        /**
+         * @brief Number of unload-reload intersection substeps for alpha bound determination.
+         */
+        int NSUB = 10;
+
+        /**
+         * @brief Elastoplastic constitutive matrix.
+         */
+        Constitutive D_ep;
 };
 
 #endif
