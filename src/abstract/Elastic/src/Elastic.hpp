@@ -49,7 +49,7 @@ class Elastic : public Model {
         * @param[in] delta_epsilon_tilde Strain increment.
         * @return Elastic trial stress tensor.
         */
-       Cauchy compute_isotropic_linear_elastic_trial_stress(Cauchy sigma_prime, double alpha, Voigt delta_epsilon_tilde);
+       Cauchy compute_isotropic_linear_elastic_stress(Cauchy sigma_prime, double alpha, Voigt delta_epsilon_tilde);
 
        /**
         * @brief Method to compute the elastic stress increment given an elastic matrix and a strain increment.

@@ -14,7 +14,7 @@ Constitutive Elastic::compute_isotropic_linear_elastic_matrix(double K, double G
     return D_e;
 }
 
-Cauchy Elastic::compute_isotropic_linear_elastic_trial_stress(Cauchy sigma_prime, double alpha, Voigt delta_epsilon_tilde) {
+Cauchy Elastic::compute_isotropic_linear_elastic_stress(Cauchy sigma_prime, double alpha, Voigt delta_epsilon_tilde) {
     Voigt delta_epsilon_tilde_trial = alpha*delta_epsilon_tilde;
     double delta_epsilon_e_vol = compute_delta_epsilon_vol(delta_epsilon_tilde_trial.cauchy()); 
     double p_prime_trial = compute_p_prime(sigma_prime);

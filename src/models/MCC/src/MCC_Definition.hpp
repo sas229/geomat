@@ -69,3 +69,17 @@
  * \f[ H = \frac{M^2 p^{\prime} p_c}{\lambda^*-\kappa^*} \operatorname{tr}\left( \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} \right) \f]
  */
 #define HARDENING_MODULUS (pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*df_dsigma_prime.trace()
+
+/**
+ * @brief Void ratio elastic update:
+ * 
+ * \f[ e = e - e \delta \epsilon_{vol, e}\f]
+ */
+#define VOID_RATIO_ELASTIC_UPDATE e-(e*delta_epsilon_vol_e)
+
+/**
+ * @brief Preconsolidation pressure elastic update:
+ * 
+ * \f[ p_{c} = \text{constant}\f]
+ */
+#define PRECONSOLIDATION_ELASTIC_UPDATE p_c

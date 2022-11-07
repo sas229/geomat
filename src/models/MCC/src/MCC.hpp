@@ -59,6 +59,7 @@ class MCC : public Elastoplastic {
          */
         void compute_derivatives(Cauchy sigma_prime, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H);
 
+        void compute_elastic_state_variable_update(void);
     protected:
        
         /** 

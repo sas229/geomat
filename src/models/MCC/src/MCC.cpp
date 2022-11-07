@@ -40,3 +40,8 @@ void MCC::compute_derivatives(Cauchy sigma_prime, Cauchy &df_dsigma_prime, Voigt
     dg_dp_prime = DG_DP_PRIME;
     H = HARDENING_MODULUS;    
 }
+
+void MCC::compute_elastic_state_variable_update(void) {
+    e = VOID_RATIO_ELASTIC_UPDATE;
+    p_c = PRECONSOLIDATION_ELASTIC_UPDATE;
+}
