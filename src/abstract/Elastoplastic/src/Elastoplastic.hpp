@@ -66,6 +66,21 @@ class Elastoplastic : public Elastic {
          */
         double delta_epsilon_vol_e;
 
+                /**
+         * @brief Elastic strain increment.
+         */
+        Voigt delta_epsilon_tilde_e;
+
+        /**
+         * @brief Plastic strain increment.
+         */
+        Voigt delta_epsilon_tilde_p;
+
+        /**
+         * @brief Effective stress after applying elastic portion of strain increment.
+         */
+        Cauchy sigma_prime_e;
+        
     private:
 
         /**
@@ -161,21 +176,6 @@ class Elastoplastic : public Elastic {
          * @brief Elastoplastic constitutive matrix.
          */
         Constitutive D_ep;
-
-        /**
-         * @brief Elastic strain increment.
-         */
-        Voigt delta_epsilon_tilde_e;
-
-        /**
-         * @brief Plastic strain increment.
-         */
-        Voigt delta_epsilon_tilde_p;
-
-        /**
-         * @brief Effective stress after applying elastic portion of strain increment.
-         */
-        Cauchy sigma_prime_e;
 };
 
 #endif

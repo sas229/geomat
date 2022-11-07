@@ -33,6 +33,7 @@ double MCC::compute_G(double K) {
 }
 
 void MCC::compute_derivatives(Cauchy sigma_prime, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H) {
+    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     df_dsigma_prime = DF_DSIGMA_PRIME;
     a = df_dsigma_prime.voigt();
     dg_dsigma_prime = DG_DSIGMA_PRIME;
@@ -42,6 +43,7 @@ void MCC::compute_derivatives(Cauchy sigma_prime, Cauchy &df_dsigma_prime, Voigt
 }
 
 void MCC::compute_elastic_state_variable_update(void) {
-    e = VOID_RATIO_ELASTIC_UPDATE;
-    p_c = PRECONSOLIDATION_ELASTIC_UPDATE;
+    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
+    state[0] = STATE_0_ELASTIC_UPDATE;
+    state[1] = STATE_1_ELASTIC_UPDATE;
 }

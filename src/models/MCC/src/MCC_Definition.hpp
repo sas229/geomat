@@ -71,15 +71,15 @@
 #define HARDENING_MODULUS (pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*df_dsigma_prime.trace()
 
 /**
- * @brief Void ratio elastic update:
+ * @brief State variable elastic update for void ratio:
  * 
  * \f[ e = e - e \delta \epsilon_{vol, e}\f]
  */
-#define VOID_RATIO_ELASTIC_UPDATE e-(e*delta_epsilon_vol_e)
+#define STATE_0_ELASTIC_UPDATE e-(e*delta_epsilon_vol_e)
 
 /**
- * @brief Preconsolidation pressure elastic update:
+ * @brief State variable elastic update for preconsolidation pressure:
  * 
- * \f[ p_{c} = \text{constant}\f]
+ * \f[ p_{c} = constant \f]
  */
-#define PRECONSOLIDATION_ELASTIC_UPDATE p_c
+#define STATE_1_ELASTIC_UPDATE p_c
