@@ -40,7 +40,7 @@ class Elastoplastic : public Elastic {
          * 
          * @note Must be overriden by model implementations.
          */
-        virtual double compute_f(Cauchy sigma_prime, Eigen::VectorXd state) = 0;
+        virtual double compute_f(Cauchy sigma_prime, State state) = 0;
 
         /** 
          * @brief Pure virtual method to compute the derivatives for the constitutive model implemented.
@@ -55,14 +55,16 @@ class Elastoplastic : public Elastic {
          * 
          * @note Must be overriden by model implementations.
          */
-        virtual void compute_derivatives(Cauchy sigma_prime, Eigen::VectorXd state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H) = 0;
+        virtual void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H) = 0;
 
         /**
          * @brief Pure virtual method to compute the elastic update of the state variables for the model implemented.
          * 
-         * * @note Must be overriden by model implementations.
+         * @return Vector of state variables.
+         * 
+         * @note Must be overriden by model implementations.
          */
-        virtual void compute_elastic_state_variable(void) = 0;
+        virtual State compute_elastic_state_variable(Voigt delta_epsilon_tilde_e) = 0;
 
         /**
          * @brief Compute elstoplastic constitutive matrix via:
@@ -97,7 +99,7 @@ class Elastoplastic : public Elastic {
          * 
          * @note Must be overriden by model implementations.
          */
-        virtual Eigen::VectorXd compute_plastic_state_variable_increment(double delta_lambda, double H) = 0;
+        virtual State compute_plastic_state_variable_increment(double delta_lambda, double H) = 0;
 
         /**
          * @brief Pure virtual method to compute the correction for the state variables for the model implemented.
@@ -107,7 +109,7 @@ class Elastoplastic : public Elastic {
          * 
          * @note Must be overriden by model implementations.
          */
-        virtual Eigen::VectorXd compute_plastic_state_variable_correction(double delta_lambda, double H) = 0;
+        virtual State compute_plastic_state_variable_correction(double delta_lambda, double H) = 0;
 
         /**
          * @brief Pure virtual method to compute the plastic update of the state variables for the model implemented.
@@ -125,7 +127,7 @@ class Elastoplastic : public Elastic {
          *  
          * @note Must be overriden by model implementations.
          */
-        virtual Eigen::VectorXd get_state_variables() = 0;
+        virtual State get_state_variables() = 0;
 
         /**
          * @brief Compute error estimate.
@@ -138,7 +140,7 @@ class Elastoplastic : public Elastic {
          * @param delta_state_2 State variable increment 2.
          * @return Error estimate.
          */
-        double compute_error_estimate(Cauchy sigma_prime_ini, Voigt delta_sigma_prime_1, Voigt delta_sigma_prime_2, Eigen::VectorXd state_ini, Eigen::VectorXd delta_state_1, Eigen::VectorXd delta_state_2);
+        double compute_error_estimate(Cauchy sigma_prime_ini, Voigt delta_sigma_prime_1, Voigt delta_sigma_prime_2, State state_ini, State delta_state_1, State delta_state_2);
 
         /**
          * @brief Compute plastic stress integration increment.
@@ -149,7 +151,7 @@ class Elastoplastic : public Elastic {
          * @param delta_sigma_prime Increment in stress state.
          * @param delta_state Increment in state variables.
          */
-        void compute_plastic_increment(Cauchy sigma_prime, Eigen::VectorXd state, Voigt delta_epsilon_tilde_p_dT, Voigt &delta_sigma_prime, Eigen::VectorXd &delta_state);
+        void compute_plastic_increment(Cauchy sigma_prime, State state, Voigt delta_epsilon_tilde_p_dT, Voigt &delta_sigma_prime, State &delta_state);
 
         /**
          * @brief Elastic volumetric strain increment.
@@ -159,12 +161,9 @@ class Elastoplastic : public Elastic {
         /**
          * @brief Elastic strain increment.
          */
-        Voigt delta_epsilon_tilde_e;
+        Cauchy delta_epsilon_e;
 
-        /**
-         * @brief Effective stress increment due to the elastic portion of the strain increment.
-         */
-        Voigt delta_sigma_prime_e;
+        /**    double R_n;
 
         /**
          * @brief Effective stress after applying elastic portion of strain increment.
@@ -192,9 +191,24 @@ class Elastoplastic : public Elastic {
         Cauchy sigma_prime_p_dT;
 
         /**
+         * @brief Elastic strain increment.
+         */
+        Voigt delta_epsilon_tilde_e;
+
+        /**
          * @brief Plastic strain increment.
          */
         Voigt delta_epsilon_tilde_p;
+
+        /**
+         * @brief Stress state after application of elastic increment.
+         */
+        Voigt delta_sigma_prime_e;
+
+        /**
+         * @brief State variables after application of elastic increment.
+         */
+        State state_e;
 
         /**
          * @brief Effective stress first estimate in forward Euler method.
@@ -344,6 +358,21 @@ class Elastoplastic : public Elastic {
          * @brief Boolean indicating whether the current strain increment has been solved.
          */
         bool solved;
+        
+        /**
+         * @brief Number of stress integration substeps performed.
+         */
+        int substeps;
+
+        /**
+         * @brief Number of stress corrections performed.
+         */
+        int corrections;
+
+        /**
+         * @brief Error estimate for current elastoplastic stress integration increment.
+         */
+        double R_n;
 };
 
 #endif

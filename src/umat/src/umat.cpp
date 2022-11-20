@@ -51,14 +51,14 @@ extern "C" void umat(
     // Create maps to data.
     Eigen::Map<Vector6d> map_to_stress(stress);
     Eigen::Map<Vector6d> map_to_strain_increment(dstran);
-    Eigen::Map<Eigen::VectorXd> map_to_state(statev, *nstatv, 1);
-    Eigen::Map<Eigen::VectorXd> map_to_parameters(props, *nprops, 1);
+    Eigen::Map<State> map_to_state(statev, *nstatv, 1);
+    Eigen::Map<Parameters> map_to_parameters(props, *nprops, 1);
 
     // Create a native Eigen type using the map as initialisation.
     Voigt Eigen_sigma = map_to_stress;
     Voigt Eigen_dstran = map_to_strain_increment;
-    Eigen::VectorXd state = map_to_state;
-    Eigen::VectorXd parameters = map_to_parameters;
+    State state = map_to_state;
+    Parameters parameters = map_to_parameters;
 
     // On first call, initialise logger and instantiate model.
     if (first_call) {

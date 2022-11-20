@@ -1,7 +1,7 @@
 #include "MCC.hpp"
 #include "MCC_Definition.hpp"
 
-MCC::MCC(Eigen::VectorXd parameters, Eigen::VectorXd state) : parameters(parameters), state(state) {
+MCC::MCC(State parameters, State state) : parameters(parameters), state(state) {
     set_name("MCC");
     int parameters_required = 5;
     int state_required = 2;
@@ -11,7 +11,7 @@ MCC::MCC(Eigen::VectorXd parameters, Eigen::VectorXd state) : parameters(paramet
     PLOG_INFO << name << " model instantiated with " << parameters.size() << " parameters and " << state.size() << " state variables.";  
 }
 
-double MCC::compute_f(Cauchy sigma_prime, Eigen::VectorXd state) {
+double MCC::compute_f(Cauchy sigma_prime, State state) {
     // State variables.
     double e = state[0];
     double p_c = state[1];
@@ -38,7 +38,7 @@ double MCC::compute_G(double K) {
     return SHEAR_MODULUS;
 }
 
-void MCC::compute_derivatives(Cauchy sigma_prime, Eigen::VectorXd state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H) {
+void MCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H) {
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
 
     // State variables.
@@ -58,28 +58,31 @@ void MCC::compute_derivatives(Cauchy sigma_prime, Eigen::VectorXd state, Cauchy 
     H = HARDENING_MODULUS;    
 }
 
-void MCC::compute_elastic_state_variable(void) {
+State MCC::compute_elastic_state_variable(Voigt delta_epsilon_tilde_e) {
+    double delta_epsilon_vol_e = compute_delta_epsilon_vol(delta_epsilon_tilde_e.cauchy());
+    State elastic_state(state.size());
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
-    state[0] = STATE_0_ELASTIC_UPDATE;
-    state[1] = STATE_1_ELASTIC_UPDATE;
+    elastic_state[0] = STATE_0_ELASTIC_UPDATE;
+    elastic_state[1] = STATE_1_ELASTIC_UPDATE;
+    return elastic_state;
 }
 
-Eigen::VectorXd MCC::get_state_variables(void) {
+State MCC::get_state_variables(void) {
     return state;
 }
 
-Eigen::VectorXd MCC::compute_plastic_state_variable_increment(double delta_lambda, double H) {
-    Eigen::VectorXd delta_state(2);
+State MCC::compute_plastic_state_variable_increment(double delta_lambda, double H) {
+    State delta_state(state.size());
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     delta_state[0] = STATE_0_PLASTIC_INCREMENT;
     delta_state[1] = STATE_1_PLASTIC_INCREMENT;
     return delta_state;
 }
 
-Eigen::VectorXd MCC::compute_plastic_state_variable_correction(double delta_lambda, double H) {
-    Eigen::VectorXd delta_state_c(2);
+State MCC::compute_plastic_state_variable_correction(double delta_lambda, double H) {
+    // Note: only correct state variables that do not depend on the magnitude of the strain increment.
+    State delta_state_c(state.size());
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
-    // Note: only correct state variables that do not depend on strain.
     delta_state_c[0] = 0;
     delta_state_c[1] = STATE_1_PLASTIC_INCREMENT;
     return delta_state_c;

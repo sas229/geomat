@@ -20,6 +20,16 @@ typedef Eigen::Matrix<double, 6, 6> Constitutive;
  */
 typedef Eigen::Matrix<double, 6, 6> Jacobian;
 
+/**
+ * @brief Vector of parameters.
+ */
+typedef Eigen::VectorXd Parameters;
+
+/**
+ * @brief Vector of state variables.
+ */
+typedef Eigen::VectorXd State;
+
 /** 
  * @brief Custom Cauchy type derived from Eigen::Matrix3d type. 
  * Method added to return the tensor in Voigt notation form. 

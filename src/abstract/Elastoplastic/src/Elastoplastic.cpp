@@ -2,23 +2,23 @@
 
 void Elastoplastic::solve(void) { 
     compute_alpha();
-    int substeps = 0;
-    int drift_corrections = 0;
-    double R_n;
+    substeps = 0;
+    corrections = 0;
 
     if (alpha > 0.0) {
         // Update stress and state variables based on elastic portion of strain increment.
         delta_epsilon_tilde_e = alpha*delta_epsilon_tilde;
+        delta_epsilon_e = delta_epsilon_tilde_e.cauchy();
+        delta_epsilon_vol_e = compute_delta_epsilon_vol(delta_epsilon_e);
         delta_sigma_prime_e = compute_elastic_stress_increment(D_e, delta_epsilon_tilde_e);
         sigma_prime_e = compute_isotropic_linear_elastic_stress(sigma_prime, alpha, delta_epsilon_tilde_e);
-        delta_epsilon_vol_e = compute_delta_epsilon_vol(delta_epsilon_tilde_e.cauchy());
-        compute_elastic_state_variable();
+        state_e = compute_elastic_state_variable(delta_epsilon_tilde_e);
     } 
     if (alpha < 1.0) {
         // Perform elastoplastic stress integration on plastic portion of strain increment.
         delta_epsilon_tilde_p = (1.0-alpha)*delta_epsilon_tilde;
         Cauchy sigma_prime_ep = sigma_prime_e;
-        Eigen::VectorXd state_ep = get_state_variables();
+        State state_ep = get_state_variables();
 
         // Substepping with automatic error control.
         dT = 1.0;
@@ -31,14 +31,14 @@ void Elastoplastic::solve(void) {
 
             // Compute stress and state variable increment estimates.
             Voigt delta_sigma_prime_1, delta_sigma_prime_2;
-            Eigen::VectorXd delta_state_1(2), delta_state_2(2);
+            State delta_state_1(2), delta_state_2(2);
             compute_plastic_increment(sigma_prime_ep, state_ep, delta_epsilon_tilde_p_dT, delta_sigma_prime_1, delta_state_1);
             sigma_prime_1 = sigma_prime_ep + delta_sigma_prime_1.cauchy();
             compute_plastic_increment(sigma_prime_1, state_ep, delta_epsilon_tilde_p_dT, delta_sigma_prime_2, delta_state_2);
 
             // Calculate modified Euler stresses and state variables.
             Cauchy sigma_prime_ini = sigma_prime_ep + 1.0/2.0*(delta_sigma_prime_1.cauchy() + delta_sigma_prime_2.cauchy());
-            Eigen::VectorXd state_ini = state_ep + 1.0/2.0*(delta_state_1+delta_state_2);
+            State state_ini = state_ep + 1.0/2.0*(delta_state_1+delta_state_2);
 
             // Compute error estimate.
             R_n = compute_error_estimate(sigma_prime_ini, delta_sigma_prime_1, delta_sigma_prime_2, state_ini, delta_state_1, delta_state_2);
@@ -46,8 +46,8 @@ void Elastoplastic::solve(void) {
                 // Accept increment and correct stresses and state variables back to yield surface.
                 Cauchy sigma_prime_u = sigma_prime_ini;
                 Cauchy sigma_prime_c = sigma_prime_u; 
-                Eigen::VectorXd state_u = state_ini;
-                Eigen::VectorXd state_c = state_u;
+                State state_u = state_ini;
+                State state_c = state_u;
 
                 // Correct stresses and state variables back to yield surface. 
                 double f_u = compute_f(sigma_prime_u, state_u);
@@ -70,7 +70,7 @@ void Elastoplastic::solve(void) {
                         // Compute correction factor.
                         double delta_lambda_c = f_u/(H_u + a_u.transpose()*D_e_u*b_u);
                         Voigt delta_sigma_prime_c = -delta_lambda_c*D_e_u*b_u;
-                        Eigen::VectorXd delta_state_c = compute_plastic_state_variable_correction(delta_lambda_c, H_u);
+                        State delta_state_c = compute_plastic_state_variable_correction(delta_lambda_c, H_u);
 
                         // Update stress and state variables using corrections.
                         sigma_prime_c = sigma_prime_u + delta_sigma_prime_c.cauchy();
@@ -104,7 +104,7 @@ void Elastoplastic::solve(void) {
                     } 
                 }
                 // Update stress state and state variables.
-                CORRECTED: drift_corrections += ITS_YSC;
+                CORRECTED: corrections += ITS_YSC;
                 solved = true;
                 sigma_prime_ep = sigma_prime_c;
                 state_ep = state_c;
@@ -128,7 +128,7 @@ void Elastoplastic::solve(void) {
         }
         // Set stress state as final elastoplastic stress state.
         sigma_prime = sigma_prime_ep;
-        PLOG_INFO << "Elastoplastic stress increment integrated to within a tolerance FTOL = " << FTOL << " via " << substeps << " substeps and " << drift_corrections << " drift corrections.";
+        PLOG_INFO << "Elastoplastic stress increment integrated to within a tolerance FTOL = " << FTOL << " via " << substeps << " substeps and " << corrections << " drift corrections.";
     } else {
         // Fully elastic increment. Update stress state.
         sigma_prime = sigma_prime_e;
@@ -140,7 +140,7 @@ void Elastoplastic::solve(void) {
     std::cout << "Principal stresses: sigma_1 = " << sigma_1 << "; sigma_2 = " << sigma_2 << "; sigma_3 = " << sigma_3 << "\n";
 }
 
-void Elastoplastic::compute_plastic_increment(Cauchy sigma_prime, Eigen::VectorXd state, Voigt delta_epsilon_tilde_p_dT, Voigt &delta_sigma_prime, Eigen::VectorXd &delta_state) {   
+void Elastoplastic::compute_plastic_increment(Cauchy sigma_prime, State state, Voigt delta_epsilon_tilde_p_dT, Voigt &delta_sigma_prime, State &delta_state) {   
     // Calculate elastic constitutive matrix using tangent moduli and elastic stress increment.
     double p_prime = compute_p_prime(sigma_prime);
     double K_tan = compute_K(0, p_prime);
@@ -161,8 +161,8 @@ void Elastoplastic::compute_plastic_increment(Cauchy sigma_prime, Eigen::VectorX
     delta_state = compute_plastic_state_variable_increment(delta_lambda, H);
 }
 
-double Elastoplastic::compute_error_estimate(Cauchy sigma_prime_ini, Voigt delta_sigma_prime_1, Voigt delta_sigma_prime_2, Eigen::VectorXd state_ini, Eigen::VectorXd delta_state_1, Eigen::VectorXd delta_state_2) {
-    Eigen::VectorXd error(state_ini.size()+1);
+double Elastoplastic::compute_error_estimate(Cauchy sigma_prime_ini, Voigt delta_sigma_prime_1, Voigt delta_sigma_prime_2, State state_ini, State delta_state_1, State delta_state_2) {
+    State error(state_ini.size()+1);
     error[0] = ((delta_sigma_prime_2.cauchy() - delta_sigma_prime_1.cauchy())).norm()/sigma_prime_ini.norm();
     for (int i=1; i<state_ini.size(); i++) {
         error[i] = std::abs((delta_state_2[i] - delta_state_1[i]))/state_ini[i];
@@ -202,7 +202,7 @@ void Elastoplastic::compute_alpha_bounds(double &alpha_0, double &alpha_1) {
             Voigt delta_sigma_e_trial = alpha_n*D_e_trial*delta_epsilon_tilde;
 
             // Check yield function.
-            Eigen::VectorXd state_trial = get_state_variables();
+            State state_trial = get_state_variables();
             Cauchy sigma_prime_trial = sigma_prime + delta_sigma_e_trial.cauchy();
             double f_trial = compute_f(sigma_prime_trial, state_trial);
 
@@ -225,7 +225,7 @@ void Elastoplastic::compute_alpha_bounds(double &alpha_0, double &alpha_1) {
 
 bool Elastoplastic::check_unload_reload(Cauchy sigma_prime) {
     // Compute required derivatives for the given stress state.
-    Eigen::VectorXd state = get_state_variables();
+    State state = get_state_variables();
     Cauchy df_dsigma_prime_check, dg_dsigma_prime_check;
     Voigt a_check, b_check;
     double dg_dp_prime_check, H_check;
@@ -256,7 +256,7 @@ bool Elastoplastic::check_unload_reload(Cauchy sigma_prime) {
 
 void Elastoplastic::compute_alpha(void) {
     // Current stress state (i.e. alpha = 0.0).
-    Eigen::VectorXd state = get_state_variables();
+    State state = get_state_variables();
     double f_0 = compute_f(sigma_prime, state);
 
     // Fully elastic increment trial stress state.
@@ -305,7 +305,7 @@ double Elastoplastic::pegasus_regula_falsi(double alpha_0, double alpha_1, doubl
     double alpha_n;
     double f_n = FTOL;
     Cauchy sigma_prime_n = sigma_prime;
-    Eigen::VectorXd state_n = get_state_variables();
+    State state_n = get_state_variables();
 
     // Iterate to find optimal alpha if a plastic increment.
     while (iterations < MAXITS_YSI && std::abs(f_n) >= FTOL) {

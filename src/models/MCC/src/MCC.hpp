@@ -14,7 +14,7 @@ class MCC : public Elastoplastic {
         /** 
          * @brief MCC model constructor. 
          */
-        MCC(Eigen::VectorXd parameters, Eigen::VectorXd state);
+        MCC(State parameters, State state);
 
         /** 
          * @brief MCC model destructor. 
@@ -28,7 +28,7 @@ class MCC : public Elastoplastic {
          * @param state State variables.
          * @return f 
          */
-        double compute_f(Cauchy sigma_prime, Eigen::VectorXd state) override;
+        double compute_f(Cauchy sigma_prime, State state) override;
 
         /**
          * @brief Overridden method to compute the bulk modulus.
@@ -60,19 +60,21 @@ class MCC : public Elastoplastic {
          * @param[in,out] H Hardening modulus.
          * @param[in,out] B_state Vector of state variable update scalars.
          */
-        void compute_derivatives(Cauchy sigma_prime, Eigen::VectorXd state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H);
+        void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H);
 
         /**
          * @brief Overriden method to compute the elastic update of the models state variables.
+         * 
+         * @return Vector of state variables.
          */
-        void compute_elastic_state_variable(void) override;
+        State compute_elastic_state_variable(Voigt delta_epsilon_tilde_e) override;
 
         /**
          * @brief Get the state variables vector.
          * 
          * @return Vector of state variables.
          */
-        Eigen::VectorXd get_state_variables(void);
+        State get_state_variables(void);
 
         /**
          * @brief Overriden method to compute the plastic increment in the models state variables.
@@ -81,7 +83,7 @@ class MCC : public Elastoplastic {
          * @param H Hardening modulus.
          * @return STate variable increment.
          */
-        Eigen::VectorXd compute_plastic_state_variable_increment(double delta_lambda, double H) override;
+        State compute_plastic_state_variable_increment(double delta_lambda, double H) override;
 
         /**
          * @brief Overriden method to compute the correction in the models state variables.
@@ -90,7 +92,7 @@ class MCC : public Elastoplastic {
          * @param H 
          * @return State variable correction
          */
-        Eigen::VectorXd compute_plastic_state_variable_correction(double delta_lambda, double H) override;
+        State compute_plastic_state_variable_correction(double delta_lambda, double H) override;
 
         /**
          * @brief Overriden method to compute the plastic update of the models state variables.
@@ -102,12 +104,12 @@ class MCC : public Elastoplastic {
         /** 
          * @brief Parameters. 
          */
-        Eigen::VectorXd parameters {{0.0, 0.0, 0.0, 0.0, 0.0}};
+        State parameters {{0.0, 0.0, 0.0, 0.0, 0.0}};
 
         /** 
          * @brief State variables. 
          */
-        Eigen::VectorXd state {{0.0, 0.0}};
+        State state {{0.0, 0.0}};
     
         /** 
          * @brief Parameter: frictional constant. 
