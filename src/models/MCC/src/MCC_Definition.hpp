@@ -83,3 +83,19 @@
  * \f[ p_{c} = constant \f]
  */
 #define STATE_1_ELASTIC_UPDATE p_c
+
+/**
+ * @brief State variable plastic increment for void ratio:
+ * 
+ * \f[ \Delta e = -(1+e) \delta \epsilon_{vol, p} \f]
+ *
+ */
+#define STATE_0_PLASTIC_INCREMENT -(1+e)*delta_epsilon_vol_p_dT
+
+/**
+ * @brief State variable plastic increment for preconsolidation pressure:
+ * 
+ * /f[ \Delta p_{c} = \Delta \lambda \frac{H}{M^2 p} /f]
+ * 
+ */
+#define STATE_1_PLASTIC_INCREMENT delta_lambda*H/(pow(M,2)*p_prime)

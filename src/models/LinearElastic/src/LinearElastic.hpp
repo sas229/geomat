@@ -14,7 +14,7 @@ class LinearElastic : public Elastic {
         /** 
          * @brief LinearElastic model constructor. 
          */
-        LinearElastic(std::vector<double> parameters, std::vector<double> state);
+        LinearElastic(Eigen::VectorXd parameters, Eigen::VectorXd state);
 
         /** 
          * @brief LinearElastic model destructor. 
@@ -43,12 +43,12 @@ class LinearElastic : public Elastic {
         /** 
          * @brief Parameters. 
          */
-        std::vector<double> parameters {0.0, 0.0};
+        Eigen::VectorXd parameters {{0.0, 0.0}};
 
         /** 
          * @brief State variables. 
          */
-        std::vector<double> state {};
+        Eigen::VectorXd state {};
     
         /** 
          * @brief Parameter: bulk modulus. 

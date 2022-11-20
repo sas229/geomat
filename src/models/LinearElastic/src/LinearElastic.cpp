@@ -1,7 +1,7 @@
 #include "LinearElastic.hpp"
 #include "LinearElastic_Definition.hpp"
 
-LinearElastic::LinearElastic(std::vector<double> parameters, std::vector<double> state) : parameters(parameters), state(state) {
+LinearElastic::LinearElastic(Eigen::VectorXd parameters, Eigen::VectorXd state) : parameters(parameters), state(state) {
     set_name("LinearElastic");
     int parameters_required = 2;
     int state_required = 0;

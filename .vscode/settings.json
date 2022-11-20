@@ -77,7 +77,8 @@
         "bitset": "cpp",
         "forward_list": "cpp",
         "regex": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "alignedvector3": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceFolder}",
 }

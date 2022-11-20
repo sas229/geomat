@@ -169,10 +169,10 @@ class Model {
          * @param[out] sigma_1 Major principal stress.
          * @param[out] sigma_2 Intermediate principal stress.
          * @param[out] sigma_3 Minor principal stress.
+         * @param[out] R Principal stress direction tensor. 
          * @param[out] S Principal stress tensor.
-         * @param[out] T Principal stress direction tensor. 
          */
-        void compute_principal_stresses(Cauchy sigma_prime, double &sigma_1, double &sigma_2, double &sigma_3, Cauchy &S, Cauchy &T);
+        void compute_principal_stresses(Cauchy sigma_prime, double &sigma_1, double &sigma_2, double &sigma_3, Cauchy &R, Cauchy &S);
 
         /** 
          * @brief Function to compute the deviatoric stress via:
@@ -458,9 +458,9 @@ class Model {
         double sigma_3;
 
         /** 
-         * @brief Principal stress directions tensor \f$ T_{i j} \f$. 
+         * @brief Principal stress directions tensor \f$ R_{i j} \f$. 
          */
-        Cauchy T = Cauchy::Zero();
+        Cauchy R = Cauchy::Zero();
 
         /** 
          * @brief Mises stress:

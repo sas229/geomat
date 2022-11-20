@@ -40,12 +40,13 @@ class Elastoplastic : public Elastic {
          * 
          * @note Must be overriden by model implementations.
          */
-        virtual double compute_f(Cauchy sigma_prime) = 0;
+        virtual double compute_f(Cauchy sigma_prime, Eigen::VectorXd state) = 0;
 
         /** 
          * @brief Pure virtual method to compute the derivatives for the constitutive model implemented.
          * 
          * @param[in] sigma_prime Effective stress tensor.
+         * @param[in] state State variables.
          * @param[in,out] df_dsigma_prime Derivatives of yield function with respect to the stress state.
          * @param[in,out] dg_dsigma_prime Derivatives of plastic potential function with respect to the stress state.
          * @param[in,out] dg_dp_prime Derivative of plastic potential function with respect to the effective mean stress.
@@ -54,22 +55,141 @@ class Elastoplastic : public Elastic {
          * 
          * @note Must be overriden by model implementations.
          */
-        virtual void compute_derivatives(Cauchy sigma_prime, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b,double &dg_dp_prime, double &H) = 0;
+        virtual void compute_derivatives(Cauchy sigma_prime, Eigen::VectorXd state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H) = 0;
 
         /**
          * @brief Pure virtual method to compute the elastic update of the state variables for the model implemented.
+         * 
+         * * @note Must be overriden by model implementations.
          */
-        virtual void compute_elastic_state_variable_update(void) = 0;
+        virtual void compute_elastic_state_variable(void) = 0;
+
+        /**
+         * @brief Compute elstoplastic constitutive matrix via:
+         * 
+         * /f[ \mathbf{D}_{\mathrm{ep}}=\mathbf{D}_{\mathrm{e}}-\frac{\mathbf{D}_{\mathrm{e}} \mathbf{b a}^{\mathrm{T}} \mathbf{D}_{\mathrm{e}}}{A+\mathbf{a}^{\mathrm{T}} \mathbf{D}_{\mathrm{e}} \mathbf{b}}/f]
+         * 
+         * @param D_e Elastic constitutive matrix.
+         * @param a Vector of derivatives with respect to the yield surface.
+         * @param b Vector of derivatives with respect to the plastic potential function.
+         * @param H Hardening modulus.
+         * @return Elastoplastic constitutive matrix.
+         */
+        Constitutive compute_elastoplastic_matrix(Constitutive D_e, Voigt a, Voigt b, double H);
+
+        /**
+         * @brief Compute elastoplastic multiplier.
+         * 
+         * @param delta_sigma_prime_e Elastic stress increment.
+         * @param D_e Elastic constitutive matrix.
+         * @param a Vector of derivatives with respect to the yield surface.
+         * @param b Vector of derivatives with respect to the plastic potential function.
+         * @param H Hardening modulus.
+         * @return Elastoplastic multiplier.
+         */
+        double compute_elastoplastic_multiplier(Voigt delta_sigma_prime_e, Constitutive D_e, Voigt a, Voigt b, double H);
+
+        /**
+         * @brief Pure virtual method to compute the increment in the state variables for the model implemented.
+         * 
+         * @param delta_lambda Plastic multiplier.
+         * @return Vector of updated state variables.
+         * 
+         * @note Must be overriden by model implementations.
+         */
+        virtual Eigen::VectorXd compute_plastic_state_variable_increment(double delta_lambda, double H) = 0;
+
+        /**
+         * @brief Pure virtual method to compute the correction for the state variables for the model implemented.
+         * 
+         * @param delta_lambda Plastic multiplier.
+         * @return Vector of state variable corrections.
+         * 
+         * @note Must be overriden by model implementations.
+         */
+        virtual Eigen::VectorXd compute_plastic_state_variable_correction(double delta_lambda, double H) = 0;
+
+        /**
+         * @brief Pure virtual method to compute the plastic update of the state variables for the model implemented.
+         * 
+         * @return Vector of updated state variables.
+         * 
+         * @note Must be overriden by model implementations.
+         */
+        virtual void compute_plastic_state_variable(void) = 0;
+
+        /**
+         * @brief Pure virtual method to get the state variables from the model implementation.
+         * 
+         * @return Vector of state variables.
+         *  
+         * @note Must be overriden by model implementations.
+         */
+        virtual Eigen::VectorXd get_state_variables() = 0;
+
+        /**
+         * @brief Compute error estimate.
+         * 
+         * @param sigma_prime_ini Effective stress estimate.
+         * @param delta_sigma_prime_1 Effective stress increment 1.
+         * @param delta_sigma_prime_2 Effective stress increment 2.
+         * @param state_ini State variable estimate.
+         * @param delta_state_1 State variable increment 1.
+         * @param delta_state_2 State variable increment 2.
+         * @return Error estimate.
+         */
+        double compute_error_estimate(Cauchy sigma_prime_ini, Voigt delta_sigma_prime_1, Voigt delta_sigma_prime_2, Eigen::VectorXd state_ini, Eigen::VectorXd delta_state_1, Eigen::VectorXd delta_state_2);
+
+        /**
+         * @brief Compute plastic stress integration increment.
+         * 
+         * @param sigma_prime Effective stress state.
+         * @param state Vector of state variables.
+         * @param delta_epsilon_tilde_p_dT Strain increment.
+         * @param delta_sigma_prime Increment in stress state.
+         * @param delta_state Increment in state variables.
+         */
+        void compute_plastic_increment(Cauchy sigma_prime, Eigen::VectorXd state, Voigt delta_epsilon_tilde_p_dT, Voigt &delta_sigma_prime, Eigen::VectorXd &delta_state);
 
         /**
          * @brief Elastic volumetric strain increment.
          */
         double delta_epsilon_vol_e;
 
-                /**
+        /**
          * @brief Elastic strain increment.
          */
         Voigt delta_epsilon_tilde_e;
+
+        /**
+         * @brief Effective stress increment due to the elastic portion of the strain increment.
+         */
+        Voigt delta_sigma_prime_e;
+
+        /**
+         * @brief Effective stress after applying elastic portion of strain increment.
+         */
+        Cauchy sigma_prime_e;
+
+        /**
+         * @brief Plastic volumetric strain increment for pseudo-time increment dT.
+         */
+        double delta_epsilon_vol_p_dT;
+
+        /**
+         * @brief Elastic strain increment for pseudo-time increment dT.
+         */
+        Voigt delta_epsilon_tilde_p_dT;
+
+        /**
+         * @brief Elastoplastic multiplier.
+         */
+        double delta_lambda;
+
+        /**
+         * @brief Effective stress after applying plastic portion of strain increment for pseudo-time increment dT.
+         */
+        Cauchy sigma_prime_p_dT;
 
         /**
          * @brief Plastic strain increment.
@@ -77,10 +197,23 @@ class Elastoplastic : public Elastic {
         Voigt delta_epsilon_tilde_p;
 
         /**
-         * @brief Effective stress after applying elastic portion of strain increment.
+         * @brief Effective stress first estimate in forward Euler method.
+         * 
          */
-        Cauchy sigma_prime_e;
+        Cauchy sigma_prime_1;
+
+        /**
+         * @brief Effective stress first estimate in forward Euler method.
+         * 
+         */
+        Cauchy sigma_prime_2;
         
+        /**
+         * @brief Effective stress after applying plastic portion of strain increment prior to correction.
+         * 
+         */
+        Cauchy sigma_prime_ep_ini;
+
     private:
 
         /**
@@ -153,14 +286,39 @@ class Elastoplastic : public Elastic {
         double H;
 
         /**
+         * @brief Elastoplastic constitutive matrix.
+         */
+        Constitutive D_ep;
+
+        /**
+         * @brief Pseudo-time for stress integration procedure.
+         */
+        double T;
+
+        /**
+         * @brief Pseudo-time increment for stress integration procedure.
+         */
+        double dT;
+
+        /**
+         * @brief Minimum pseudo-time increment for stress integration procedure.
+         */
+        double dT_min = 1e-6;
+
+        /**
          * @brief Yield surface tolerance.
          */
-        double FTOL = 1e-10;
+        double FTOL = 1e-8;
 
         /**
          * @brief Maximum number of Pegasus method iterations to be performed during yield surface intersection calculations.
          */
-        int MAXITS = 10;
+        int MAXITS_YSI = 10;
+
+        /**
+         * @brief Maximum number of yield surface correction iterations to be performed during elastoplastic stress integration.
+         */
+        int MAXITS_YSC = 30;
 
         /**
          * @brief Unload-reload tolerance.
@@ -168,14 +326,24 @@ class Elastoplastic : public Elastic {
         double LTOL = 1e-6;
 
         /**
+         * @brief Stress integration tolerance.
+         */
+        double STOL = 1e-4;
+
+        /**
          * @brief Number of unload-reload intersection substeps for alpha bound determination.
          */
         int NSUB = 10;
 
         /**
-         * @brief Elastoplastic constitutive matrix.
+         * @brief Double precision tolerance.
          */
-        Constitutive D_ep;
+        double EPS = 1e-16;
+
+        /**
+         * @brief Boolean indicating whether the current strain increment has been solved.
+         */
+        bool solved;
 };
 
 #endif

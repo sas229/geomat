@@ -79,7 +79,7 @@ double Model::compute_p_prime(Cauchy sigma_prime) {
     return Model::compute_p(sigma_prime);
 }
 
-void Model::compute_principal_stresses(Cauchy sigma_prime, double &sigma_1, double &sigma_2, double &sigma_3, Cauchy &S, Cauchy &T) {
+void Model::compute_principal_stresses(Cauchy sigma_prime, double &sigma_1, double &sigma_2, double &sigma_3, Cauchy &R, Cauchy &S) {
     // Solve eigenvalues and eigevectors..
     Eigen::EigenSolver<Eigen::MatrixXd> es(sigma_prime);
         
@@ -97,7 +97,7 @@ void Model::compute_principal_stresses(Cauchy sigma_prime, double &sigma_1, doub
     sigma_3 = ordered_principal(2);
 
     // Principal stress directions.
-    T = es.eigenvectors().real();
+    R = es.eigenvectors().real();
 }
 
 double Model::compute_q(Cauchy sigma) {
@@ -136,7 +136,7 @@ void Model::compute_stress_invariants(Cauchy sigma, double &I_1, double &I_2, do
 // Updaters.
 
 void Model::update_cartesian_stresses(void) {
-    this->sigma = Model::compute_cartesian_stresses(this->T, this->S);
+    this->sigma = Model::compute_cartesian_stresses(this->R, this->S);
 }
 
 void Model::update_delta_epsilon_vol(void) {
@@ -164,7 +164,7 @@ void Model::update_p_prime(void) {
 }
 
 void Model::update_principal_stresses(void) {
-    Model::compute_principal_stresses(this->sigma_prime, this->sigma_1, this->sigma_2, this->sigma_3, this->S, this->T);
+    Model::compute_principal_stresses(this->sigma_prime, this->sigma_1, this->sigma_2, this->sigma_3, this->R, this->S);
 }   
 
 void Model::update_q(void) {

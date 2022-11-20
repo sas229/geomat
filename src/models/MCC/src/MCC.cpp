@@ -1,7 +1,7 @@
 #include "MCC.hpp"
 #include "MCC_Definition.hpp"
 
-MCC::MCC(std::vector<double> parameters, std::vector<double> state) : parameters(parameters), state(state) {
+MCC::MCC(Eigen::VectorXd parameters, Eigen::VectorXd state) : parameters(parameters), state(state) {
     set_name("MCC");
     int parameters_required = 5;
     int state_required = 2;
@@ -11,10 +11,16 @@ MCC::MCC(std::vector<double> parameters, std::vector<double> state) : parameters
     PLOG_INFO << name << " model instantiated with " << parameters.size() << " parameters and " << state.size() << " state variables.";  
 }
 
-double MCC::compute_f(Cauchy sigma_prime) {
-    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
+double MCC::compute_f(Cauchy sigma_prime, Eigen::VectorXd state) {
+    // State variables.
+    double e = state[0];
+    double p_c = state[1];
+
+    // Stress invariants.
     double q = compute_q(sigma_prime);
     double p_prime = compute_p_prime(sigma_prime);
+    
+    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     return YIELD;
 }
 
@@ -32,8 +38,18 @@ double MCC::compute_G(double K) {
     return SHEAR_MODULUS;
 }
 
-void MCC::compute_derivatives(Cauchy sigma_prime, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H) {
+void MCC::compute_derivatives(Cauchy sigma_prime, Eigen::VectorXd state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H) {
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
+
+    // State variables.
+    double e = state[0];
+    double p_c = state[1];
+
+    // Compute mean effective stress and deviatoric stress tensor for current stress state.
+    double p_prime = compute_p_prime(sigma_prime);
+    Cauchy s = compute_s(sigma_prime, p_prime);
+
+    // Compute derivatives.
     df_dsigma_prime = DF_DSIGMA_PRIME;
     a = df_dsigma_prime.voigt();
     dg_dsigma_prime = DG_DSIGMA_PRIME;
@@ -42,8 +58,33 @@ void MCC::compute_derivatives(Cauchy sigma_prime, Cauchy &df_dsigma_prime, Voigt
     H = HARDENING_MODULUS;    
 }
 
-void MCC::compute_elastic_state_variable_update(void) {
+void MCC::compute_elastic_state_variable(void) {
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     state[0] = STATE_0_ELASTIC_UPDATE;
     state[1] = STATE_1_ELASTIC_UPDATE;
+}
+
+Eigen::VectorXd MCC::get_state_variables(void) {
+    return state;
+}
+
+Eigen::VectorXd MCC::compute_plastic_state_variable_increment(double delta_lambda, double H) {
+    Eigen::VectorXd delta_state(2);
+    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
+    delta_state[0] = STATE_0_PLASTIC_INCREMENT;
+    delta_state[1] = STATE_1_PLASTIC_INCREMENT;
+    return delta_state;
+}
+
+Eigen::VectorXd MCC::compute_plastic_state_variable_correction(double delta_lambda, double H) {
+    Eigen::VectorXd delta_state_c(2);
+    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
+    // Note: only correct state variables that do not depend on strain.
+    delta_state_c[0] = 0;
+    delta_state_c[1] = STATE_1_PLASTIC_INCREMENT;
+    return delta_state_c;
+}
+
+void MCC::compute_plastic_state_variable(void) {
+    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
 }

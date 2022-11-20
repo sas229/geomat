@@ -51,12 +51,14 @@ extern "C" void umat(
     // Create maps to data.
     Eigen::Map<Vector6d> map_to_stress(stress);
     Eigen::Map<Vector6d> map_to_strain_increment(dstran);
-    std::vector<double> state(statev, statev+*nstatv);
-    std::vector<double> parameters(props, props+*nprops);
+    Eigen::Map<Eigen::VectorXd> map_to_state(statev, *nstatv, 1);
+    Eigen::Map<Eigen::VectorXd> map_to_parameters(props, *nprops, 1);
 
     // Create a native Eigen type using the map as initialisation.
     Voigt Eigen_sigma = map_to_stress;
     Voigt Eigen_dstran = map_to_strain_increment;
+    Eigen::VectorXd state = map_to_state;
+    Eigen::VectorXd parameters = map_to_parameters;
 
     // On first call, initialise logger and instantiate model.
     if (first_call) {
@@ -92,23 +94,23 @@ extern "C" void umat(
     // Do some work with it... (i.e. stress integration).
     model->solve();
 
-    // Equate map to updated variable in order to map back to input variable.
-    std::cout << "Stress prior to update:\n" << map_to_stress << "\n";
-    map_to_stress = model->get_sigma_prime();
-    std::cout << "Updated stress after remapping:\n" << map_to_stress << "\n";
+    // // Equate map to updated variable in order to map back to input variable.
+    // std::cout << "Stress prior to update:\n" << map_to_stress << "\n";
+    // map_to_stress = model->get_sigma_prime();
+    // std::cout << "Updated stress after remapping:\n" << map_to_stress << "\n";
 
-    // The map to the jacobian below somehow overwrites the stress state in the LinearElastic model class!!!
-    Jacobian jacobian = model->get_jacobian();
-    ddsdde = jacobian.data();
+    // // The map to the jacobian below somehow overwrites the stress state in the LinearElastic model class!!!
+    // Jacobian jacobian = model->get_jacobian();
+    // ddsdde = jacobian.data();
     
-    statev = state.data();
-    std::cout << "Jacobian:\n" << jacobian << "\n";
-    std::cout << "Updated stress after sign change:\n" << map_to_stress << "\n";
-    std::cout << "From C array:\n";
-    for (auto i=0; i<6; i++) {
-        std::cout << stress[i] << "\n";
-    }
-    if (*nstatv > 0) {
-        std::cout << "statev[0]: " << statev[0] << "\n";
-    }   
+    // statev = state.data();
+    // std::cout << "Jacobian:\n" << jacobian << "\n";
+    // std::cout << "Updated stress after sign change:\n" << map_to_stress << "\n";
+    // std::cout << "From C array:\n";
+    // for (auto i=0; i<6; i++) {
+    //     std::cout << stress[i] << "\n";
+    // }
+    // if (*nstatv > 0) {
+    //     std::cout << "statev[0]: " << statev[0] << "\n";
+    // }   
 }

@@ -65,9 +65,9 @@ class Elastic : public Model {
         * 
         * @param delta_epsilon_vol 
         * @param p_prime 
-        * @return double 
+        * @return Bulk modulus. 
         * 
-        * @note Can be overriden by model implementations.
+        * @note Must be overriden by model implementations.
         */
        virtual double compute_K(double delta_epsilon_vol = 0.0, double p_prime = 0.0) = 0;
        
@@ -75,9 +75,9 @@ class Elastic : public Model {
         * @brief Method to compute the shear modulus. The default implementation simply passes the parameter G.
         * 
         * @param K Bulk modulus. 
-        * @return double 
+        * @return Shear modulus.
         * 
-        * @note Can be overriden by model implementations.
+        * @note Must be overriden by model implementations.
         */
        virtual double compute_G(double K = 0.0) = 0;
 
