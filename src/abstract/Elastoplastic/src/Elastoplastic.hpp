@@ -162,13 +162,36 @@ class Elastoplastic : public Elastic {
          * @brief Elastic strain increment.
          */
         Cauchy delta_epsilon_e;
+        
+        /**
+         * @brief Yield surface function for uncorrected stress state.
+         */
+        double f_u;
 
-        /**    double R_n;
+        /**
+         * @brief Yield surface function for corrected stress state.
+         */
+        double f_c;
 
         /**
          * @brief Effective stress after applying elastic portion of strain increment.
          */
         Cauchy sigma_prime_e;
+
+        /**
+         * @brief Effective stress after applying elastoplastic strain increment.
+         */
+        Cauchy sigma_prime_ep;
+
+        /**
+         * @brief Uncorrected effective stress state.
+         */
+        Cauchy sigma_prime_u;
+
+        /**
+         * @brief Corrected effective stress state.
+         */
+        Cauchy sigma_prime_c;
 
         /**
          * @brief Plastic volumetric strain increment for pseudo-time increment dT.
@@ -211,16 +234,51 @@ class Elastoplastic : public Elastic {
         State state_e;
 
         /**
-         * @brief Effective stress first estimate in forward Euler method.
+         * @brief State variables after application of elastoplastic increment.
+         */
+        State state_ep;
+
+        /**
+         * @brief Uncorrected state variables.
+         */
+        State state_u;
+
+        /**
+         * @brief Corrected state variables.
+         */
+        State state_c;
+
+        /**
+         * @brief Effective stress for the first estimate in the forward Euler method.
          * 
          */
         Cauchy sigma_prime_1;
 
         /**
-         * @brief Effective stress first estimate in forward Euler method.
-         * 
+         * @brief Effective stress increment for the first estimate in the forward Euler method.
+         */
+        Voigt delta_sigma_prime_1;
+
+        /**
+         * @brief State variable increment for the first estimate in the forward Euler method.
+         */
+        State delta_state_1;
+
+        /**
+         * @brief Effective stress for the second estimate in the forward Euler method.
          */
         Cauchy sigma_prime_2;
+
+        /**
+         * @brief Effective stress increment for the second estimate in the forward Euler method.
+         * 
+         */
+        Voigt delta_sigma_prime_2;
+
+        /**
+         * @brief State variable increment for the second estimate in the forward Euler method.
+         */
+        State delta_state_2;
         
         /**
          * @brief Effective stress after applying plastic portion of strain increment prior to correction.
@@ -330,6 +388,11 @@ class Elastoplastic : public Elastic {
         int MAXITS_YSI = 10;
 
         /**
+         * @brief Number of yield surface correction iterations performed during elastoplastic stress integration.
+         */
+        int ITS_YSC;
+
+        /**
          * @brief Maximum number of yield surface correction iterations to be performed during elastoplastic stress integration.
          */
         int MAXITS_YSC = 30;
@@ -373,6 +436,72 @@ class Elastoplastic : public Elastic {
          * @brief Error estimate for current elastoplastic stress integration increment.
          */
         double R_n;
+
+        /**
+         * @brief Mean stress for uncorrected stress state.
+         */
+        double p_prime_u;
+
+        /**
+         * @brief Tangent bulk modulus for uncorrected stress state.
+         */
+        double K_tan_u;
+
+        /**
+         * @brief Tangent shear modulus for uncorrected stress state.
+         */
+        double G_tan_u;
+
+        /**
+         * @brief Elastic constitutive matrix for uncorrected stress state.
+         */
+        Constitutive D_e_u;
+
+        /**
+         * @brief Derivatives of the yield surface with respect to the uncorrected stress state.
+         */
+        Cauchy df_dsigma_prime_u;
+
+        /**
+         * @brief Derivatives of the plastic potential function with respect to the uncorrected stress state.
+         */
+        Cauchy dg_dsigma_prime_u;
+
+        /**
+         * @brief Vector of derivatives the yield surface with respect to the uncorrected stress state.
+         */
+        Voigt a_u;
+
+        /**
+         * @brief Vector of derivatives the plastic potential function with respect to the uncorrected stress state.
+         */
+        Voigt b_u;
+
+        /**
+         * @brief Derivative of the plastic potential function with respect to the mean stress.
+         */
+        double dg_dp_prime_u;
+
+        /**
+         * @brief Hardening modulus for uncorrected stress state.
+         */
+        double H_u;
+
+        /**
+         * @brief Plastic multiplier for the yield surface correction.
+         */
+        double delta_lambda_c;
+
+        /**
+         * @brief Tensor of stress state corrections.
+         */
+        Voigt delta_sigma_prime_c;
+
+        /**
+         * @brief Vector of state variable corrections.
+         * 
+         */
+        State delta_state_c;
 };
 
 #endif
