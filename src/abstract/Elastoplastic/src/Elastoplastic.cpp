@@ -34,6 +34,7 @@ void Elastoplastic::solve(void) {
 
             // Compute stress and state variable increment estimates.
             compute_plastic_increment(sigma_prime_ep, state_ep, delta_epsilon_tilde_p_dT, delta_sigma_prime_1, delta_state_1);
+            state_1 = state_ep + delta_state_1;
             sigma_prime_1 = sigma_prime_ep + delta_sigma_prime_1.cauchy();
             compute_plastic_increment(sigma_prime_1, state_ep, delta_epsilon_tilde_p_dT, delta_sigma_prime_2, delta_state_2);
 

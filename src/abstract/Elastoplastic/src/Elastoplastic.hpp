@@ -503,6 +503,16 @@ class Elastoplastic : public Elastic {
         State state_c;
 
         /**
+         * @brief State variables after first forward Euler estimate.
+         */
+        State state_1;
+        
+        /**
+         * @brief State variables after second forward Euler estimate.
+         */
+        State state_2;
+
+        /**
          * @brief Effective stress for the first estimate in the forward Euler method.
          * 
          */
