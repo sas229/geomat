@@ -1,7 +1,7 @@
 #include "MCC.hpp"
 #include "MCC_Definition.hpp"
 
-MCC::MCC(State parameters, State state) : parameters(parameters), state(state) {
+MCC::MCC(Parameters parameters, State state) : parameters(parameters), state(state) {
     set_name("MCC");
     int parameters_required = 5;
     int state_required = 2;
@@ -71,7 +71,12 @@ State MCC::get_state_variables(void) {
     return state;
 }
 
-State MCC::compute_plastic_state_variable_increment(double delta_lambda, double H) {
+void MCC::set_state_variables(State new_state) {
+    state = new_state;
+}
+
+State MCC::compute_plastic_state_variable(Voigt delta_epsilon_tilde_p, double delta_lambda, double H) {
+    double delta_epsilon_vol_p = compute_delta_epsilon_vol(delta_epsilon_tilde_p.cauchy());
     State delta_state(state.size());
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     delta_state[0] = STATE_0_PLASTIC_INCREMENT;
@@ -79,15 +84,8 @@ State MCC::compute_plastic_state_variable_increment(double delta_lambda, double 
     return delta_state;
 }
 
-State MCC::compute_plastic_state_variable_correction(double delta_lambda, double H) {
-    // Note: only correct state variables that do not depend on the magnitude of the strain increment.
-    State delta_state_c(state.size());
-    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
-    delta_state_c[0] = 0;
-    delta_state_c[1] = STATE_1_PLASTIC_INCREMENT;
-    return delta_state_c;
-}
-
-void MCC::compute_plastic_state_variable(void) {
-    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
+State MCC::compute_plastic_state_variable(double delta_lambda, double H) {
+    // Note: only correct state variables that do not depend on the magnitude of the strain increment (hence strain increment is not passed in).
+    Voigt delta_epsilon_tilde_p = Voigt::Zero();
+    return compute_plastic_state_variable(delta_epsilon_tilde_p, delta_lambda, H);
 }

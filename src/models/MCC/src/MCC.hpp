@@ -11,8 +11,11 @@ class MCC : public Elastoplastic {
 
     public: 
 
-        /** 
+        /**
          * @brief MCC model constructor. 
+         * 
+         * @param[in] parameters Vector of parameters.
+         * @param[in] state Vector of state variables.
          */
         MCC(State parameters, State state);
 
@@ -21,29 +24,31 @@ class MCC : public Elastoplastic {
          */
         virtual ~MCC() {}
 
+    protected:
+
         /**
          * @brief Overridden method to compute the current value of the yield surface function.
          * 
-         * @param sigma_prime Effective stress state.
-         * @param state State variables.
-         * @return f 
+         * @param[in] sigma_prime Effective stress state.
+         * @param[in] state State variables.
+         * @return Yielf function, f. 
          */
         double compute_f(Cauchy sigma_prime, State state) override;
 
         /**
          * @brief Overridden method to compute the bulk modulus.
          * 
-         * @param delta_epsilon_e_vol Elastic volumetric strain increment.
-         * @param p_prime Mean effective stress.
-         * @return K
+         * @param[in] delta_epsilon_e_vol Elastic volumetric strain increment.
+         * @param[in] p_prime Mean effective stress.
+         * @return Bulk modulus, K.
          */
         double compute_K(double delta_epsilon_e_vol, double p_prime) override;
 
         /**
          * @brief Overriden method to compute the shear modulus.
          * 
-         * @param K Bulk modulus.
-         * @return double 
+         * @param[in] K Bulk modulus.
+         * @return Shear modulus, G.
          */
         double compute_G(double K) override;
 
@@ -65,6 +70,7 @@ class MCC : public Elastoplastic {
         /**
          * @brief Overriden method to compute the elastic update of the models state variables.
          * 
+         * @param[in] delta_epsilon_tilde_e Elastic strain increment. 
          * @return Vector of state variables.
          */
         State compute_elastic_state_variable(Voigt delta_epsilon_tilde_e) override;
@@ -77,40 +83,41 @@ class MCC : public Elastoplastic {
         State get_state_variables(void);
 
         /**
+         * @brief Set the state variables vector.
+         * 
+         * @param[in] new_state Vector of new state variables.
+         */
+        void set_state_variables(State new_state);
+
+        /**
          * @brief Overriden method to compute the plastic increment in the models state variables.
          * 
-         * @param delta_lambda Plastic multiplier increment.
-         * @param H Hardening modulus.
-         * @return STate variable increment.
+         * @param[in] delta_epsilon_tilde_p Plastic strain increment.
+         * @param[in] delta_lambda Plastic multiplier increment.
+         * @param[in] H Hardening modulus.
+         * @return Vector of state variable increments.
          */
-        State compute_plastic_state_variable_increment(double delta_lambda, double H) override;
+        State compute_plastic_state_variable(Voigt delta_epsilon_tilde_p, double delta_lambda, double H) override;
 
         /**
          * @brief Overriden method to compute the correction in the models state variables.
          * 
-         * @param delta_lambda 
-         * @param H 
-         * @return State variable correction
+         * @param[in] delta_lambda Plastic multiplier.
+         * @param[in] H Hardening modulus.
+         * @return Vector of state variable corrections.
          */
-        State compute_plastic_state_variable_correction(double delta_lambda, double H) override;
+        State compute_plastic_state_variable(double delta_lambda, double H) override;
 
-        /**
-         * @brief Overriden method to compute the plastic update of the models state variables.
-         */
-        void compute_plastic_state_variable(void) override;
-
-    protected:
-       
-        /** 
+       /** 
          * @brief Parameters. 
          */
-        State parameters {{0.0, 0.0, 0.0, 0.0, 0.0}};
+        Parameters parameters;
 
         /** 
          * @brief State variables. 
          */
-        State state {{0.0, 0.0}};
-    
+        State state;
+
         /** 
          * @brief Parameter: frictional constant. 
          */

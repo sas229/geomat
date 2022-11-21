@@ -22,13 +22,12 @@ void Elastoplastic::solve(void) {
         // Perform elastoplastic stress integration on plastic portion of strain increment.
         delta_epsilon_tilde_p = (1.0-alpha)*delta_epsilon_tilde;
         sigma_prime_ep = sigma_prime_e;
-        state_ep = get_state_variables();
+        state_ep = state_e;
 
         // Substepping with automatic error control.
         dT = 1.0;
         solved = false;
         T = 0.0;
-        double q_step;
         while (T < 1.0) {
             delta_epsilon_tilde_p_dT = delta_epsilon_tilde_p*dT;
             delta_epsilon_vol_p_dT = (delta_epsilon_tilde_p_dT.cauchy()).trace();
@@ -67,7 +66,7 @@ void Elastoplastic::solve(void) {
                         // Compute correction factor.
                         delta_lambda_c = f_u/(H_u + a_u.transpose()*D_e_u*b_u);
                         delta_sigma_prime_c = -delta_lambda_c*D_e_u*b_u;
-                        delta_state_c = compute_plastic_state_variable_correction(delta_lambda_c, H_u);
+                        delta_state_c = compute_plastic_state_variable(delta_lambda_c, H_u);
 
                         // Update stress and state variables using corrections.
                         sigma_prime_c = sigma_prime_u + delta_sigma_prime_c.cauchy();
@@ -123,13 +122,15 @@ void Elastoplastic::solve(void) {
             dT = std::max(dT, dT_min);
             dT = std::min(dT, 1.0-T);
         }
-        // Set stress state as final elastoplastic stress state.
+        // Set stress and state variables as final elastoplastic values.
         sigma_prime = sigma_prime_ep;
+        set_state_variables(state_ep);
         PLOG_INFO << "Elastoplastic stress increment integrated to within a tolerance FTOL = " << FTOL << " via " << substeps << " substeps and " << corrections << " drift corrections.";
     } else {
-        // Fully elastic increment. Update stress state.
+        // Fully elastic increment. Update stress and state variables.
         sigma_prime = sigma_prime_e;
-        PLOG_INFO << "Fully elastic tress increment integrated directly.";
+        set_state_variables(state_e);
+        PLOG_INFO << "Fully elastic stress increment integrated directly.";
     }
     
     // Compute final stress invariants.
@@ -155,7 +156,7 @@ void Elastoplastic::compute_plastic_increment(Cauchy sigma_prime, State state, V
 
     // Update stress and state variable increment by reference.
     delta_sigma_prime = D_ep*delta_epsilon_tilde_p_dT;
-    delta_state = compute_plastic_state_variable_increment(delta_lambda, H);
+    delta_state = compute_plastic_state_variable(delta_epsilon_tilde_p_dT, delta_lambda, H);
 }
 
 double Elastoplastic::compute_error_estimate(Cauchy sigma_prime_ini, Voigt delta_sigma_prime_1, Voigt delta_sigma_prime_2, State state_ini, State delta_state_1, State delta_state_2) {
@@ -164,7 +165,7 @@ double Elastoplastic::compute_error_estimate(Cauchy sigma_prime_ini, Voigt delta
     for (int i=1; i<state_ini.size(); i++) {
         error[i] = std::abs((delta_state_2[i] - delta_state_1[i]))/state_ini[i];
     }
-    double R_n = 1.0/2.0*error.maxCoeff();
+    R_n = 1.0/2.0*error.maxCoeff();
 
     // Check against machine tolerance.
     R_n = std::max(R_n, EPS);
@@ -172,9 +173,7 @@ double Elastoplastic::compute_error_estimate(Cauchy sigma_prime_ini, Voigt delta
 }
 
 double Elastoplastic::compute_elastoplastic_multiplier(Voigt delta_sigma_prime_e, Constitutive D_e, Voigt a, Voigt b, double H) {
-    double numerator = (a.transpose()*delta_sigma_prime_e);
-    double denominator = H + a.transpose()*D_e*b;
-    return numerator/denominator;
+    return (double)(a.transpose()*delta_sigma_prime_e)/(double)(H + a.transpose()*D_e*b);
 }
 
 Constitutive Elastoplastic::compute_elastoplastic_matrix(Constitutive D_e, Voigt a, Voigt b, double H) {
@@ -237,11 +236,7 @@ bool Elastoplastic::check_unload_reload(Cauchy sigma_prime) {
     Voigt delta_sigma_e = D_e_tan*delta_epsilon_tilde;
 
     // Check unloading-reloading criterion.
-    double norm_a = a.squaredNorm();
-    double norm_delta_sigma_e = delta_sigma_e.squaredNorm();
-    double numerator = a.transpose()*delta_sigma_e;       
-    double denominator = norm_a*norm_delta_sigma_e;
-    double cos_theta = numerator/denominator;
+    double cos_theta = (double)(a.transpose()*delta_sigma_e)/(double)(a.squaredNorm()*delta_sigma_e.squaredNorm());
 
     // Check against tolerance.
     if (cos_theta >= -LTOL) {
@@ -298,14 +293,14 @@ void Elastoplastic::compute_alpha(void) {
 
 double Elastoplastic::pegasus_regula_falsi(double alpha_0, double alpha_1, double f_0, double f_1) {
     // Pegasus algorithm.
-    int iterations = 0;
     double alpha_n;
     double f_n = FTOL;
     Cauchy sigma_prime_n = sigma_prime;
     State state_n = get_state_variables();
 
     // Iterate to find optimal alpha if a plastic increment.
-    while (iterations < MAXITS_YSI && std::abs(f_n) >= FTOL) {
+    ITS_YSI = 0;
+    while (ITS_YSI < MAXITS_YSI && std::abs(f_n) >= FTOL) {
         alpha_n = alpha_1 - f_1*(alpha_1-alpha_0)/(f_1-f_0);  
             
         sigma_prime_n = compute_isotropic_linear_elastic_stress(sigma_prime, alpha_n, delta_epsilon_tilde);
@@ -320,7 +315,7 @@ double Elastoplastic::pegasus_regula_falsi(double alpha_0, double alpha_1, doubl
         }
         alpha_0 = alpha_n;
         f_0 = f_n;
-        iterations += 1;
+        ITS_YSI += 1;
     }
     double alpha = alpha_n;
     double f = f_n;
@@ -328,7 +323,7 @@ double Elastoplastic::pegasus_regula_falsi(double alpha_0, double alpha_1, doubl
         PLOG_FATAL << "Performed " << MAXITS_YSI << " Pegasus iteration(s): alpha = " << alpha << "; |f| = " << std::abs(f) << " > tolerance = " << FTOL << ".";
         assert(false);
     } else{
-        PLOG_INFO << "Performed " << iterations << " Pegasus iteration(s): " << "alpha = " << alpha << "; " << "|f| = " << std::abs(f) << " < tolerance = " << FTOL << ".";
+        PLOG_INFO << "Performed " << ITS_YSI << " Pegasus iteration(s): " << "alpha = " << alpha << "; " << "|f| = " << std::abs(f) << " < tolerance = " << FTOL << ".";
         assert(alpha >= 0.0 && alpha <= 1.0);
     }
     return alpha;

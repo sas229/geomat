@@ -90,7 +90,7 @@
  * \f[ \Delta e = -(1+e) \delta \epsilon_{vol, p} \f]
  *
  */
-#define STATE_0_PLASTIC_INCREMENT -(1+e)*delta_epsilon_vol_p_dT
+#define STATE_0_PLASTIC_INCREMENT -(1+e)*delta_epsilon_vol_p
 
 /**
  * @brief State variable plastic increment for preconsolidation pressure:

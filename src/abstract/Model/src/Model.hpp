@@ -58,7 +58,7 @@ class Model {
          */
         virtual void solve(void) {};
 
-    // protected:
+    protected:
 
         // Setters.
 
