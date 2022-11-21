@@ -148,6 +148,33 @@ class Elastoplastic : public Elastic {
         double compute_error_estimate(Cauchy sigma_prime_ini, Voigt delta_sigma_prime_1, Voigt delta_sigma_prime_2, State state_ini, State delta_state_1, State delta_state_2);
 
         /**
+         * @brief Compute new substep size.
+         * 
+         * @return Substep size. 
+         */
+        double compute_new_substep_size(void);
+
+        /**
+         * @brief Compute yield surface correction.
+         * 
+         * @param sigma_prime_u Uncorrected stress state.
+         * @param state_u Uncorrected vector of state variables.
+         * @param sigma_prime_c Corrected stress state.
+         * @param state_c Corrected vector of state variables.
+         */
+        void compute_yield_surface_correction(Cauchy &sigma_prime_u, State &state_u, Cauchy &sigma_prime_c, State &state_c);
+
+        /**
+         * @brief Compute normal yield surface correction.
+         * 
+         * @param sigma_prime_u Uncorrected stress state.
+         * @param state_u Uncorrected vector of state variables.
+         * @param sigma_prime_c Corrected stress state.
+         * @param state_c Corrected vector of state variables.
+         */
+        void compute_normal_yield_surface_correction(Cauchy &sigma_prime_u, State &state_u, Cauchy &sigma_prime_c, State &state_c);
+        
+        /**
          * @brief Compute plastic stress integration increment.
          * 
          * @param sigma_prime Effective stress state.
@@ -157,7 +184,6 @@ class Elastoplastic : public Elastic {
          * @param delta_state Increment in state variables.
          */
         void compute_plastic_increment(Cauchy sigma_prime, State state, Voigt delta_epsilon_tilde_p_dT, Voigt &delta_sigma_prime, State &delta_state);
-
 
         /**
          * @brief Pegasus regula falsi algorithm to find root of general non-linear system of equations.
@@ -297,6 +323,11 @@ class Elastoplastic : public Elastic {
          * @brief Boolean indicating whether the current strain increment has been solved.
          */
         bool solved;
+
+        /**
+         * @brief Boolean indicating whether the current substep size was accepted.
+         */
+        bool accepted;
         
         /**
          * @brief Number of stress integration substeps performed.
