@@ -33,18 +33,17 @@ void Elastoplastic::solve(void) {
             delta_epsilon_vol_p_dT = (delta_epsilon_tilde_p_dT.cauchy()).trace();
 
             // Compute stress and state variable increment estimates.
-            State delta_state_1(2), delta_state_2(2);
             compute_plastic_increment(sigma_prime_ep, state_ep, delta_epsilon_tilde_p_dT, delta_sigma_prime_1, delta_state_1);
             sigma_prime_1 = sigma_prime_ep + delta_sigma_prime_1.cauchy();
             compute_plastic_increment(sigma_prime_1, state_ep, delta_epsilon_tilde_p_dT, delta_sigma_prime_2, delta_state_2);
 
             // Calculate modified Euler stresses and state variables.
-            Cauchy sigma_prime_ini = sigma_prime_ep + 1.0/2.0*(delta_sigma_prime_1.cauchy() + delta_sigma_prime_2.cauchy());
-            State state_ini = state_ep + 1.0/2.0*(delta_state_1+delta_state_2);
+            sigma_prime_ini = sigma_prime_ep + 1.0/2.0*(delta_sigma_prime_1.cauchy() + delta_sigma_prime_2.cauchy());
+            state_ini = state_ep + 1.0/2.0*(delta_state_1+delta_state_2);
 
             // Compute error estimate.
             accepted = false;
-            R_n = compute_error_estimate(sigma_prime_ini, delta_sigma_prime_1, delta_sigma_prime_2, state_ini, delta_state_1, delta_state_2);
+            compute_error_estimate();
             if (R_n < STOL) {
                 // Accept increment and correct stresses and state variables back to yield surface.a
                 accepted = true;
@@ -57,14 +56,14 @@ void Elastoplastic::solve(void) {
                 while (ITS_YSC < MAXITS_YSC) {
                     if (std::abs(f_c) > FTOL) {
                         // Compute consistent correction to yield surface.
-                        compute_yield_surface_correction(sigma_prime_u, state_u, sigma_prime_c, state_c);
+                        compute_yield_surface_correction();
 
                         // Check yield surface function.
                         f_c = compute_f(sigma_prime_c, state_c);
                         f_u = compute_f(sigma_prime_u, state_u);
                         if (std::abs(f_c) > std::abs(f_u)) {
                             // Apply normal correction instead.
-                            compute_normal_yield_surface_correction(sigma_prime_u, state_u, sigma_prime_c, state_c);
+                            compute_normal_yield_surface_correction();
                         }
 
                         // Correct stress and state variables.
@@ -89,9 +88,9 @@ void Elastoplastic::solve(void) {
                 sigma_prime_ep = sigma_prime_c;
                 state_ep = state_c;
 
-                // Increment substep and pseudotime T; reset solved boolean.
-                T += dT;
+                // Increment substep and pseudotime T.
                 substeps += 1;
+                T += dT;
             }
             dT = compute_new_substep_size();
         }
@@ -129,7 +128,7 @@ double Elastoplastic::compute_new_substep_size(void) {
     return dT;
 }
 
-void Elastoplastic::compute_yield_surface_correction(Cauchy &sigma_prime_u, State &state_u, Cauchy &sigma_prime_c, State &state_c) {
+void Elastoplastic::compute_yield_surface_correction(void) {
     // Calculate elastic constitutive matrix using tangent moduli and elastic stress increment.
     p_prime_u = compute_p_prime(sigma_prime_u);
     K_tan_u = compute_K(0, p_prime_u);
@@ -141,19 +140,22 @@ void Elastoplastic::compute_yield_surface_correction(Cauchy &sigma_prime_u, Stat
 
     // Compute correction factor.
     delta_lambda_c = f_u/(H_u + a_u.transpose()*D_e_u*b_u);
-    delta_sigma_prime_c = -delta_lambda_c*D_e_u*b_u;
-    delta_state_c = compute_plastic_state_variable(delta_lambda_c, H_u);
 
     // Update stress and state variables using corrections.
+    delta_sigma_prime_c = -delta_lambda_c*D_e_u*b_u;
+    delta_state_c = compute_plastic_state_variable(delta_lambda_c, H_u);
     sigma_prime_c = sigma_prime_u + delta_sigma_prime_c.cauchy();
     state_c = state_u + delta_state_c;
 }
 
-void Elastoplastic::compute_normal_yield_surface_correction(Cauchy &sigma_prime_u, State &state_u, Cauchy &sigma_prime_c, State &state_c) {
+void Elastoplastic::compute_normal_yield_surface_correction(void) {
+    // Compute corretion factor.
     delta_lambda_c = f_u/(a_u.transpose()*a_u);
+    
+    //Update stress and state variables using correction.
     delta_sigma_prime_c = -delta_lambda_c*a_u;
     sigma_prime_c = sigma_prime_u + delta_sigma_prime_c.cauchy();
-    state_c = state_u;
+    state_c = state_u; /* i.e. no correction to state variables. */
 }
 
 void Elastoplastic::compute_plastic_increment(Cauchy sigma_prime, State state, Voigt delta_epsilon_tilde_p_dT, Voigt &delta_sigma_prime, State &delta_state) {   
@@ -177,8 +179,8 @@ void Elastoplastic::compute_plastic_increment(Cauchy sigma_prime, State state, V
     delta_state = compute_plastic_state_variable(delta_epsilon_tilde_p_dT, delta_lambda, H);
 }
 
-double Elastoplastic::compute_error_estimate(Cauchy sigma_prime_ini, Voigt delta_sigma_prime_1, Voigt delta_sigma_prime_2, State state_ini, State delta_state_1, State delta_state_2) {
-    State error(state_ini.size()+1);
+void Elastoplastic::compute_error_estimate(void) {
+    State error(get_state_variables().size()+1);
     error[0] = ((delta_sigma_prime_2.cauchy() - delta_sigma_prime_1.cauchy())).norm()/sigma_prime_ini.norm();
     for (int i=1; i<state_ini.size(); i++) {
         error[i] = std::abs((delta_state_2[i] - delta_state_1[i]))/state_ini[i];
@@ -187,7 +189,6 @@ double Elastoplastic::compute_error_estimate(Cauchy sigma_prime_ini, Voigt delta
 
     // Check against machine tolerance.
     R_n = std::max(R_n, EPS);
-    return R_n;
 }
 
 double Elastoplastic::compute_elastoplastic_multiplier(Voigt delta_sigma_prime_e, Constitutive D_e, Voigt a, Voigt b, double H) {

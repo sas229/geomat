@@ -136,16 +136,8 @@ class Elastoplastic : public Elastic {
 
         /**
          * @brief Compute error estimate.
-         * 
-         * @param sigma_prime_ini Effective stress estimate.
-         * @param delta_sigma_prime_1 Effective stress increment 1.
-         * @param delta_sigma_prime_2 Effective stress increment 2.
-         * @param state_ini State variable estimate.
-         * @param delta_state_1 State variable increment 1.
-         * @param delta_state_2 State variable increment 2.
-         * @return Error estimate.
          */
-        double compute_error_estimate(Cauchy sigma_prime_ini, Voigt delta_sigma_prime_1, Voigt delta_sigma_prime_2, State state_ini, State delta_state_1, State delta_state_2);
+        void compute_error_estimate(void);
 
         /**
          * @brief Compute new substep size.
@@ -156,23 +148,13 @@ class Elastoplastic : public Elastic {
 
         /**
          * @brief Compute yield surface correction.
-         * 
-         * @param sigma_prime_u Uncorrected stress state.
-         * @param state_u Uncorrected vector of state variables.
-         * @param sigma_prime_c Corrected stress state.
-         * @param state_c Corrected vector of state variables.
          */
-        void compute_yield_surface_correction(Cauchy &sigma_prime_u, State &state_u, Cauchy &sigma_prime_c, State &state_c);
+        void compute_yield_surface_correction(void);
 
         /**
          * @brief Compute normal yield surface correction.
-         * 
-         * @param sigma_prime_u Uncorrected stress state.
-         * @param state_u Uncorrected vector of state variables.
-         * @param sigma_prime_c Corrected stress state.
-         * @param state_c Corrected vector of state variables.
          */
-        void compute_normal_yield_surface_correction(Cauchy &sigma_prime_u, State &state_u, Cauchy &sigma_prime_c, State &state_c);
+        void compute_normal_yield_surface_correction(void);
         
         /**
          * @brief Compute plastic stress integration increment.
@@ -290,7 +272,7 @@ class Elastoplastic : public Elastic {
         int MAXITS_YSI = 10;
 
         /**
-         * @brief Number of yield surface correction iterations performed during elastoplastic stress integration.
+         * @brief Number of yield surface correction iterations performed during current elastoplastic stress integration substep.
          */
         int ITS_YSC;
 
@@ -335,7 +317,7 @@ class Elastoplastic : public Elastic {
         int substeps;
 
         /**
-         * @brief Number of stress corrections performed.
+         * @brief Number of yield surface corrections performed during current strain increment.
          */
         int corrections;
 
@@ -436,6 +418,11 @@ class Elastoplastic : public Elastic {
         double f_c;
 
         /**
+         * @brief Intial effective stress estimate from forward Euler method.
+         */
+        Cauchy sigma_prime_ini;
+
+        /**
          * @brief Effective stress after applying elastic portion of strain increment.
          */
         Cauchy sigma_prime_e;
@@ -489,6 +476,11 @@ class Elastoplastic : public Elastic {
          * @brief Stress state after application of elastic increment.
          */
         Voigt delta_sigma_prime_e;
+
+        /**
+         * @brief Intial state variable estimate from forward Euler method.
+         */
+        State state_ini;
 
         /**
          * @brief State variables after application of elastic increment.
