@@ -27,7 +27,7 @@ class Model {
         /** 
          * @brief Method to set effective stress tensor in Voigt notation. 
          */
-        void set_sigma_prime(Voigt s);
+        void set_sigma_prime(Voigt sigma_prime_tilde);
 
         /** 
          * @brief Method to set strain increment in Voigt notation. 
@@ -46,17 +46,26 @@ class Model {
          */
         Voigt get_sigma_prime(void);
 
-        /** 
-         * @brief Method to get strain increment in Voigt notation.
-         */
-        Voigt get_strain_increment(void);
-
         /**
          * @brief Method to solve stress increment given the current strain increment.
          * 
          * @note Must be overriden by constitutive behaviour classes (e.g. Elastic, Elastoplastic).
          */
         virtual void solve(void) {};
+
+        double get_p_prime(void);
+
+        /** 
+         * @brief Mean effective stress calculated via:
+         * \f[ p^{\prime}=\frac{1}{3} \operatorname{tr}\left( \boldsymbol{\sigma}^{\prime} \right) \f]
+         * where \f$ \boldsymbol{\sigma}^{\prime} \f$ is the effective stress tensor.
+         * 
+         * @param[in] sigma_prime Effective stress tensor.
+         * @returns Mean effective stress.
+         */
+        double compute_p_prime(Cauchy sigma_prime);
+
+        Cauchy compute_dq_dsigma_prime(Cauchy sigma_prime);
 
     protected:
 
@@ -141,16 +150,6 @@ class Model {
          * @returns Mean stress.
          */
         double compute_p(Cauchy sigma);
-
-        /** 
-         * @brief Mean effective stress calculated via:
-         * \f[ p^{\prime}=\frac{1}{3} \operatorname{tr}\left( \boldsymbol{\sigma}^{\prime} \right) \f]
-         * where \f$ \boldsymbol{\sigma}^{\prime} \f$ is the effective stress tensor.
-         * 
-         * @param[in] sigma_prime Effective stress tensor.
-         * @returns Mean effective stress.
-         */
-        double compute_p_prime(Cauchy sigma_prime);
 
         /** 
          * @brief Method to compute the principal stresses and directions. The principal stresses
@@ -300,6 +299,10 @@ class Model {
          */
         void update_stress_invariants(void);
 
+        Voigt to_voigt(Cauchy cauchy);
+
+        Cauchy to_cauchy(Voigt voigt);
+
         // Members.
 
         /** 
@@ -359,8 +362,8 @@ class Model {
 
         /** 
          * @brief Volumetric strain increment:
-         * * \f[ \Delta \epsilon_{vol} = \operatorname{tr} \left( \boldsymbol{\Delta \epsilon} \right)\f] 
-         * where \f$ \boldsymbol{\Delta \epsilon} \f$ is the strain increment tensor. 
+         * \f[ \Delta \epsilon_{vol} = \operatorname{tr} \left(\Delta \boldsymbol{\epsilon} \right)\f] 
+         * where \f$ \Delta \boldsymbol{\epsilon} \f$ is the strain increment tensor. 
          */
         double delta_epsilon_vol;
         
@@ -495,6 +498,31 @@ class Model {
          * @brief Lode angle from negative sine definition. 
          */
         double theta_s_bar;
+
+        /**
+         * @brief Boolean indicating whether the current strain increment has been solved.
+         */
+        bool solved;
+
+        /**
+         * @brief Derivative of the mean stress with respect to the effective stress state:
+         * 
+         * \f[ \frac{\partial p}{\partial \boldsymbol{\sigma}^{\prime}} = \frac{1}{3} \boldsymbol{I} \f]
+         * 
+         * where \f$ \boldsymbol{I} \f$ is the identity matrix. 
+         */
+        Cauchy dp_dsigma_prime = 1.0/3.0*eye;
+
+        /**
+         * @brief Derivative of the deviatoric stress with respect to the effective stress state:
+         * 
+         * \f[ \frac{\partial q}{\partial \boldsymbol{ \sigma^{\prime}}} = \frac{3}{2q} \left[\begin{array}{lll}
+         *      \sigma_{11}-p^{\prime} & 2\tau_{12} & 2\tau_{13} \\
+         *      2\tau_{21} & \sigma_{22}-p^{\prime} & 2\tau_{23} \\
+         *      2\tau_{31} & 2\tau_{32} & \sigma_{33}-p^{\prime}
+         *      \end{array}\right] \f]
+         */
+        Cauchy dq_dsigma_prime;
 };
 
 #endif

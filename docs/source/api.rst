@@ -99,20 +99,11 @@ The following typdefs and classes contain types used by the constitutive model d
 Types
 ^^^^^
 
-.. doxygentypedef:: Vector6d
+.. doxygentypedef:: Voigt
+   :project: umat
+
+.. doxygentypedef:: Cauchy
    :project: umat
 
 .. doxygentypedef:: Constitutive
    :project: umat
-
-.. doxygenclass:: Cauchy
-    :project: umat
-    :members:
-    :protected-members:
-    :private-members:
-
-.. doxygenclass:: Voigt
-    :project: umat
-    :members:
-    :protected-members:
-    :private-members:

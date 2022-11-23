@@ -25,6 +25,11 @@ target_link_libraries(umat_library PUBLIC Model LinearElastic MCC)
 add_subdirectory(${PROJECT_SOURCE_DIR}/docs)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src)
 
+# Create Python module.
+# add_subdirectory(src/external/pybind11)
+pybind11_add_module(models src/PythonAPI.cpp)
+target_link_libraries(models PUBLIC Types Model Elastic LinearElastic Elastoplastic MCC Eigen3::Eigen)
+
 # Tests.
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

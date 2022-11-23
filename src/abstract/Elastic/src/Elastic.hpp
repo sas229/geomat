@@ -13,7 +13,7 @@
  */
 class Elastic : public Model {
 
-    protected: 
+    public: 
 
         /** @brief Elastic model constructor. */
         Elastic() {}

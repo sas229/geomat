@@ -6,6 +6,7 @@
 #include <cassert>
 #include "Types.hpp"
 #include "Elastic.hpp"
+#include "Types.hpp"
 
 class LinearElastic : public Elastic {
 
@@ -14,7 +15,7 @@ class LinearElastic : public Elastic {
         /** 
          * @brief LinearElastic model constructor. 
          */
-        LinearElastic(State parameters, State state);
+        LinearElastic(Parameters parameters, State state);
 
         /** 
          * @brief LinearElastic model destructor. 

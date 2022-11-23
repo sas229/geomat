@@ -1,4 +1,4 @@
-// Elastic definitions.
+// MCC definitions.
 
 /**
  * @brief Secant bulk modulus definition:
@@ -42,19 +42,25 @@
 #define YIELD pow(q,2) + pow(M,2)*p_prime*(p_prime-p_c)
 
 /**
- * @brief Derivatives of the yield surface with respect to the effective stress state:
+ * @brief Derivatives of the yield surface with respect to the deviatoric stress:
  * 
- * \f[ \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} = \frac{M^2\left(2 p^{\prime}-p_c \right)}{3} \mathbf{1} + 3 \operatorname{dev}(\boldsymbol{\sigma}^{\prime}) \f]
+ * \f[ \frac{\partial f}{\partial q} = 2q \f]
  */
-#define DF_DSIGMA_PRIME pow(M,2)*(2*p_prime-p_c)*1.0/3.0*eye + 3.0*s
+#define DF_DQ 2*q
 
 /**
- * @brief Derivatives of the plastic potential function with respect to the effective stress state. 
- * Equal to the derivates for the yield surface if associated flow:
+ * @brief Derivatives of the yield surface with respect to the mean effective stress:
  * 
- * \f[ \frac{\partial g}{\partial \boldsymbol{\sigma}^{\prime}} = \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} \f]
+ * \f[ \frac{\partial f}{\partial p} = M^2\left(2 p^{\prime}-p_c \right) \f]
  */
-#define DG_DSIGMA_PRIME DF_DSIGMA_PRIME
+#define DF_DP_PRIME pow(M,2)*(2*p_prime-p_c)
+
+/**
+ * @brief Derivatives of the plastic potential function with respect to the deviatoric stress:
+ * 
+ * \f[ \frac{\partial g}{\partial q} = 2q \f]
+ */
+#define DG_DQ 2*q
 
 /**
  * @brief Derivative of the plastic potential function with respect to the effective mean stress:

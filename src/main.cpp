@@ -45,7 +45,7 @@ int main() {
     double ddsddt[ntens], drplde[ntens];
     double drpldt;
     double stran[ntens] = {0};
-    double dstran[ntens] = {-0.005, 0.0025, 0.0025, 0.0, 0.0, 0.0};
+    double dstran[ntens] = {-0.0005, 0.00025, 0.00025, 0.0, 0.0, 0.0};
     double time[2];
     double dtime, temp, dtemp;
     double predef, dpred;

@@ -1,7 +1,7 @@
 #include "LinearElastic.hpp"
 #include "LinearElastic_Definition.hpp"
 
-LinearElastic::LinearElastic(State parameters, State state) : parameters(parameters), state(state) {
+LinearElastic::LinearElastic(Parameters parameters, State state) : parameters(parameters), state(state) {
     set_name("LinearElastic");
     int parameters_required = 2;
     int state_required = 0;

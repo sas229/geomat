@@ -45,21 +45,25 @@ void MCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma
     double e = state[0];
     double p_c = state[1];
 
-    // Compute mean effective stress and deviatoric stress tensor for current stress state.
+    // Compute mean effective stress, deviatoric stress tensor and derivatives of the stress state for current stress state.
     double p_prime = compute_p_prime(sigma_prime);
-    Cauchy s = compute_s(sigma_prime, p_prime);
-
+    s = compute_s(sigma_prime, p_prime);
+    dq_dsigma_prime = compute_dq_dsigma_prime(sigma_prime);
+    
     // Compute derivatives.
-    df_dsigma_prime = DF_DSIGMA_PRIME;
-    a = df_dsigma_prime.voigt();
-    dg_dsigma_prime = DG_DSIGMA_PRIME;
-    b = dg_dsigma_prime.voigt();
+    df_dq = DF_DQ;
+    df_dp_prime = DF_DP_PRIME;
+    df_dsigma_prime = (df_dq*dq_dsigma_prime) + (df_dp_prime*dp_dsigma_prime);
+    dg_dq = DG_DQ;
     dg_dp_prime = DG_DP_PRIME;
-    H = HARDENING_MODULUS;    
+    dg_dsigma_prime = (dg_dq*dq_dsigma_prime) + (dg_dp_prime*dp_dsigma_prime);
+    a = to_voigt(df_dsigma_prime);
+    b = to_voigt(dg_dsigma_prime);
+    H = HARDENING_MODULUS;
 }
 
 State MCC::compute_elastic_state_variable(Voigt delta_epsilon_tilde_e) {
-    double delta_epsilon_vol_e = compute_delta_epsilon_vol(delta_epsilon_tilde_e.cauchy());
+    double delta_epsilon_vol_e = compute_delta_epsilon_vol(to_cauchy(delta_epsilon_tilde_e));
     State elastic_state(state.size());
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     elastic_state[0] = STATE_0_ELASTIC_UPDATE;
@@ -75,8 +79,8 @@ void MCC::set_state_variables(State new_state) {
     state = new_state;
 }
 
-State MCC::compute_plastic_state_variable(Voigt delta_epsilon_tilde_p, double delta_lambda, double H) {
-    double delta_epsilon_vol_p = compute_delta_epsilon_vol(delta_epsilon_tilde_p.cauchy());
+State MCC::compute_plastic_state_variable_increment(Voigt delta_epsilon_tilde_p, double delta_lambda, double H) {
+    double delta_epsilon_vol_p = compute_delta_epsilon_vol(to_cauchy(delta_epsilon_tilde_p));
     State delta_state(state.size());
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     delta_state[0] = STATE_0_PLASTIC_INCREMENT;
@@ -84,8 +88,8 @@ State MCC::compute_plastic_state_variable(Voigt delta_epsilon_tilde_p, double de
     return delta_state;
 }
 
-State MCC::compute_plastic_state_variable(double delta_lambda, double H) {
+State MCC::compute_plastic_state_variable_increment(double delta_lambda, double H) {
     // Note: only correct state variables that do not depend on the magnitude of the strain increment (hence strain increment is not passed in).
     Voigt delta_epsilon_tilde_p = Voigt::Zero();
-    return compute_plastic_state_variable(delta_epsilon_tilde_p, delta_lambda, H);
+    return compute_plastic_state_variable_increment(delta_epsilon_tilde_p, delta_lambda, H);
 }

@@ -15,7 +15,7 @@
  */
 class Elastoplastic : public Elastic {
 
-    protected: 
+    public: 
 
         /** 
          * @brief Elastoplastic model constructor.
@@ -77,7 +77,7 @@ class Elastoplastic : public Elastic {
          * 
          * @note Must be overriden by model implementations.
          */
-        virtual State compute_plastic_state_variable(Voigt delta_epsilon_tilde_p, double delta_lambda, double H) = 0;
+        virtual State compute_plastic_state_variable_increment(Voigt delta_epsilon_tilde_p, double delta_lambda, double H) = 0;
 
         /**
          * @brief Pure virtual method to compute the correction for the state variables for the model implemented (i.e. where the strain increment is constant).
@@ -87,7 +87,7 @@ class Elastoplastic : public Elastic {
          * 
          * @note Must be overriden by model implementations.
          */
-        virtual State compute_plastic_state_variable(double delta_lambda, double H) = 0;
+        virtual State compute_plastic_state_variable_increment(double delta_lambda, double H) = 0;
 
         /**
          * @brief Pure virtual method to get the state variables from the model implementation.
@@ -107,7 +107,7 @@ class Elastoplastic : public Elastic {
          */
         virtual void set_state_variables(State new_state) = 0;
 
-    private:
+    // private:
 
         /**
          * @brief Compute elstoplastic constitutive matrix via:
@@ -227,7 +227,22 @@ class Elastoplastic : public Elastic {
         Voigt b;
 
         /**
-         * @brief Derivative of plastic potential function with respect to the effective mean stress.
+         * @brief Derivative of the yield surface with respect to the deviatoric stress.
+         */
+        double df_dq;
+
+        /**
+         * @brief Derivative of the yield surface with respect to the mean effective stress.
+         */
+        double df_dp_prime;
+
+        /**
+         * @brief Derivative of the plastic potential function with respect to the deviatoric stress.
+         */
+        double dg_dq;
+
+        /**
+         * @brief Derivative of the plastic potential function with respect to the effective mean stress.
          */
         double dg_dp_prime;
 
@@ -300,11 +315,6 @@ class Elastoplastic : public Elastic {
          * @brief Double precision tolerance.
          */
         double EPS = 1e-16;
-
-        /**
-         * @brief Boolean indicating whether the current strain increment has been solved.
-         */
-        bool solved;
 
         /**
          * @brief Boolean indicating whether the current substep size was accepted.
@@ -506,7 +516,7 @@ class Elastoplastic : public Elastic {
          * @brief State variables after first forward Euler estimate.
          */
         State state_1;
-        
+
         /**
          * @brief State variables after second forward Euler estimate.
          */

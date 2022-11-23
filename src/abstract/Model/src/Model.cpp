@@ -10,10 +10,57 @@ void Model::set_jacobian(Jacobian m) {
     jacobian = m;
 }
 
-void Model::set_sigma_prime(Voigt sigma_prime) {
+double Model::get_p_prime(void) {
+    return p_prime;
+}
+
+Cauchy Model::compute_dq_dsigma_prime(Cauchy sigma_prime) {
+    double q = compute_q(sigma_prime);
+    if (q == 0.0) {
+        return Cauchy::Zero();
+    } else {
+        double p_prime = compute_p_prime(sigma_prime);
+        Cauchy dq_dsigma_prime;
+        dq_dsigma_prime(0,0) = sigma_prime(0,0)-p_prime;
+        dq_dsigma_prime(1,1) = sigma_prime(1,1)-p_prime;
+        dq_dsigma_prime(2,2) = sigma_prime(2,2)-p_prime;
+        dq_dsigma_prime(0,1) = 2*sigma_prime(0,1);
+        dq_dsigma_prime(1,0) = 2*sigma_prime(1,0);
+        dq_dsigma_prime(0,2) = 2*sigma_prime(0,2);
+        dq_dsigma_prime(2,0) = 2*sigma_prime(2,0);
+        dq_dsigma_prime(1,2) = 2*sigma_prime(1,2);
+        dq_dsigma_prime(2,1) = 2*sigma_prime(2,1);
+        dq_dsigma_prime *= 3.0/(2.0*q);
+        return dq_dsigma_prime;
+    }
+}
+
+Voigt Model::to_voigt(Cauchy cauchy) {
+    Voigt voigt = Voigt::Zero();
+    voigt(0) = cauchy(0,0);
+    voigt(1) = cauchy(1,1);
+    voigt(2) = cauchy(2,2);
+    voigt(3) = cauchy(0,1);
+    voigt(4) = cauchy(0,2);
+    voigt(5) = cauchy(1,2);
+    return voigt;
+}
+
+Cauchy Model::to_cauchy(Voigt voigt) {
+    Cauchy cauchy = Cauchy::Zero();
+    cauchy(0,0) = voigt(0);
+    cauchy(1,1) = voigt(1);
+    cauchy(2,2) = voigt(2);
+    cauchy(0,1) = cauchy(1,0) = voigt(3);
+    cauchy(0,2) = cauchy(2,0) = voigt(4);
+    cauchy(1,2) = cauchy(2,1) = voigt(5);
+    return cauchy;
+}
+
+void Model::set_sigma_prime(Voigt sigma_prime_tilde) {
     // Stress in Voigt notation form - change sign to use compression positive soil mechanics convention.
-    this->sigma_prime_tilde = -sigma_prime;
-    this->sigma_prime = this->sigma_prime_tilde.cauchy();
+    this->sigma_prime_tilde = -sigma_prime_tilde;
+    this->sigma_prime = to_cauchy(this->sigma_prime_tilde);
 
     // Total stresses given pore pressure, u.
     update_sigma();
@@ -26,10 +73,8 @@ void Model::set_sigma_prime(Voigt sigma_prime) {
 void Model::set_strain_increment(Voigt delta_epsilon) {
     // Strain increment in Voigt notation form - change sign to use compression positive soil mechanics convention.
     this->delta_epsilon_tilde = -delta_epsilon;
-    this->delta_epsilon = this->delta_epsilon_tilde.cauchy();
-
-    // Volumetric and deviatoric strain increments.
-    
+    this->delta_epsilon = this->to_cauchy(delta_epsilon_tilde);
+    solved = false;   
 }
 
 // Getters.

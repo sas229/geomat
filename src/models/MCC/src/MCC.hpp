@@ -97,7 +97,7 @@ class MCC : public Elastoplastic {
          * @param[in] H Hardening modulus.
          * @return Vector of state variable increments.
          */
-        State compute_plastic_state_variable(Voigt delta_epsilon_tilde_p, double delta_lambda, double H) override;
+        State compute_plastic_state_variable_increment(Voigt delta_epsilon_tilde_p, double delta_lambda, double H) override;
 
         /**
          * @brief Overriden method to compute the correction in the models state variables.
@@ -106,7 +106,7 @@ class MCC : public Elastoplastic {
          * @param[in] H Hardening modulus.
          * @return Vector of state variable corrections.
          */
-        State compute_plastic_state_variable(double delta_lambda, double H) override;
+        State compute_plastic_state_variable_increment(double delta_lambda, double H) override;
 
        /** 
          * @brief Parameters. 
