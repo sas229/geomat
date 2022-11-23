@@ -19,11 +19,12 @@ Cauchy Model::compute_dq_dsigma_prime(Cauchy sigma_prime) {
     if (q == 0.0) {
         return Cauchy::Zero();
     } else {
-        double p_prime = compute_p_prime(sigma_prime);
+        p_prime = compute_p_prime(sigma_prime);
+        s = compute_s(sigma_prime, p_prime);
         Cauchy dq_dsigma_prime;
-        dq_dsigma_prime(0,0) = sigma_prime(0,0)-p_prime;
-        dq_dsigma_prime(1,1) = sigma_prime(1,1)-p_prime;
-        dq_dsigma_prime(2,2) = sigma_prime(2,2)-p_prime;
+        dq_dsigma_prime(0,0) = s(0,0);
+        dq_dsigma_prime(1,1) = s(1,1);
+        dq_dsigma_prime(2,2) = s(2,2);
         dq_dsigma_prime(0,1) = 2*sigma_prime(0,1);
         dq_dsigma_prime(1,0) = 2*sigma_prime(1,0);
         dq_dsigma_prime(0,2) = 2*sigma_prime(0,2);

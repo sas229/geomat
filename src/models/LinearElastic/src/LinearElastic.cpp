@@ -14,13 +14,13 @@ LinearElastic::LinearElastic(Parameters parameters, State state) : parameters(pa
 double LinearElastic::compute_K(double delta_epsilon_e_vol, double p_prime) {
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     if (delta_epsilon_e_vol != 0.0) {
-        return BULK_MODULUS_SECANT;
+        return LINEAR_ELASTIC_SECANT_BULK_MODULUS;
     } else {
-        return BULK_MODULUS_TANGENT;
+        return LINEAR_ELASTIC_TANGENT_BULK_MODULUS;
     }
 }
 
 double LinearElastic::compute_G(double K) {
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
-    return SHEAR_MODULUS;
+    return LINEAR_ELASTIC_SHEAR_MODULUS;
 }

@@ -506,21 +506,19 @@ class Model {
 
         /**
          * @brief Derivative of the mean stress with respect to the effective stress state:
-         * 
          * \f[ \frac{\partial p}{\partial \boldsymbol{\sigma}^{\prime}} = \frac{1}{3} \boldsymbol{I} \f]
-         * 
          * where \f$ \boldsymbol{I} \f$ is the identity matrix. 
          */
         Cauchy dp_dsigma_prime = 1.0/3.0*eye;
 
         /**
          * @brief Derivative of the deviatoric stress with respect to the effective stress state:
-         * 
          * \f[ \frac{\partial q}{\partial \boldsymbol{ \sigma^{\prime}}} = \frac{3}{2q} \left[\begin{array}{lll}
-         *      \sigma_{11}-p^{\prime} & 2\tau_{12} & 2\tau_{13} \\
-         *      2\tau_{21} & \sigma_{22}-p^{\prime} & 2\tau_{23} \\
-         *      2\tau_{31} & 2\tau_{32} & \sigma_{33}-p^{\prime}
+         *      s_{11} & 2\tau_{12} & 2\tau_{13} \\
+         *      2\tau_{21} & s_{22} & 2\tau_{23} \\
+         *      2\tau_{31} & 2\tau_{32} & s_{33}
          *      \end{array}\right] \f]
+         * where \f$ s_{ii} \f$ are the deviatoric stress components, \f$ \tau_{ii} \f$ are the shear stresses and \f$ q \f$ is the deviatoric stress.
          */
         Cauchy dq_dsigma_prime;
 };

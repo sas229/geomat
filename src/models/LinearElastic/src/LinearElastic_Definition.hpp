@@ -5,18 +5,18 @@
  * 
  * \f[ K = constant \f]
  */
-#define BULK_MODULUS_SECANT K
+#define LINEAR_ELASTIC_SECANT_BULK_MODULUS K
 
 /**
  * @brief Tangent bulk modulus definition:
  * 
  * \f[ K = constant \f]
  */
-#define BULK_MODULUS_TANGENT K
+#define LINEAR_ELASTIC_TANGENT_BULK_MODULUS K
 
 /**
  * @brief Shear modulus definition:
  * 
  * \f[ G = constant \f]
  */
-#define SHEAR_MODULUS G
+#define LINEAR_ELASTIC_SHEAR_MODULUS G
