@@ -30,6 +30,10 @@ PYBIND11_MODULE(models, m) {
         .def(py::init<Parameters, State>()) // Constructor.
         .def("set_sigma_prime", &MCC::set_sigma_prime)
         .def("get_sigma_prime", &MCC::get_sigma_prime)
+        .def("get_p_prime", &MCC::get_p_prime)
+        .def("get_q", &MCC::get_q)
+        .def_readonly("p_prime", &MCC::p_prime)
+        .def_readonly("q", &MCC::q)
         .def("set_strain_increment", &MCC::set_strain_increment)
         .def("solve", &MCC::solve);
 }

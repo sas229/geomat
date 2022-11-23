@@ -55,6 +55,8 @@ class Model {
 
         double get_p_prime(void);
 
+        double get_q(void);
+
         /** 
          * @brief Mean effective stress calculated via:
          * \f[ p^{\prime}=\frac{1}{3} \operatorname{tr}\left( \boldsymbol{\sigma}^{\prime} \right) \f]
@@ -67,7 +69,7 @@ class Model {
 
         Cauchy compute_dq_dsigma_prime(Cauchy sigma_prime);
 
-    protected:
+    // protected:
 
         // Setters.
 

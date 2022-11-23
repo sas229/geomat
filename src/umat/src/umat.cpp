@@ -92,12 +92,12 @@ extern "C" void umat(
     // model->update_lode();
 
     // Do some work with it... (i.e. stress integration).
-    int i = 0;
-    while (i<1000) {
-        model->solve();
-        model->set_strain_increment(Eigen_dstran);
-        i += 1;
-    }
+    // int i = 0;
+    // while (i<1000) {
+    //     model->solve();
+    //     model->set_strain_increment(Eigen_dstran);
+    //     i += 1;
+    // }
     model->solve();
 
     // // Equate map to updated variable in order to map back to input variable.

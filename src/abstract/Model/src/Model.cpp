@@ -14,6 +14,10 @@ double Model::get_p_prime(void) {
     return p_prime;
 }
 
+double Model::get_q(void) {
+    return q;
+}
+
 Cauchy Model::compute_dq_dsigma_prime(Cauchy sigma_prime) {
     double q = compute_q(sigma_prime);
     if (q == 0.0) {

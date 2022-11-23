@@ -2,9 +2,6 @@
 
 void Elastoplastic::solve(void) {
     if (!solved) {
-        p = compute_p(sigma_prime);
-        q = compute_q(sigma_prime);
-        std::cout << "q = " << q << " ; p = " << p << " ; q/p = " << q/p << "\n";
         compute_alpha();
         substeps = 0;
         corrections = 0;
@@ -102,6 +99,8 @@ void Elastoplastic::solve(void) {
             // Set stress and state variables as final elastoplastic values.
             sigma_prime = sigma_prime_ep;
             set_state_variables(state_ep);
+            p_prime = compute_p_prime(sigma_prime);
+            q = compute_q(sigma_prime);
             solved = true;
             PLOG_INFO << "Elastoplastic stress increment integrated to within a tolerance FTOL = " << FTOL << " via " << substeps << " substeps and " << corrections << " drift corrections.";
         } else {
@@ -346,7 +345,9 @@ double Elastoplastic::pegasus_regula_falsi(double alpha_0, double alpha_1, doubl
         f_0 = f_n;
         ITS_YSI += 1;
     }
-    double alpha = alpha_n;
+    alpha = alpha_n;
+    alpha = std::max(alpha, 0.0);
+    alpha = std::min(alpha, 1.0);
     double f = f_n;
     if (std::abs(f) >= FTOL) {
         PLOG_FATAL << "Performed " << MAXITS_YSI << " Pegasus iteration(s): alpha = " << alpha << "; |f| = " << std::abs(f) << " > tolerance = " << FTOL << ".";
