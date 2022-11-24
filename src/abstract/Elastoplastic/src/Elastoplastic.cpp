@@ -13,16 +13,16 @@ void Elastoplastic::solve(void) {
         }
         if (alpha > 0.0) {
             // Update stress and state variables based on elastic portion of strain increment.
-            delta_epsilon_tilde_e = alpha*delta_epsilon_tilde;
-            delta_epsilon_e = to_cauchy(delta_epsilon_tilde_e);
-            delta_epsilon_vol_e = compute_delta_epsilon_vol(delta_epsilon_e);
-            delta_sigma_prime_e = compute_elastic_stress_increment(D_e, delta_epsilon_tilde_e);
-            sigma_prime_e = compute_isotropic_linear_elastic_stress(sigma_prime, alpha, delta_epsilon_tilde_e);
-            state_e = compute_elastic_state_variable(delta_epsilon_tilde_e);
+            Delta_epsilon_tilde_e = alpha*Delta_epsilon_tilde;
+            Delta_epsilon_e = to_cauchy(Delta_epsilon_tilde_e);
+            Delta_epsilon_vol_e = compute_Delta_epsilon_vol(Delta_epsilon_e);
+            Delta_sigma_prime_e = compute_elastic_stress_increment(D_e, Delta_epsilon_tilde_e);
+            sigma_prime_e = compute_isotropic_linear_elastic_stress(sigma_prime, alpha, Delta_epsilon_tilde_e);
+            state_e = compute_elastic_state_variable(Delta_epsilon_tilde_e);
         } 
         if (alpha < 1.0) {
             // Perform elastoplastic stress integration on plastic portion of strain increment.
-            delta_epsilon_tilde_p = (1.0-alpha)*delta_epsilon_tilde;
+            Delta_epsilon_tilde_p = (1.0-alpha)*Delta_epsilon_tilde;
             sigma_prime_ep = sigma_prime_e;
             state_ep = state_e;
 
@@ -30,17 +30,17 @@ void Elastoplastic::solve(void) {
             dT = 1.0;
             T = 0.0;
             while (T < 1.0) {
-                delta_epsilon_tilde_p_dT = delta_epsilon_tilde_p*dT;
-                delta_epsilon_vol_p_dT = to_cauchy(delta_epsilon_tilde_p_dT).trace();
+                Delta_epsilon_tilde_p_dT = Delta_epsilon_tilde_p*dT;
+                Delta_epsilon_vol_p_dT = to_cauchy(Delta_epsilon_tilde_p_dT).trace();
 
                 // Compute stress and state variable increment estimates.
-                compute_plastic_increment(sigma_prime_ep, state_ep, delta_epsilon_tilde_p_dT, delta_sigma_prime_1, delta_state_1);
-                sigma_prime_1 = sigma_prime_ep + to_cauchy(delta_sigma_prime_1);
+                compute_plastic_increment(sigma_prime_ep, state_ep, Delta_epsilon_tilde_p_dT, Delta_sigma_prime_1, delta_state_1);
+                sigma_prime_1 = sigma_prime_ep + to_cauchy(Delta_sigma_prime_1);
                 state_1 = state_ep + delta_state_1;
-                compute_plastic_increment(sigma_prime_1, state_ep, delta_epsilon_tilde_p_dT, delta_sigma_prime_2, delta_state_2);
+                compute_plastic_increment(sigma_prime_1, state_ep, Delta_epsilon_tilde_p_dT, Delta_sigma_prime_2, delta_state_2);
 
                 // Calculate modified Euler stresses and state variables.
-                sigma_prime_ini = sigma_prime_ep + to_cauchy(1.0/2.0*(delta_sigma_prime_1 + delta_sigma_prime_2));
+                sigma_prime_ini = sigma_prime_ep + to_cauchy(1.0/2.0*(Delta_sigma_prime_1 + Delta_sigma_prime_2));
                 state_ini = state_ep + 1.0/2.0*(delta_state_1+delta_state_2);
 
                 // Compute error estimate.
@@ -99,8 +99,6 @@ void Elastoplastic::solve(void) {
             // Set stress and state variables as final elastoplastic values.
             sigma_prime = sigma_prime_ep;
             set_state_variables(state_ep);
-            p_prime = compute_p_prime(sigma_prime);
-            q = compute_q(sigma_prime);
             solved = true;
             PLOG_INFO << "Elastoplastic stress increment integrated to within a tolerance FTOL = " << FTOL << " via " << substeps << " substeps and " << corrections << " drift corrections.";
         } else {
@@ -111,7 +109,11 @@ void Elastoplastic::solve(void) {
         }
 
         // Compute final stress invariants.
+        p_prime = compute_p_prime(sigma_prime);
+        q = compute_q(sigma_prime);
         compute_principal_stresses(sigma_prime, sigma_1, sigma_2, sigma_3, R, S);
+        Eigen::VectorXd p_prime_surface, q_surface;
+        compute_yield_surface(get_state_variables(), 1000, p_prime_surface, q_surface);
     }
 }
 
@@ -150,9 +152,9 @@ void Elastoplastic::compute_yield_surface_correction(void) {
     delta_lambda_c = f_u/(H_u + a_u.transpose()*D_e_u*b_u);
 
     // Update stress and state variables using corrections.
-    delta_sigma_prime_c = -delta_lambda_c*D_e_u*b_u;
+    Delta_sigma_prime_c = -delta_lambda_c*D_e_u*b_u;
     delta_state_c = compute_plastic_state_variable_increment(delta_lambda_c, H_u);
-    sigma_prime_c = sigma_prime_u + to_cauchy(delta_sigma_prime_c);
+    sigma_prime_c = sigma_prime_u + to_cauchy(Delta_sigma_prime_c);
     state_c = state_u + delta_state_c;
 }
 
@@ -161,18 +163,18 @@ void Elastoplastic::compute_normal_yield_surface_correction(void) {
     delta_lambda_c = f_u/(a_u.transpose()*a_u);
     
     //Update stress and state variables using correction.
-    delta_sigma_prime_c = -delta_lambda_c*a_u;
-    sigma_prime_c = sigma_prime_u + to_cauchy(delta_sigma_prime_c);
+    Delta_sigma_prime_c = -delta_lambda_c*a_u;
+    sigma_prime_c = sigma_prime_u + to_cauchy(Delta_sigma_prime_c);
     state_c = state_u; /* i.e. no correction to state variables. */
 }
 
-void Elastoplastic::compute_plastic_increment(Cauchy sigma_prime, State state, Voigt delta_epsilon_tilde_p_dT, Voigt &delta_sigma_prime, State &delta_state) {   
+void Elastoplastic::compute_plastic_increment(Cauchy sigma_prime, State state, Voigt Delta_epsilon_tilde_p_dT, Voigt &Delta_sigma_prime, State &delta_state) {   
     // Calculate elastic constitutive matrix using tangent moduli and elastic stress increment.
     double p_prime = compute_p_prime(sigma_prime);
     double K_tan = compute_K(0, p_prime);
     double G_tan = compute_G(K_tan);
     Constitutive D_e = compute_isotropic_linear_elastic_matrix(K_tan, G_tan);
-    Voigt delta_sigma_prime_e = D_e*delta_epsilon_tilde_p_dT;
+    Voigt Delta_sigma_prime_e = D_e*Delta_epsilon_tilde_p_dT;
 
     // Compute elastoplastic constitutive matrix and elastoplastic multiplier. 
     Cauchy df_dsigma_prime, dg_dsigma_prime;
@@ -180,17 +182,17 @@ void Elastoplastic::compute_plastic_increment(Cauchy sigma_prime, State state, V
     double dg_dp_prime, H;
     compute_derivatives(sigma_prime, state, df_dsigma_prime, a, dg_dsigma_prime, b, dg_dp_prime, H);
     Constitutive D_ep = compute_elastoplastic_matrix(D_e, a, b, H);
-    double delta_lambda = compute_elastoplastic_multiplier(delta_sigma_prime_e, D_e, a, b, H);
+    double delta_lambda = compute_elastoplastic_multiplier(Delta_sigma_prime_e, D_e, a, b, H);
 
     // Update stress and state variable increment by reference.
-    delta_sigma_prime = D_ep*delta_epsilon_tilde_p_dT;
-    delta_state = compute_plastic_state_variable_increment(delta_epsilon_tilde_p_dT, delta_lambda, H);
+    Delta_sigma_prime = D_ep*Delta_epsilon_tilde_p_dT;
+    delta_state = compute_plastic_state_variable_increment(Delta_epsilon_tilde_p_dT, delta_lambda, H);
 }
 
 void Elastoplastic::compute_error_estimate(void) {
     int size_state = get_state_variables().size();
     State error(size_state);
-    error[0] = (to_cauchy(delta_sigma_prime_2 - delta_sigma_prime_1)).norm()/sigma_prime_ini.norm();
+    error[0] = (to_cauchy(Delta_sigma_prime_2 - Delta_sigma_prime_1)).norm()/sigma_prime_ini.norm();
     for (int i=1; i<size_state; i++) {
         error[i] = std::abs((delta_state_2[i] - delta_state_1[i]))/state_ini[i];
     }
@@ -200,8 +202,8 @@ void Elastoplastic::compute_error_estimate(void) {
     R_n = std::max(R_n, EPS);
 }
 
-double Elastoplastic::compute_elastoplastic_multiplier(Voigt delta_sigma_prime_e, Constitutive D_e, Voigt a, Voigt b, double H) {
-    return (double)(a.transpose()*delta_sigma_prime_e)/(double)(H + a.transpose()*D_e*b);
+double Elastoplastic::compute_elastoplastic_multiplier(Voigt Delta_sigma_prime_e, Constitutive D_e, Voigt a, Voigt b, double H) {
+    return (double)(a.transpose()*Delta_sigma_prime_e)/(double)(H + a.transpose()*D_e*b);
 }
 
 Constitutive Elastoplastic::compute_elastoplastic_matrix(Constitutive D_e, Voigt a, Voigt b, double H) {
@@ -209,7 +211,7 @@ Constitutive Elastoplastic::compute_elastoplastic_matrix(Constitutive D_e, Voigt
 }
 
 void Elastoplastic::compute_alpha_bounds(double &alpha_0, double &alpha_1) {
-    double delta_epsilon_vol_e = delta_epsilon.trace();
+    double Delta_epsilon_vol_e = Delta_epsilon.trace();
     double alpha_n, d_alpha;
     int i = 0;
     int j = 0;
@@ -218,16 +220,16 @@ void Elastoplastic::compute_alpha_bounds(double &alpha_0, double &alpha_1) {
         alpha_n = alpha_0+d_alpha;
         while (j < NSUB) {
             // Compute the elastic matrix.
-            double K_trial = compute_K(alpha_n*delta_epsilon_vol_e, p_prime);
+            double K_trial = compute_K(alpha_n*Delta_epsilon_vol_e, p_prime);
             double G_trial = compute_G(K_trial);
             Constitutive D_e_trial = compute_isotropic_linear_elastic_matrix(K_trial, G_trial);
 
             // Compute elastic stress increment.
-            Voigt delta_sigma_e_trial = alpha_n*D_e_trial*delta_epsilon_tilde;
+            Voigt Delta_sigma_e_trial = alpha_n*D_e_trial*Delta_epsilon_tilde;
 
             // Check yield function.
             State state_trial = get_state_variables();
-            Cauchy sigma_prime_trial = sigma_prime + to_cauchy(delta_sigma_e_trial);
+            Cauchy sigma_prime_trial = sigma_prime + to_cauchy(Delta_sigma_e_trial);
             double f_trial = compute_f(sigma_prime_trial, state_trial);
 
             // Check criterion.
@@ -261,10 +263,10 @@ bool Elastoplastic::check_unload_reload(Cauchy sigma_prime) {
     Constitutive D_e_tan = compute_isotropic_linear_elastic_matrix(K_tan, G_tan);
 
     // Compute elastic stress increment.
-    Voigt delta_sigma_e = D_e_tan*delta_epsilon_tilde;
+    Voigt Delta_sigma_e = D_e_tan*Delta_epsilon_tilde;
 
     // Check unloading-reloading criterion.
-    double cos_theta = (double)(a.transpose()*delta_sigma_e)/(double)(a.squaredNorm()*delta_sigma_e.squaredNorm());
+    double cos_theta = (double)(a.transpose()*Delta_sigma_e)/(double)(a.squaredNorm()*Delta_sigma_e.squaredNorm());
 
     // Check against tolerance.
     if (cos_theta >= -LTOL) {
@@ -280,7 +282,7 @@ void Elastoplastic::compute_alpha(void) {
     double f_0 = compute_f(sigma_prime, state);
 
     // Fully elastic increment trial stress state.
-    Cauchy sigma_prime_1 = compute_isotropic_linear_elastic_stress(sigma_prime, 1.0, delta_epsilon_tilde);
+    Cauchy sigma_prime_1 = compute_isotropic_linear_elastic_stress(sigma_prime, 1.0, Delta_epsilon_tilde);
     double f_1 = compute_f(sigma_prime_1, state);
 
     // Check increment type by finding alpha.
@@ -296,11 +298,11 @@ void Elastoplastic::compute_alpha(void) {
             compute_alpha_bounds(alpha_0, alpha_1);
 
             // Trial stress state for alpha_0.
-            Cauchy sigma_prime_0 = compute_isotropic_linear_elastic_stress(sigma_prime, alpha_0, delta_epsilon_tilde);
+            Cauchy sigma_prime_0 = compute_isotropic_linear_elastic_stress(sigma_prime, alpha_0, Delta_epsilon_tilde);
             double f_0 = compute_f(sigma_prime_0, state);
 
             // Trial stress state for alpha_1.
-            Cauchy sigma_prime_1 = compute_isotropic_linear_elastic_stress(sigma_prime, alpha_1, delta_epsilon_tilde);
+            Cauchy sigma_prime_1 = compute_isotropic_linear_elastic_stress(sigma_prime, alpha_1, Delta_epsilon_tilde);
             double f_1 = compute_f(sigma_prime_1, state);
 
             // Perform Pegasus intersection within the bounds of alpha_0 and alpha_1.
@@ -331,7 +333,7 @@ double Elastoplastic::pegasus_regula_falsi(double alpha_0, double alpha_1, doubl
     while (ITS_YSI < MAXITS_YSI && std::abs(f_n) >= FTOL) {
         alpha_n = alpha_1 - f_1*(alpha_1-alpha_0)/(f_1-f_0);  
             
-        sigma_prime_n = compute_isotropic_linear_elastic_stress(sigma_prime, alpha_n, delta_epsilon_tilde);
+        sigma_prime_n = compute_isotropic_linear_elastic_stress(sigma_prime, alpha_n, Delta_epsilon_tilde);
         f_n = compute_f(sigma_prime_n, state_n);
 
         // Update trial using Pegasus method rules.
@@ -357,4 +359,10 @@ double Elastoplastic::pegasus_regula_falsi(double alpha_0, double alpha_1, doubl
         assert(alpha >= 0.0 && alpha <= 1.0);
     }
     return alpha;
+}
+
+void Elastoplastic::compute_yield_surface(State state, int points, Eigen::VectorXd &p_prime_surface, Eigen::VectorXd &q_surface) {
+    // Calculate minimum and maximum p_prime.
+
+    // For the calculated range of p_prime, solve for q.  
 }

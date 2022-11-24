@@ -6,10 +6,6 @@ void Model::set_name(std::string s) {
     name = s;
 }
 
-void Model::set_jacobian(Jacobian m) {
-    jacobian = m;
-}
-
 double Model::get_p_prime(void) {
     return p_prime;
 }
@@ -62,23 +58,26 @@ Cauchy Model::to_cauchy(Voigt voigt) {
     return cauchy;
 }
 
-void Model::set_sigma_prime(Voigt sigma_prime_tilde) {
+void Model::set_sigma_prime_tilde(Voigt sigma_prime_tilde) {
     // Stress in Voigt notation form - change sign to use compression positive soil mechanics convention.
     this->sigma_prime_tilde = -sigma_prime_tilde;
     this->sigma_prime = to_cauchy(this->sigma_prime_tilde);
 
     // Total stresses given pore pressure, u.
-    update_sigma();
+    // update_sigma();
+    sigma = compute_sigma(sigma_prime, u);
 
     // Mean and deviatoric stress.
-    update_p_prime();
-    update_q();
+    // update_p_prime();
+    // update_q();
+    p = compute_p_prime(sigma_prime);
+    q = compute_q(sigma_prime);
 }
 
-void Model::set_strain_increment(Voigt delta_epsilon) {
+void Model::set_Delta_epsilon_tilde(Voigt Delta_epsilon_tilde) {
     // Strain increment in Voigt notation form - change sign to use compression positive soil mechanics convention.
-    this->delta_epsilon_tilde = -delta_epsilon;
-    this->delta_epsilon = this->to_cauchy(delta_epsilon_tilde);
+    this->Delta_epsilon_tilde = -Delta_epsilon_tilde;
+    this->Delta_epsilon = this->to_cauchy(Delta_epsilon_tilde);
     solved = false;   
 }
 
@@ -99,12 +98,12 @@ Jacobian Model::get_jacobian(void) {
 
 // Computers.
 
-Cauchy Model::compute_cartesian_stresses(Cauchy T, Cauchy S) {
-    return T*S*T.transpose();
+Cauchy Model::compute_cartesian_stresses(Cauchy R, Cauchy S) {
+    return R*S*R.transpose();
 }
 
-double Model::compute_delta_epsilon_vol(Cauchy delta_epsilon) {
-    return delta_epsilon.trace();
+double Model::compute_Delta_epsilon_vol(Cauchy Delta_epsilon) {
+    return Delta_epsilon.trace();
 }
 
 void Model::compute_lode(double J_2, double J_3, double &theta_c, double &theta_s, double &theta_s_bar) {
@@ -172,7 +171,7 @@ void Model::compute_stress_invariants(Cauchy sigma, double &I_1, double &I_2, do
     I_3 = sigma.determinant();
 
     // Mean stress.
-    double p = compute_p_prime(sigma);
+    double p = compute_p(sigma);
     
     // Deviatoric stress tensor, s.
     Cauchy s = compute_s(sigma, p);
@@ -181,54 +180,4 @@ void Model::compute_stress_invariants(Cauchy sigma, double &I_1, double &I_2, do
     J_1 = s.trace(); // Is always zero...
     J_2 = (std::pow(I_1,2)/3.0) - I_2;
     J_3 = s.determinant();
-}
-
-// Updaters.
-
-void Model::update_cartesian_stresses(void) {
-    this->sigma = Model::compute_cartesian_stresses(this->R, this->S);
-}
-
-void Model::update_delta_epsilon_vol(void) {
-    this->delta_epsilon_vol = Model::compute_delta_epsilon_vol(this->delta_epsilon);
-}
-
-void Model::update_lode(void) {
-    Model::compute_lode(this->J_2, this->J_3, this->theta_c, this->theta_s, this->theta_s_bar);
-}
-
-void Model::update_max_shear(void) {
-    this->max_shear = Model::compute_max_shear(this->sigma_1, this->sigma_2, this->sigma_3);
-}
-
-void Model::update_mises_stress(void) {
-    this->mises_stress = Model::compute_mises_stress(this->J_2);
-}
-
-void Model::update_p(void) {
-    this->p = Model::compute_p(this->sigma);
-}
-
-void Model::update_p_prime(void) {
-    this->p_prime = Model::compute_p(this->sigma_prime);
-}
-
-void Model::update_principal_stresses(void) {
-    Model::compute_principal_stresses(this->sigma_prime, this->sigma_1, this->sigma_2, this->sigma_3, this->R, this->S);
-}   
-
-void Model::update_q(void) {
-    this->q = Model::compute_q(this->sigma);
-}
-
-void Model::update_s(void) {
-    this->s = Model::compute_s(this->sigma, this->p);
-}
-
-void Model::update_sigma(void) {
-    this->sigma = Model::compute_sigma(this->sigma_prime, this->u);
-}
-
-void Model::update_stress_invariants(void) {
-    Model::compute_stress_invariants(this->sigma, this->I_1, this->I_2, this->I_3, this->J_1, this->J_2, this->J_3);
 }

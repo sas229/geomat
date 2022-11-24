@@ -8,7 +8,7 @@
  * where \f$ p^{\prime} \f$ is the effective mean stress, \f$ \Delta \epsilon_{e}^{vol} \f$ is the elastic volumetric strain increment
  * and \f$ \kappa^{*} \f$ is the slope of the recompression line in \f$ \ln \left( e \right)-\ln \left( p^{\prime} \right)\f$ space.
  */
-#define MCC_SECANT_BULK_MODULUS (p_prime/delta_epsilon_e_vol)*(exp(delta_epsilon_e_vol/kappa_star)-1)
+#define MCC_SECANT_BULK_MODULUS (p_prime/Delta_epsilon_e_vol)*(exp(Delta_epsilon_e_vol/kappa_star)-1)
 
 /**
  * @brief Tangent bulk modulus definition:
@@ -79,9 +79,9 @@
 /**
  * @brief State variable elastic update for void ratio:
  * 
- * \f[ e = e - e \delta \epsilon_{vol, e}\f]
+ * \f[ e = e - e \Delta \epsilon_{vol, e}\f]
  */
-#define MCC_STATE_0_ELASTIC_UPDATE e-(e*delta_epsilon_vol_e)
+#define MCC_STATE_0_ELASTIC_UPDATE e-(e*Delta_epsilon_vol_e)
 
 /**
  * @brief State variable elastic update for preconsolidation pressure:
@@ -93,10 +93,10 @@
 /**
  * @brief State variable plastic increment for void ratio:
  * 
- * \f[ \Delta e = -(1+e) \delta \epsilon_{vol, p} \f]
+ * \f[ \Delta e = -(1+e) \Delta \epsilon_{vol, p} \f]
  *
  */
-#define MCC_STATE_0_PLASTIC_INCREMENT -(1+e)*delta_epsilon_vol_p
+#define MCC_STATE_0_PLASTIC_INCREMENT -(1+e)*Delta_epsilon_vol_p
 
 /**
  * @brief State variable plastic increment for preconsolidation pressure:

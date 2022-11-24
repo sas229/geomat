@@ -14,19 +14,19 @@ Constitutive Elastic::compute_isotropic_linear_elastic_matrix(double K, double G
     return D_e;
 }
 
-Cauchy Elastic::compute_isotropic_linear_elastic_stress(Cauchy sigma_prime, double alpha, Voigt delta_epsilon_tilde) {
-    Voigt delta_epsilon_tilde_trial = alpha*delta_epsilon_tilde;
-    double delta_epsilon_e_vol = compute_delta_epsilon_vol(to_cauchy(delta_epsilon_tilde_trial)); 
+Cauchy Elastic::compute_isotropic_linear_elastic_stress(Cauchy sigma_prime, double alpha, Voigt Delta_epsilon_tilde) {
+    Voigt Delta_epsilon_tilde_trial = alpha*Delta_epsilon_tilde;
+    double Delta_epsilon_e_vol = compute_Delta_epsilon_vol(to_cauchy(Delta_epsilon_tilde_trial)); 
     double p_prime_trial = compute_p_prime(sigma_prime);
-    double K_trial = compute_K(delta_epsilon_e_vol, p_prime_trial);
+    double K_trial = compute_K(Delta_epsilon_e_vol, p_prime_trial);
     double G_trial = compute_G(K_trial);
     Constitutive D_e_trial = compute_isotropic_linear_elastic_matrix(K_trial, G_trial);
-    Voigt delta_sigma_prime_tilde_trial = compute_elastic_stress_increment(D_e_trial, delta_epsilon_tilde_trial);
-    return sigma_prime + to_cauchy(delta_sigma_prime_tilde_trial);
+    Voigt Delta_sigma_prime_tilde_trial = compute_elastic_stress_increment(D_e_trial, Delta_epsilon_tilde_trial);
+    return sigma_prime + to_cauchy(Delta_sigma_prime_tilde_trial);
 }
 
-Voigt Elastic::compute_elastic_stress_increment(Constitutive D_e, Voigt delta_epsilon_tilde) {
-    return D_e*delta_epsilon_tilde;
+Voigt Elastic::compute_elastic_stress_increment(Constitutive D_e, Voigt Delta_epsilon_tilde) {
+    return D_e*Delta_epsilon_tilde;
 }
 
 void Elastic::solve(void) {
@@ -36,8 +36,8 @@ void Elastic::solve(void) {
     D_e = compute_isotropic_linear_elastic_matrix(K, G);
 
     // Update stress state.
-    Voigt delta_sigma_prime_tilde = D_e*delta_epsilon_tilde;
-    sigma_prime_tilde += delta_sigma_prime_tilde;
+    Voigt Delta_sigma_prime_tilde = D_e*Delta_epsilon_tilde;
+    sigma_prime_tilde += Delta_sigma_prime_tilde;
     sigma_prime = to_cauchy(sigma_prime_tilde);
 
     // Take the Jacobian as the tangent stiffness.

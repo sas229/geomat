@@ -36,11 +36,22 @@ class Elastoplastic : public Elastic {
          * @brief Pure virtual method to compute the yield surface value given the parameters, current state variables and stress state.
          * 
          * @param sigma_prime Effective stress tensor. 
+         * @param state State variables.
          * @return f 
          * 
          * @note Must be overriden by model implementations.
          */
         virtual double compute_f(Cauchy sigma_prime, State state) = 0;
+
+        /**
+         * @brief Pure virtual method to compute the yield surface value given the parameters, current state variables and stress state.
+         * 
+         * @param p_prime Mean effective stress.
+         * @param q Deviatoric stress.
+         * @param state State variables.
+         * @return double 
+         */
+        virtual double compute_f(double p_prime, double q, State state) = 0;
 
         /** 
          * @brief Pure virtual method to compute the derivatives for the constitutive model implemented.
@@ -65,19 +76,19 @@ class Elastoplastic : public Elastic {
          * 
          * @note Must be overriden by model implementations.
          */
-        virtual State compute_elastic_state_variable(Voigt delta_epsilon_tilde_e) = 0;
+        virtual State compute_elastic_state_variable(Voigt Delta_epsilon_tilde_e) = 0;
 
         /**
          * @brief Pure virtual method to compute the increment in the state variables for the model implemented.
          * 
-         * @param delta_epsilon_tilde_p Plastic strain increment.
+         * @param Delta_epsilon_tilde_p Plastic strain increment.
          * @param delta_lambda Plastic multiplier.
          * @param H Hardening modulus.
          * @return Vector of updated state variables.
          * 
          * @note Must be overriden by model implementations.
          */
-        virtual State compute_plastic_state_variable_increment(Voigt delta_epsilon_tilde_p, double delta_lambda, double H) = 0;
+        virtual State compute_plastic_state_variable_increment(Voigt Delta_epsilon_tilde_p, double delta_lambda, double H) = 0;
 
         /**
          * @brief Pure virtual method to compute the correction for the state variables for the model implemented (i.e. where the strain increment is constant).
@@ -125,14 +136,14 @@ class Elastoplastic : public Elastic {
         /**
          * @brief Compute elastoplastic multiplier.
          * 
-         * @param delta_sigma_prime_e Elastic stress increment.
+         * @param Delta_sigma_prime_e Elastic stress increment.
          * @param D_e Elastic constitutive matrix.
          * @param a Vector of derivatives with respect to the yield surface.
          * @param b Vector of derivatives with respect to the plastic potential function.
          * @param H Hardening modulus.
          * @return Elastoplastic multiplier.
          */
-        double compute_elastoplastic_multiplier(Voigt delta_sigma_prime_e, Constitutive D_e, Voigt a, Voigt b, double H);
+        double compute_elastoplastic_multiplier(Voigt Delta_sigma_prime_e, Constitutive D_e, Voigt a, Voigt b, double H);
 
         /**
          * @brief Compute error estimate.
@@ -161,11 +172,11 @@ class Elastoplastic : public Elastic {
          * 
          * @param sigma_prime Effective stress state.
          * @param state Vector of state variables.
-         * @param delta_epsilon_tilde_p_dT Strain increment.
-         * @param delta_sigma_prime Increment in stress state.
+         * @param Delta_epsilon_tilde_p_dT Strain increment.
+         * @param Delta_sigma_prime Increment in stress state.
          * @param delta_state Increment in state variables.
          */
-        void compute_plastic_increment(Cauchy sigma_prime, State state, Voigt delta_epsilon_tilde_p_dT, Voigt &delta_sigma_prime, State &delta_state);
+        void compute_plastic_increment(Cauchy sigma_prime, State state, Voigt Delta_epsilon_tilde_p_dT, Voigt &Delta_sigma_prime, State &delta_state);
 
         /**
          * @brief Pegasus regula falsi algorithm to find root of general non-linear system of equations.
@@ -200,6 +211,16 @@ class Elastoplastic : public Elastic {
          * @param alpha_1 Upper bound for alpha.
          */
         void compute_alpha_bounds(double &alpha_0, double &alpha_1);
+
+        /**
+         * @brief Method to compute vectors of coordinates to visualise the yield surface for a given set of state variables.
+         * 
+         * @param state Vector of state variables.
+         * @param points Number of points on surface.
+         * @param p_prime_surface Surface coordinate for mean effective stress.
+         * @param q_surface Surface coordinate for deviatoric stress.
+         */
+        void compute_yield_surface(State state, int points, Eigen::VectorXd &p_prime_surface, Eigen::VectorXd &q_surface);
 
         /**
          * @brief Elastic fraction of strain increment.
@@ -394,7 +415,7 @@ class Elastoplastic : public Elastic {
         /**
          * @brief Tensor of stress state corrections.
          */
-        Voigt delta_sigma_prime_c;
+        Voigt Delta_sigma_prime_c;
 
         /**
          * @brief Vector of state variable corrections.
@@ -410,12 +431,12 @@ class Elastoplastic : public Elastic {
         /**
          * @brief Elastic volumetric strain increment.
          */
-        double delta_epsilon_vol_e;
+        double Delta_epsilon_vol_e;
 
         /**
          * @brief Elastic strain increment.
          */
-        Cauchy delta_epsilon_e;
+        Cauchy Delta_epsilon_e;
         
         /**
          * @brief Yield surface function for uncorrected stress state.
@@ -455,12 +476,12 @@ class Elastoplastic : public Elastic {
         /**
          * @brief Plastic volumetric strain increment for pseudo-time increment dT.
          */
-        double delta_epsilon_vol_p_dT;
+        double Delta_epsilon_vol_p_dT;
 
         /**
          * @brief Elastic strain increment for pseudo-time increment dT.
          */
-        Voigt delta_epsilon_tilde_p_dT;
+        Voigt Delta_epsilon_tilde_p_dT;
 
         /**
          * @brief Elastoplastic multiplier.
@@ -475,17 +496,17 @@ class Elastoplastic : public Elastic {
         /**
          * @brief Elastic strain increment.
          */
-        Voigt delta_epsilon_tilde_e;
+        Voigt Delta_epsilon_tilde_e;
 
         /**
          * @brief Plastic strain increment.
          */
-        Voigt delta_epsilon_tilde_p;
+        Voigt Delta_epsilon_tilde_p;
 
         /**
          * @brief Stress state after application of elastic increment.
          */
-        Voigt delta_sigma_prime_e;
+        Voigt Delta_sigma_prime_e;
 
         /**
          * @brief Intial state variable estimate from forward Euler method.
@@ -531,7 +552,7 @@ class Elastoplastic : public Elastic {
         /**
          * @brief Effective stress increment for the first estimate in the forward Euler method.
          */
-        Voigt delta_sigma_prime_1;
+        Voigt Delta_sigma_prime_1;
 
         /**
          * @brief State variable increment for the first estimate in the forward Euler method.
@@ -547,7 +568,7 @@ class Elastoplastic : public Elastic {
          * @brief Effective stress increment for the second estimate in the forward Euler method.
          * 
          */
-        Voigt delta_sigma_prime_2;
+        Voigt Delta_sigma_prime_2;
 
         /**
          * @brief State variable increment for the second estimate in the forward Euler method.

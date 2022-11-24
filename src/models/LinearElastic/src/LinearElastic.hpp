@@ -25,11 +25,11 @@ class LinearElastic : public Elastic {
         /**
          * @brief Overridden method to compute the bulk modulus.
          * 
-         * @param delta_epsilon_e_vol Elastic volumetric strain increment.
+         * @param Delta_epsilon_e_vol Elastic volumetric strain increment.
          * @param p_prime Mean effective stress.
          * @return K
          */
-        double compute_K(double delta_epsilon_e_vol, double p_prime);
+        double compute_K(double Delta_epsilon_e_vol, double p_prime);
 
         /**
          * @brief Overriden method to compute the shear modulus.

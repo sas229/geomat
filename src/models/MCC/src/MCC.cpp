@@ -20,13 +20,21 @@ double MCC::compute_f(Cauchy sigma_prime, State state) {
     double q = compute_q(sigma_prime);
     double p_prime = compute_p_prime(sigma_prime);
     
+    return MCC_YIELD;
+}
+
+double MCC::compute_f(double p_prime, double q, State state) {
+    // State variables.
+    double e = state[0];
+    double p_c = state[1];
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     return MCC_YIELD;
 }
 
-double MCC::compute_K(double delta_epsilon_e_vol, double p_prime) {
+
+double MCC::compute_K(double Delta_epsilon_e_vol, double p_prime) {
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
-    if (delta_epsilon_e_vol != 0.0) {
+    if (Delta_epsilon_e_vol != 0.0) {
         return MCC_SECANT_BULK_MODULUS;
     } else {
         return MCC_TANGENT_BULK_MODULUS;
@@ -34,13 +42,10 @@ double MCC::compute_K(double delta_epsilon_e_vol, double p_prime) {
 }
 
 double MCC::compute_G(double K) {
-    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     return MCC_SHEAR_MODULUS;
 }
 
 void MCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H) {
-    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
-
     // State variables.
     double e = state[0];
     double p_c = state[1];
@@ -50,6 +55,7 @@ void MCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma
     dq_dsigma_prime = compute_dq_dsigma_prime(sigma_prime);
     
     // Compute derivatives.
+    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     df_dq = MCC_DF_DQ;
     df_dp_prime = MCC_DF_DP_PRIME;
     df_dsigma_prime = (df_dq*dq_dsigma_prime) + (df_dp_prime*dp_dsigma_prime);
@@ -61,8 +67,8 @@ void MCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma
     H = MCC_HARDENING_MODULUS;
 }
 
-State MCC::compute_elastic_state_variable(Voigt delta_epsilon_tilde_e) {
-    double delta_epsilon_vol_e = compute_delta_epsilon_vol(to_cauchy(delta_epsilon_tilde_e));
+State MCC::compute_elastic_state_variable(Voigt Delta_epsilon_tilde_e) {
+    double Delta_epsilon_vol_e = compute_Delta_epsilon_vol(to_cauchy(Delta_epsilon_tilde_e));
     State elastic_state(state.size());
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     elastic_state[0] = MCC_STATE_0_ELASTIC_UPDATE;
@@ -78,8 +84,8 @@ void MCC::set_state_variables(State new_state) {
     state = new_state;
 }
 
-State MCC::compute_plastic_state_variable_increment(Voigt delta_epsilon_tilde_p, double delta_lambda, double H) {
-    double delta_epsilon_vol_p = compute_delta_epsilon_vol(to_cauchy(delta_epsilon_tilde_p));
+State MCC::compute_plastic_state_variable_increment(Voigt Delta_epsilon_tilde_p, double delta_lambda, double H) {
+    double Delta_epsilon_vol_p = compute_Delta_epsilon_vol(to_cauchy(Delta_epsilon_tilde_p));
     State delta_state(state.size());
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     delta_state[0] = MCC_STATE_0_PLASTIC_INCREMENT;
@@ -89,6 +95,6 @@ State MCC::compute_plastic_state_variable_increment(Voigt delta_epsilon_tilde_p,
 
 State MCC::compute_plastic_state_variable_increment(double delta_lambda, double H) {
     // Note: only correct state variables that do not depend on the magnitude of the strain increment (hence strain increment is not passed in).
-    Voigt delta_epsilon_tilde_p = Voigt::Zero();
-    return compute_plastic_state_variable_increment(delta_epsilon_tilde_p, delta_lambda, H);
+    Voigt Delta_epsilon_tilde_p = Voigt::Zero();
+    return compute_plastic_state_variable_increment(Delta_epsilon_tilde_p, delta_lambda, H);
 }

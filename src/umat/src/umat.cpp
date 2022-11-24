@@ -82,8 +82,8 @@ extern "C" void umat(
     } 
 
     // Set variables within model.    
-    model->set_sigma_prime(Eigen_sigma);
-    model->set_strain_increment(Eigen_dstran);
+    model->set_sigma_prime_tilde(Eigen_sigma);
+    model->set_Delta_epsilon_tilde(Eigen_dstran);
 
     // model->update_stress_invariants();
     // model->update_principal_stresses();
@@ -95,7 +95,7 @@ extern "C" void umat(
     // int i = 0;
     // while (i<1000) {
     //     model->solve();
-    //     model->set_strain_increment(Eigen_dstran);
+    //     model->set_Delta_epsilon_tilde(Eigen_dstran);
     //     i += 1;
     // }
     model->solve();

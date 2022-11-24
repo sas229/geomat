@@ -11,9 +11,9 @@ LinearElastic::LinearElastic(Parameters parameters, State state) : parameters(pa
     PLOG_INFO << name << " model instantiated with " << parameters.size() << " parameters and " << state.size() << " state variables."; 
 }
 
-double LinearElastic::compute_K(double delta_epsilon_e_vol, double p_prime) {
+double LinearElastic::compute_K(double Delta_epsilon_e_vol, double p_prime) {
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
-    if (delta_epsilon_e_vol != 0.0) {
+    if (Delta_epsilon_e_vol != 0.0) {
         return LINEAR_ELASTIC_SECANT_BULK_MODULUS;
     } else {
         return LINEAR_ELASTIC_TANGENT_BULK_MODULUS;

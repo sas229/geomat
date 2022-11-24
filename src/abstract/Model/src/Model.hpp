@@ -17,35 +17,6 @@ class Model {
         /** @brief Virtual destructor for Model class. */
         virtual ~Model() {}
 
-        // Setters.
-        
-        /** 
-         * @brief Method to set Jacobian matrix. 
-         */
-        void set_jacobian(Jacobian j);
-
-        /** 
-         * @brief Method to set effective stress tensor in Voigt notation. 
-         */
-        void set_sigma_prime(Voigt sigma_prime_tilde);
-
-        /** 
-         * @brief Method to set strain increment in Voigt notation. 
-         */
-        void set_strain_increment(Voigt delta_epsilon);
-        
-        // Getters.
-
-        /**
-         * @brief Method to get Jacobian matrix. 
-         */
-        Jacobian get_jacobian(void);
-
-        /** 
-         * @brief Method to get effective stress tensor in Voigt notation. 
-         */
-        Voigt get_sigma_prime(void);
-
         /**
          * @brief Method to solve stress increment given the current strain increment.
          * 
@@ -53,65 +24,140 @@ class Model {
          */
         virtual void solve(void) {};
 
+        // Setters.
+
+        /** 
+         * @brief Method to set strain increment in Voigt notation. 
+         * 
+         * @param[in] Delta_epsilon_tilde Strain increment.
+         */
+        void set_Delta_epsilon_tilde(Voigt Delta_epsilon_tilde);
+
+        /**
+         * @brief Method to set effective stress tensor in Voigt notation.
+         * 
+         * @param[in] sigma_prime_tilde Effective stress.
+         */ 
+        void set_sigma_prime_tilde(Voigt sigma_prime_tilde);
+
+        /**
+         * @brief Method to set name of model.
+         * 
+         * @param name Name of model.
+         */
+        void set_name(std::string name);
+        
+        // Getters.
+
+        /**
+         * @brief Method to get Jacobian matrix.
+         * 
+         * @return Jacobian 
+         */
+        Jacobian get_jacobian(void);
+
+        /**
+         * @brief Method to get the mean effective stress.
+         * 
+         * @return double 
+         */
         double get_p_prime(void);
 
+        /**
+         * @brief Method to get the deviatoric stress.
+         * 
+         * @return double 
+         */
         double get_q(void);
+
+        /**
+         * @brief Method to get the effective stress tensor in Voigt notation.
+         * 
+         * @return Voigt 
+         */
+        Voigt get_sigma_prime(void);
+
+        /**
+         * @brief Method to get name of model.
+         * 
+         * @return std::string 
+         */
+        std::string get_name(void);
+
+    protected:
 
         /** 
          * @brief Mean effective stress calculated via:
+         * 
          * \f[ p^{\prime}=\frac{1}{3} \operatorname{tr}\left( \boldsymbol{\sigma}^{\prime} \right) \f]
          * where \f$ \boldsymbol{\sigma}^{\prime} \f$ is the effective stress tensor.
          * 
          * @param[in] sigma_prime Effective stress tensor.
-         * @returns Mean effective stress.
+         * @return double
          */
         double compute_p_prime(Cauchy sigma_prime);
 
+        /**
+         * @brief Method to compute the derivative of the deviatoric stress with respect to the effective stress state:
+         * 
+         * \f[ \frac{\partial q}{\partial \boldsymbol{ \sigma^{\prime}}} = \frac{3}{2q} \left[\begin{array}{lll}
+         *      s_{11} & 2\tau_{12} & 2\tau_{13} \\
+         *      2\tau_{21} & s_{22} & 2\tau_{23} \\
+         *      2\tau_{31} & 2\tau_{32} & s_{33}
+         *      \end{array}\right] \f]
+         * 
+         * where \f$ s_{ii} \f$ are the deviatoric stress components, \f$ \tau_{ii} \f$ are the shear stresses and \f$ q \f$ is the deviatoric stress.
+         * 
+         * @param[in] sigma_prime Effective stress tensor.
+         * @return Cauchy 
+         */
         Cauchy compute_dq_dsigma_prime(Cauchy sigma_prime);
-
-    // protected:
-
-        // Setters.
-
-        /** @brief Method to set name of model. */
-        void set_name(std::string name);
-
-        // Getters.
-
-        /** @brief Method to get name of model. */
-        std::string get_name(void);
 
         // Computers.
 
         /**
          * @brief Method to compute the cartesian stress tensor from principal stresses and directions as: 
-         * \f[ \boldsymbol{\sigma}^{\prime} = \mathbf{T S T}^\intercal \f] 
-         * where \f$ \mathbf{T} \f$ is the principal stress direction tensor and \f$ \mathbf{S} \f$ is the principal stress tensor.
          * 
-         * @param[in] T Principal stress direction tensor.
+         * \f[ \boldsymbol{\sigma}^{\prime} = \mathbf{R S R}^\intercal \f] 
+         * 
+         * where \f$ \mathbf{R} \f$ is the principal stress direction tensor and \f$ \mathbf{S} \f$ is the principal stress tensor.
+         * 
+         * @param[in] R Principal stress direction tensor.
          * @param[in] S Principal stress tensor.
-         * @returns Cartesian stress tensor.
+         * @return Cauchy
          */
-        Cauchy compute_cartesian_stresses(Cauchy T, Cauchy S);
+        Cauchy compute_cartesian_stresses(Cauchy R, Cauchy S);
 
         /** 
          * @brief Method to compute the volumetric strain increment:
+         * 
          * \f[ \Delta \epsilon_{vol} = \operatorname{tr} \left( \boldsymbol{\Delta \epsilon} \right)\f] 
+         * 
          * where \f$ \boldsymbol{\Delta \epsilon} \f$ is the strain increment tensor. 
          * 
-         * @param[in] delta_epsilon Strain increment tensor.
-         * @return Volumetric strain increment.
+         * @param[in] Delta_epsilon Strain increment tensor.
+         * @return double
          */
-        double compute_delta_epsilon_vol(Cauchy delta_epsilon);
+        double compute_Delta_epsilon_vol(Cauchy Delta_epsilon);
 
         /** 
          * @brief Function to compute Lode's angle with cosine definition \f$ \theta_c \f$ as:
-         * \f[ \theta_c=\arccos{\left[\frac{J_3}{2}\left(\frac{3}{J_2}\right)^{3/2}\right]} \f]
+         * 
+         * \f[ \theta_c=\arccos{\left[\frac{J_3}{2}\left(\frac{3}{J_2}\right)^{3/2}\right]} \text{ where } 0 \leq \theta_c \leq \frac{\pi}{3} \f]
+         * 
          * where \f$ J_2 \f$ and \f$ J_3 \f$ are the second and third deviatoric stress invariants, respectively.
+         * 
          * This is converted to the Lode's angle for a sine definition \f$ \theta_s \f$ via:
-         * \f[ \theta_s=\frac{\pi}{6}-\theta_c \f]
+         * 
+         * \f[ \theta_s=\frac{\pi}{6}-\theta_c \text{ where } -\frac{\pi}{6} \leq \theta_s \leq \frac{\pi}{6}\f]
+         * 
+         * where a negative value indicates triaxial compression and a positive value indicates triaxial extension.
+         * 
          * Similarly, the negative sine definition of Lode's angle \f$ \bar{\theta_s} \f$ is computed as:
+         * 
          * \f[ \bar{\theta_s}=-\theta_s=-\frac{\pi}{6}+\theta_c\f]
+         * 
+         * where a positive value indicates triaxial compression and a negative value indicates triaxial extension.
          * 
          * @param[in] J_2 Second deviatoric stress invariant.
          * @param[in] J_3 Third deviatoric stress invariant.
@@ -123,33 +169,39 @@ class Model {
 
         /** 
          * @brief Maximum shear stress calculated via:
+         * 
          * \f[ \sigma_{max} = \frac{\max(\left|\sigma_1 - \sigma_2\right|, \left|\sigma_1 - \sigma_3\right|, \left|\sigma_2 - \sigma_3\right|)}{2}\f]
+         * 
          * where \f$ \sigma_1 \f$, \f$ \sigma_2 \f$ and \f$ \sigma_3 \f$ are the principal stresses. 
          * 
          * @param[in] sigma_1 Major principal stress.
          * @param[in] sigma_2 Intermediate principal stress.
          * @param[in] sigma_3 Minor principal stress.
-         * @returns Maximum shear stress.
+         * @return double
          */
         double compute_max_shear(double sigma_1, double sigma_2, double sigma_3);
 
         /** 
          * @brief von Mises stress calculated via:
+         * 
          * \f[ \sigma_m = \sqrt{3J_{2}} \f]
+         * 
          * where \f$ J_2 \f$ is the second deviatoric stress invariant.
          * 
          * @param[in] J_2 Second deviatoric stress invariant.
-         * @returns von Mises stress.
+         * @returns double
          */
         double compute_mises_stress(double J_2);
 
         /** 
          * @brief Mean stress calculated via:
+         * 
          * \f[ p=\frac{1}{3} \operatorname{tr}\left( \boldsymbol{\sigma} \right) \f]
+         * 
          * where \f$ \boldsymbol{\sigma} \f$ is the total stress tensor.
          * 
          * @param[in] sigma Total stress tensor.
-         * @returns Mean stress.
+         * @returns double
          */
         double compute_p(Cauchy sigma);
 
@@ -177,53 +229,63 @@ class Model {
 
         /** 
          * @brief Function to compute the deviatoric stress via:
+         * 
          * \f[ q = \sqrt{\frac{1}{2} \left[
          * \left(\sigma_{1 1} -\sigma_{2 2}\right)^2 +
          * \left(\sigma_{2 2} -\sigma_{3 3}\right)^2 +
          * \left(\sigma_{3 3} -\sigma_{1 1}\right)^2 +
          * 6 \left( \tau_{1 2}^2 + \tau_{1 3}^2 + \tau_{2 3}^2 \right)
          * \right]} \f] 
+         * 
          * where \f$ \sigma_{1 1} \f$, \f$ \sigma_{2 2} \f$, \f$ \sigma_{3 3} \f$, \f$ \tau_{1 2} \f$, \f$ \tau_{1 3} \f$
          * and \f$ \tau_{2 3} \f$ are the components of the stress tensor \f$ \boldsymbol{\sigma} \f$. 
          * 
          * @param[in] sigma
-         * @returns Deviatoric stress. 
+         * @return double
          */
         double compute_q(Cauchy sigma);
 
         /** 
          * @brief Function to compute the deviatoric stress tensor as: 
+         * 
          * \f[ s =  \boldsymbol{\sigma} - p \mathbf{I} \f]
+         * 
          * where \f$ p \f$ is the mean stress and \f$ \mathbf{I} \f$ is the identity matrix.
          *  
          * @param[in] sigma Stress tensor.
          * @param[in] p Mean stress.
-         * @returns Deviatoric stress tensor.
+         * @return Cauchy
          */
         Cauchy compute_s(Cauchy sigma, double p);
 
         /** 
          * @brief Function to compute the total stress tensor as: 
+         * 
          * \f[ \boldsymbol{\sigma} = \boldsymbol{\sigma}^{\prime} + u \mathbf{I} \f]
+         * 
          * where \f$ \boldsymbol{\sigma}^{\prime} \f$ is the effective stress tensor, 
          * \f$ u \f$ is the pore pressure and \f$ \mathbf{I} \f$ is the identity matrix.
          *  
          * @param[in] sigma_prime Stress tensor.
          * @param[in] u Pore pressure.
-         * @returns Total stress tensor.
+         * @return Total stress tensor.
          */
         Cauchy compute_sigma(Cauchy sigma_prime, double u);
 
         /** @brief Method to compute the stress invariants. The first, second and third stress invariants 
          * \f$ I_1 \f$, \f$ I_2 \f$ and \f$ I_3 \f$ are calculated as:
+         * 
          * \f[ I_1=\operatorname{tr}\left( \boldsymbol{\sigma}\right) \f] 
          * \f[ I_2=\frac{1}{2}\left\{\left[\operatorname{tr}\left( \boldsymbol{\sigma}\right)\right]^2-\operatorname{tr}\left( \boldsymbol{\sigma}^2\right)\right\} \f]
          * \f[ I_3=\operatorname{det} \left( \boldsymbol{\sigma}\right) \f]
+         * 
          * where \f$ \boldsymbol{\sigma} \f$ is the total stress tensor. The first, second and third deviatoric stress invariants
          * \f$ J_1 \f$, \f$ J_2 \f$ and \f$ J_3 \f$ are calculated as:
+         * 
          * \f[ J_1=\operatorname{tr}\left(\mathbf{s}\right)=0\f]
          * \f[ J_2=\frac{1}{2} \operatorname{tr}\left(\mathbf{s}^2\right) \f]
          * \f[ J_3=\operatorname{det} \left(\mathbf{s}\right) \f]
+         * 
          * where \f$ \mathbf{s} \f$ is the deviatoric stress tensor, which can be computed via compute_s().
          * 
          * @param[in] sigma Total stress tensor.
@@ -236,73 +298,20 @@ class Model {
          */
         void compute_stress_invariants(Cauchy sigma, double &I_1, double &I_2, double &I_3, double &J_1, double &J_2, double &J_3);
 
-        //  Updaters.
-        
         /**
-         * @brief Method to update the cartesian stress tensor class attribute #sigma_prime via compute_cartesian_stresses(). 
+         * @brief Convert Cauchy tensor into Voigt form.
+         * 
+         * @param cauchy Cauchy tensor.
+         * @return Voigt 
          */
-        void update_cartesian_stresses(void);
-
-        /**
-         * @brief Method to update the volumetric strain increment tensor class attribute #delta_epsilon_vol via compute_delta_epsilon_vol(). 
-         */
-        void update_delta_epsilon_vol(void);
-        
-        /** 
-         * @brief Method to update Lode's angle class attributes #theta_c, #theta_s and #theta_s_bar via 
-         * compute_lode(). 
-         */
-        void update_lode(void);
-
-        /** 
-         * @brief Method to update the maximum shear stress class attribute #max_shear via compute_max_shear(). 
-         */
-        void update_max_shear(void);
-
-        /** 
-         * @brief Method to update von Mises stress class attribute #mises_stress via compute_mises_stress(). 
-         */
-        void update_mises_stress(void);
-        
-        /** 
-         * @brief Method to update the mean stress class attribute #p via compute_p(). 
-         */
-        void update_p(void);
-        
-        /** 
-         * @brief Method to update the mean effective stress class attribute #p_prime via compute_p_prime(). 
-         */
-        void update_p_prime(void);
-
-        /** 
-         * @brief Method to compute the principal stresses #sigma_1, #sigma_2, #sigma_3, 
-         * and principal stress and direction tensors #S and #T, 
-         * via compute_principal_stresses(). 
-         */
-        void update_principal_stresses(void);
-
-        /** 
-         * @brief Method to update the deviatoric stress class attribute #q via compute_q(). 
-         */
-        void update_q(void);
-
-        /** 
-         * @brief Method to update the deviatoric stress tensor class attribute #s via compute_s(). 
-         */
-        void update_s(void);
-
-        /** 
-         * @brief Method to update the total stress tensor class attribute #s via compute_sigma(). 
-         */
-        void update_sigma(void);
-
-        /** 
-         * @brief Method to compute the stress invariant class attributes #I_1, #I_2, #I_3, #J_1, #J_2 and #J_3 via compute_stress_invariants(). 
-         */
-        void update_stress_invariants(void);
-
         Voigt to_voigt(Cauchy cauchy);
 
+        /**
+         * @brief Convert Voigt tensor into Cauchy form.
+         * 
+         * @param voigt Voigt tensor.
+         * @return Cauchy 
+         */
         Cauchy to_cauchy(Voigt voigt);
 
         // Members.
@@ -314,18 +323,21 @@ class Model {
 
         /** 
          * @brief Effective stress in Voigt notation:
+         * 
          * \f[ \boldsymbol{\tilde{\sigma}}^{\prime} = \left[\sigma_{1 1}^{\prime}, \sigma_{2 2}^{\prime}, \sigma_{3 3}^{\prime}, \tau_{1 2}, \tau_{1 3}, \tau_{2 3}\right]^T\f]
          */
         Voigt sigma_prime_tilde;
 
         /** 
          * @brief Effective stress tensor:
+         * 
          * \f[  \boldsymbol{\sigma}^{\prime} = 
          *      \left[\begin{array}{lll}
          *      \sigma_{1 1}^{\prime} & \tau_{1 2} & \tau_{1 3} \\
          *      \tau_{2 1} & \sigma_{2 2}^{\prime} & \tau_{2 3} \\
          *      \tau_{3 1} & \tau_{3 2} & \sigma_{3 3}^{\prime}
          *      \end{array}\right] \f]
+         * 
          * where \f$ \sigma_{1 1}^{\prime} \f$, \f$ \sigma_{2 2}^{\prime} \f$ and \f$ \sigma_{3 3}^{\prime} \f$ are the effective axial stresses, 
          * and  \f$ \tau_{1 2} \f$, \f$ \tau_{1 3} \f$ and \f$ \tau_{2 3} \f$ are the shear streses, respectively. 
          */
@@ -333,7 +345,9 @@ class Model {
 
         /** 
          * @brief Total stress tensor:
+         * 
          *  \f[  \boldsymbol{\sigma}= \boldsymbol{\sigma}^{\prime}+u\mathbf{I} \f]
+         * 
          * where \f$ u \f$ is the pore pressure and \f$ \mathbf{I} \f$ is the identity matrix.
          */
         Cauchy sigma = Cauchy::Zero();
@@ -345,32 +359,38 @@ class Model {
 
         /** 
          * @brief Strain increment in Voigt notation:
+         * 
          * \f[ \Delta \tilde{\epsilon} = \left[\Delta \epsilon_{1 1}, \Delta \epsilon_{2 2}, \Delta \epsilon_{3 3}, \Delta \epsilon_{1 2}, \Delta \epsilon_{1 3}, \Delta \epsilon_{2 3}\right]^T\f]. 
          */
-        Voigt delta_epsilon_tilde;
+        Voigt Delta_epsilon_tilde;
 
         /** 
          * @brief Strain increment tensor:
+         * 
          * \f[ \Delta \boldsymbol{\epsilon} = 
          *      \left[\begin{array}{lll}
          *      \Delta \epsilon_{1 1} & \Delta \epsilon_{1 2} & \Delta \epsilon_{1 3} \\
          *      \Delta \epsilon_{2 1} & \Delta \epsilon_{2 2} & \Delta \epsilon_{2 3} \\
          *      \Delta \epsilon_{3 1} & \Delta \epsilon_{3 2} & \Delta \epsilon_{3 3}
          *      \end{array}\right] \f]
+         * 
          * where \f$ \Delta \epsilon_{1 1} \f$, \f$ \Delta \epsilon_{2 2} \f$ and \f$ \Delta \epsilon_{3 3} \f$ are the axial strain increments, 
          * and  \f$ \Delta \epsilon_{1 2} \f$, \f$ \Delta \epsilon_{1 3} \f$ and \f$ \Delta \epsilon_{2 3} \f$ are the shear strain increments, respectively. 
          */
-        Cauchy delta_epsilon = Cauchy::Zero();
+        Cauchy Delta_epsilon = Cauchy::Zero();
 
         /** 
          * @brief Volumetric strain increment:
+         * 
          * \f[ \Delta \epsilon_{vol} = \operatorname{tr} \left(\Delta \boldsymbol{\epsilon} \right)\f] 
+         * 
          * where \f$ \Delta \boldsymbol{\epsilon} \f$ is the strain increment tensor. 
          */
-        double delta_epsilon_vol;
+        double Delta_epsilon_vol;
         
         /** 
          * @brief Identity matrix:
+         * 
          * \f[ \mathbf{I} = 
          *      \left[\begin{array}{lll}
          *      1 & 0 & 0 \\
@@ -437,12 +457,14 @@ class Model {
 
         /** 
          * @brief Principal stress tensor \f$ \mathbf{S} \f$: 
+         * 
          * \f[ \mathbf{S} = 
          *      \left[\begin{array}{lll}
          *      \sigma_{1} & 0 & 0 \\
          *      0 & \sigma_{2} & 0 \\
          *      0 & 0 & \sigma_{3}
          *      \end{array}\right] \f]
+         * 
          * where \f$ \sigma_1 \f$, \f$ \sigma_2 \f$ and \f$ \sigma_3 \f$ are the major, intermediate and minor principal stresses, respectively. 
          */
         Cauchy S = Cauchy::Zero();
@@ -469,14 +491,18 @@ class Model {
 
         /** 
          * @brief Mises stress:
-         * \f[ \sigma_{m} = \sqrt{3 J_2}\f]
+         * 
+         * \f[ \sigma_{M} = \sqrt{3 J_2}\f]
+         * 
          * where \f$ J_2 \f$ is the second deviatoric stress invariant. 
          */
         double mises_stress;
 
         /** 
          * @brief Maximum shear stress:
+         * 
          * \f[ \sigma_{max} = \frac{\max(\left|\sigma_1 - \sigma_2\right|, \left|\sigma_1 - \sigma_3\right|, \left|\sigma_2 - \sigma_3\right|)}{2}\f]
+         * 
          * where \f$ \sigma_1 \f$, \f$ \sigma_2 \f$ and \f$ \sigma_3 \f$ are the principal stresses. 
          */
         double max_shear;  
@@ -508,19 +534,15 @@ class Model {
 
         /**
          * @brief Derivative of the mean stress with respect to the effective stress state:
+         * 
          * \f[ \frac{\partial p}{\partial \boldsymbol{\sigma}^{\prime}} = \frac{1}{3} \boldsymbol{I} \f]
+         * 
          * where \f$ \boldsymbol{I} \f$ is the identity matrix. 
          */
         Cauchy dp_dsigma_prime = 1.0/3.0*eye;
 
         /**
-         * @brief Derivative of the deviatoric stress with respect to the effective stress state:
-         * \f[ \frac{\partial q}{\partial \boldsymbol{ \sigma^{\prime}}} = \frac{3}{2q} \left[\begin{array}{lll}
-         *      s_{11} & 2\tau_{12} & 2\tau_{13} \\
-         *      2\tau_{21} & s_{22} & 2\tau_{23} \\
-         *      2\tau_{31} & 2\tau_{32} & s_{33}
-         *      \end{array}\right] \f]
-         * where \f$ s_{ii} \f$ are the deviatoric stress components, \f$ \tau_{ii} \f$ are the shear stresses and \f$ q \f$ is the deviatoric stress.
+         * @brief Derivative of the deviatoric stress with respect to the effective stress state.
          */
         Cauchy dq_dsigma_prime;
 };

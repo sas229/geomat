@@ -46,30 +46,30 @@ class Elastic : public Model {
         * 
         * @param[in] sigma_prime Effective stress tensor.
         * @param[in] alpha Elastic fraction of strain increment. 
-        * @param[in] delta_epsilon_tilde Strain increment.
+        * @param[in] Delta_epsilon_tilde Strain increment.
         * @return Elastic trial stress tensor.
         */
-       Cauchy compute_isotropic_linear_elastic_stress(Cauchy sigma_prime, double alpha, Voigt delta_epsilon_tilde);
+       Cauchy compute_isotropic_linear_elastic_stress(Cauchy sigma_prime, double alpha, Voigt Delta_epsilon_tilde);
 
        /**
         * @brief Method to compute the elastic stress increment given an elastic matrix and a strain increment.
         * 
         * @param[in] D_e Elastic matrix.
-        * @param[in] delta_epsilon_tilde Strain increment. 
+        * @param[in] Delta_epsilon_tilde Strain increment. 
         * @return Stress increment.
         */
-       Voigt compute_elastic_stress_increment(Constitutive D_e, Voigt delta_epsilon_tilde);
+       Voigt compute_elastic_stress_increment(Constitutive D_e, Voigt Delta_epsilon_tilde);
        
        /**
         * @brief Method to compute the bulk modulus. The default implementation simply passes the parameter K.
         * 
-        * @param delta_epsilon_vol 
+        * @param Delta_epsilon_vol 
         * @param p_prime 
         * @return Bulk modulus. 
         * 
         * @note Must be overriden by model implementations.
         */
-       virtual double compute_K(double delta_epsilon_vol = 0.0, double p_prime = 0.0) = 0;
+       virtual double compute_K(double Delta_epsilon_vol = 0.0, double p_prime = 0.0) = 0;
        
        /**
         * @brief Method to compute the shear modulus. The default implementation simply passes the parameter G.

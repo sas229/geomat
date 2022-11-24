@@ -36,13 +36,23 @@ class MCC : public Elastoplastic {
         double compute_f(Cauchy sigma_prime, State state) override;
 
         /**
+         * @brief Overridden method to compute the current value of the yield surface function.
+         * 
+         * @param p_prime Mean effective stress.
+         * @param q Deviatoric stress.
+         * @param state State variables.
+         * @return double 
+         */
+        double compute_f(double p_prime, double q, State state) override;
+
+        /**
          * @brief Overridden method to compute the bulk modulus.
          * 
-         * @param[in] delta_epsilon_e_vol Elastic volumetric strain increment.
+         * @param[in] Delta_epsilon_e_vol Elastic volumetric strain increment.
          * @param[in] p_prime Mean effective stress.
          * @return Bulk modulus, K.
          */
-        double compute_K(double delta_epsilon_e_vol, double p_prime) override;
+        double compute_K(double Delta_epsilon_e_vol, double p_prime) override;
 
         /**
          * @brief Overriden method to compute the shear modulus.
@@ -70,10 +80,10 @@ class MCC : public Elastoplastic {
         /**
          * @brief Overriden method to compute the elastic update of the models state variables.
          * 
-         * @param[in] delta_epsilon_tilde_e Elastic strain increment. 
+         * @param[in] Delta_epsilon_tilde_e Elastic strain increment. 
          * @return Vector of state variables.
          */
-        State compute_elastic_state_variable(Voigt delta_epsilon_tilde_e) override;
+        State compute_elastic_state_variable(Voigt Delta_epsilon_tilde_e) override;
 
         /**
          * @brief Get the state variables vector.
@@ -92,12 +102,12 @@ class MCC : public Elastoplastic {
         /**
          * @brief Overriden method to compute the plastic increment in the models state variables.
          * 
-         * @param[in] delta_epsilon_tilde_p Plastic strain increment.
+         * @param[in] Delta_epsilon_tilde_p Plastic strain increment.
          * @param[in] delta_lambda Plastic multiplier increment.
          * @param[in] H Hardening modulus.
          * @return Vector of state variable increments.
          */
-        State compute_plastic_state_variable_increment(Voigt delta_epsilon_tilde_p, double delta_lambda, double H) override;
+        State compute_plastic_state_variable_increment(Voigt Delta_epsilon_tilde_p, double delta_lambda, double H) override;
 
         /**
          * @brief Overriden method to compute the correction in the models state variables.
@@ -107,6 +117,8 @@ class MCC : public Elastoplastic {
          * @return Vector of state variable corrections.
          */
         State compute_plastic_state_variable_increment(double delta_lambda, double H) override;
+
+        void compute_yield_surface(double p_prime, double q, int points, State state, Eigen::VectorXd &p_prime_surface, Eigen::VectorXd &q_surface);
 
        /** 
          * @brief Parameters. 
