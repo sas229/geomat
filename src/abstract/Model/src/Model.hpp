@@ -71,6 +71,48 @@ class Model {
         double get_q(void);
 
         /**
+         * @brief Method to get the I_1 stress invariant.
+         * 
+         * @return double 
+         */
+        double get_I_1(void);
+
+        /**
+         * @brief Method to get the I_2 stress invariant.
+         * 
+         * @return double 
+         */
+        double get_I_2(void);
+
+        /**
+         * @brief Method to get the I_3 stress invariant.
+         * 
+         * @return double 
+         */
+        double get_I_3(void);
+
+        /**
+         * @brief Method to get the J_1 stress invariant.
+         * 
+         * @return double 
+         */
+        double get_J_1(void);
+
+        /**
+         * @brief Method to get the J_2 stress invariant.
+         * 
+         * @return double 
+         */
+        double get_J_2(void);
+
+        /**
+         * @brief Method to get the J_3 stress invariant.
+         * 
+         * @return double 
+         */
+        double get_J_3(void);
+
+        /**
          * @brief Method to get the effective stress tensor in Voigt notation.
          * 
          * @return Voigt 
@@ -108,10 +150,22 @@ class Model {
          * 
          * where \f$ s_{ii} \f$ are the deviatoric stress components, \f$ \tau_{ii} \f$ are the shear stresses and \f$ q \f$ is the deviatoric stress.
          * 
-         * @param[in] sigma_prime Effective stress tensor.
+         * @param sigma_prime Effective stress tensor.
+         * @param s Deviatoric stress tensor.
+         * @param q Deviatoric stress.
          * @return Cauchy 
          */
-        Cauchy compute_dq_dsigma_prime(Cauchy sigma_prime);
+        Cauchy compute_dq_dsigma_prime(Cauchy sigma_prime, Cauchy s, double q);
+
+        /**
+         * @brief Method to compute the derivatives of the third deviatoric stress invariant with respect to the effective stress state.
+         * 
+         * @param sigma_prime Effective stress tensor.
+         * @param s Deviatoric stress tensor.
+         * @param q Deviatoric stress.
+         * @return Cauchy 
+         */
+        Cauchy compute_dJ_3_dsigma_prime(Cauchy sigma_prime, Cauchy s, double q);
 
         // Computers.
 
@@ -545,6 +599,11 @@ class Model {
          * @brief Derivative of the deviatoric stress with respect to the effective stress state.
          */
         Cauchy dq_dsigma_prime;
+
+        /**
+         * @brief Derivatives of the thrid deviatoric stress invariant with respect to the effective stress state.
+         */
+        Cauchy dJ_3_dsigma_prime;
 };
 
 #endif

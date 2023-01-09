@@ -258,6 +258,11 @@ class Elastoplastic : public Elastic {
         double df_dp_prime;
 
         /**
+         * @brief Derivative of the yield surface with respect to the Lode angle.
+         */
+        double df_dtheta;
+
+        /**
          * @brief Derivative of the plastic potential function with respect to the deviatoric stress.
          */
         double dg_dq;
@@ -266,6 +271,11 @@ class Elastoplastic : public Elastic {
          * @brief Derivative of the plastic potential function with respect to the effective mean stress.
          */
         double dg_dp_prime;
+
+        /**
+         * @brief Derivative of the plastic potential function with respect to the Lode angle.
+         */
+        double dg_dtheta;
 
         /**
          * @brief Hardening modulus.

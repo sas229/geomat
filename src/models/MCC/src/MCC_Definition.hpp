@@ -49,6 +49,13 @@
 #define MCC_DF_DQ 2*q
 
 /**
+ * @brief Derivatives of the plastic potential function with respect to the Lode angle:
+ * 
+ * \f[ \frac{\partial f}{\partial \theta} = 0 \f]
+ */
+#define MCC_DF_DTHETA 0
+
+/**
  * @brief Derivatives of the yield surface with respect to the mean effective stress:
  * 
  * \f[ \frac{\partial f}{\partial p} = M^2\left(2 p^{\prime}-p_c \right) \f]
@@ -61,6 +68,13 @@
  * \f[ \frac{\partial g}{\partial q} = 2q \f]
  */
 #define MCC_DG_DQ 2*q
+
+/**
+ * @brief Derivatives of the plastic potential function with respect to the Lode angle:
+ * 
+ * \f[ \frac{\partial g}{\partial \theta} = 0 \f]
+ */
+#define MCC_DG_DTHETA 0
 
 /**
  * @brief Derivative of the plastic potential function with respect to the effective mean stress:

@@ -10,7 +10,7 @@ bool first_call = true;
  */
 std::unique_ptr<Model> model;
 
-extern "C" void umat(
+void umat(
     double *stress,
     double *statev,
     double *ddsdde,

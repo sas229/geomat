@@ -34,6 +34,12 @@ PYBIND11_MODULE(models, m) {
         .def("get_q", &MCC::get_q)
         .def_property_readonly("p_prime", &MCC::get_p_prime)
         .def_property_readonly("q", &MCC::get_q)
+        .def_property_readonly("I_1", &MCC::get_I_1)
+        .def_property_readonly("I_2", &MCC::get_I_2)
+        .def_property_readonly("I_3", &MCC::get_I_3)
+        .def_property_readonly("J_1", &MCC::get_J_1)
+        .def_property_readonly("J_2", &MCC::get_J_2)
+        .def_property_readonly("J_3", &MCC::get_J_3)
         .def("set_Delta_epsilon_tilde", &MCC::set_Delta_epsilon_tilde)
         .def("solve", &MCC::solve);
 }

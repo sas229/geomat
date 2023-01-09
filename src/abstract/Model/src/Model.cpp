@@ -14,13 +14,34 @@ double Model::get_q(void) {
     return q;
 }
 
-Cauchy Model::compute_dq_dsigma_prime(Cauchy sigma_prime) {
-    double q = compute_q(sigma_prime);
+double Model::get_I_1(void) {
+    return I_1;
+}
+
+double Model::get_I_2(void) {
+    return I_2;
+}
+
+double Model::get_I_3(void) {
+    return I_3;
+}
+
+double Model::get_J_1(void) {
+    return J_1;
+}
+
+double Model::get_J_2(void) {
+    return J_2;
+}
+
+double Model::get_J_3(void) {
+    return J_3;
+}
+
+Cauchy Model::compute_dq_dsigma_prime(Cauchy sigma_prime, Cauchy s, double q) {
     if (q == 0.0) {
         return Cauchy::Zero();
     } else {
-        p_prime = compute_p_prime(sigma_prime);
-        s = compute_s(sigma_prime, p_prime);
         Cauchy dq_dsigma_prime;
         dq_dsigma_prime(0,0) = s(0,0);
         dq_dsigma_prime(1,1) = s(1,1);
@@ -64,14 +85,16 @@ void Model::set_sigma_prime_tilde(Voigt sigma_prime_tilde) {
     this->sigma_prime = to_cauchy(this->sigma_prime_tilde);
 
     // Total stresses given pore pressure, u.
-    // update_sigma();
     sigma = compute_sigma(sigma_prime, u);
 
-    // Mean and deviatoric stress.
-    // update_p_prime();
-    // update_q();
+    // Stress invariants and other stress measures.
+    compute_stress_invariants(sigma, I_1, I_2, I_3, J_1, J_2, J_3);
+    compute_lode(J_2, J_3, theta_c, theta_s, theta_s_bar);
+    compute_principal_stresses(sigma_prime, sigma_1, sigma_2, sigma_3, R, S);
     p = compute_p_prime(sigma_prime);
     q = compute_q(sigma_prime);
+    mises_stress = compute_mises_stress(J_2);
+    max_shear = compute_max_shear(sigma_1, sigma_2, sigma_3);
 }
 
 void Model::set_Delta_epsilon_tilde(Voigt Delta_epsilon_tilde) {
@@ -180,4 +203,17 @@ void Model::compute_stress_invariants(Cauchy sigma, double &I_1, double &I_2, do
     J_1 = s.trace(); // Is always zero...
     J_2 = (std::pow(I_1,2)/3.0) - I_2;
     J_3 = s.determinant();
+}
+
+Cauchy Model::compute_dJ_3_dsigma_prime(Cauchy sigma_prime, Cauchy s, double q) {
+    dJ_3_dsigma_prime(0,0) = (s(1,1)*s(2,2) - std::pow(sigma_prime(1,2),2)) + (1.0*std::pow(q,2)/3.0);
+    dJ_3_dsigma_prime(1,1) = (s(0,0)*s(2,2) - std::pow(sigma_prime(0,2),2)) + (1.0*std::pow(q,2)/3.0);
+    dJ_3_dsigma_prime(1,1) = (s(0,0)*s(1,1) - std::pow(sigma_prime(0,1),2)) + (1.0*std::pow(q,2)/3.0);
+    dJ_3_dsigma_prime(0,1) = 2.0*(sigma_prime(1,2)*sigma_prime(0,2) - s(2,2)*sigma_prime(0,1));
+    dJ_3_dsigma_prime(0,2) = 2.0*(sigma_prime(0,2)*sigma_prime(0,1) - s(0,0)*sigma_prime(1,2));
+    dJ_3_dsigma_prime(1,2) = 2.0*(sigma_prime(0,1)*sigma_prime(1,2) - s(1,1)*sigma_prime(0,2));
+    dJ_3_dsigma_prime(1,0) = dJ_3_dsigma_prime(0,1);
+    dJ_3_dsigma_prime(2,0) = dJ_3_dsigma_prime(0,2);
+    dJ_3_dsigma_prime(2,1) = dJ_3_dsigma_prime(1,2);
+    return dJ_3_dsigma_prime;
 }
