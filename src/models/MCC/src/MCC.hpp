@@ -73,7 +73,6 @@ class MCC : public Elastoplastic {
          * @param[in,out] b Vector of derivatives of plastic potential function with respect to the stress state.
          * @param[in,out] dg_dp_prime Derivative of plastic potential function with respect to the effective mean stress.
          * @param[in,out] H Hardening modulus.
-         * @param[in,out] B_state Vector of state variable update scalars.
          */
         void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H);
 
