@@ -27,7 +27,7 @@ target_link_libraries(umat_library PUBLIC Model LinearElastic MCC SMCC)
 
 # Create Python module.
 pybind11_add_module(models src/PythonAPI.cpp)
-target_link_libraries(models PUBLIC Types Model Elastic LinearElastic Elastoplastic Eigen3::Eigen MCC SMCC)
+target_link_libraries(models PUBLIC Types Model Elastic LinearElastic Elastoplastic Eigen3::Eigen MCC)
 
 # Tests.
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

@@ -45,7 +45,7 @@ void Elastoplastic::solve(void) {
 
                 // Compute error estimate.
                 accepted = false;
-                compute_error_estimate();
+                R_n = compute_error_estimate();
                 if (R_n < STOL) {
                     // Accept increment and correct stresses and state variables back to yield surface.a
                     accepted = true;
@@ -72,6 +72,7 @@ void Elastoplastic::solve(void) {
                             sigma_prime_u = sigma_prime_c;
                             state_u = state_c;
                             ITS_YSC += 1;
+                            std::cout << "Corrections: " << ITS_YSC <<std::endl; 
                         } else {
                             // Stresses and state variables corrected; breakout of correction while loop.
                             sigma_prime_c = sigma_prime_u;
@@ -138,6 +139,7 @@ double Elastoplastic::compute_new_substep_size(void) {
 
 void Elastoplastic::compute_yield_surface_correction(double f_u, Cauchy sigma_prime_u, State state_u, Cauchy &sigma_prime_c, State &state_c) {
     // Calculate elastic constitutive matrix using tangent moduli and elastic stress increment.
+    std::cout << "sigma_prime_u =\n" << sigma_prime_u << std::endl;
     double p_prime_u = compute_p_prime(sigma_prime_u);
     double K_tan_u = compute_K(0, p_prime_u);
     double G_tan_u = compute_G(K_tan_u);
@@ -147,7 +149,7 @@ void Elastoplastic::compute_yield_surface_correction(double f_u, Cauchy sigma_pr
     Cauchy df_dsigma_prime_u, dg_dsigma_prime_u;
     Voigt a_u, b_u;
     double H_u;
-    compute_derivatives(sigma_prime_u, state_u, df_dsigma_prime_u, a_u, dg_dsigma_prime_u, b_u, dg_dp_prime_u, H_u);
+    compute_derivatives(sigma_prime_u, state_u, df_dsigma_prime_u, a_u, dg_dsigma_prime_u, b_u, H_u);
 
     // Compute correction factor.
     double delta_lambda_c = f_u/(H_u + a_u.transpose()*D_e_u*b_u);
@@ -172,6 +174,7 @@ void Elastoplastic::compute_normal_yield_surface_correction(double f_u, Cauchy s
 void Elastoplastic::compute_plastic_increment(Cauchy sigma_prime, State state, Voigt Delta_epsilon_tilde_p_dT, Voigt &Delta_sigma_prime, State &delta_state) {   
     // Calculate elastic constitutive matrix using tangent moduli and elastic stress increment.
     double p_prime = compute_p_prime(sigma_prime);
+    std::cout << "p_prime = " << p_prime << std::endl;
     double K_tan = compute_K(0, p_prime);
     double G_tan = compute_G(K_tan);
     Constitutive D_e = compute_isotropic_linear_elastic_matrix(K_tan, G_tan);
@@ -180,8 +183,8 @@ void Elastoplastic::compute_plastic_increment(Cauchy sigma_prime, State state, V
     // Compute elastoplastic constitutive matrix and elastoplastic multiplier. 
     Cauchy df_dsigma_prime, dg_dsigma_prime;
     Voigt a, b;
-    double dg_dp_prime, H;
-    compute_derivatives(sigma_prime, state, df_dsigma_prime, a, dg_dsigma_prime, b, dg_dp_prime, H);
+    double H;
+    compute_derivatives(sigma_prime, state, df_dsigma_prime, a, dg_dsigma_prime, b, H);
     Constitutive D_ep = compute_elastoplastic_matrix(D_e, a, b, H);
     double delta_lambda = compute_elastoplastic_multiplier(Delta_sigma_prime_e, D_e, a, b, H);
 
@@ -190,17 +193,19 @@ void Elastoplastic::compute_plastic_increment(Cauchy sigma_prime, State state, V
     delta_state = compute_plastic_state_variable_increment(Delta_epsilon_tilde_p_dT, delta_lambda, H);
 }
 
-void Elastoplastic::compute_error_estimate(void) {
+double Elastoplastic::compute_error_estimate(void) {
     int size_state = get_state_variables().size();
     State error(size_state);
     error[0] = (to_cauchy(Delta_sigma_prime_2 - Delta_sigma_prime_1)).norm()/sigma_prime_ini.norm();
     for (int i=1; i<size_state; i++) {
         error[i] = std::abs((delta_state_2[i] - delta_state_1[i]))/state_ini[i];
     }
-    R_n = 1.0/2.0*error.maxCoeff();
+    double R_n = 1.0/2.0*error.maxCoeff();
 
     // Check against machine tolerance.
     R_n = std::max(R_n, EPS);
+
+    return R_n;
 }
 
 double Elastoplastic::compute_elastoplastic_multiplier(Voigt Delta_sigma_prime_e, Constitutive D_e, Voigt a, Voigt b, double H) {
@@ -221,6 +226,7 @@ void Elastoplastic::compute_alpha_bounds(double &alpha_0, double &alpha_1) {
         alpha_n = alpha_0+d_alpha;
         while (j < NSUB) {
             // Compute the elastic matrix.
+            std::cout << "p_prime = " << p_prime << std::endl;
             double K_trial = compute_K(alpha_n*Delta_epsilon_vol_e, p_prime);
             double G_trial = compute_G(K_trial);
             Constitutive D_e_trial = compute_isotropic_linear_elastic_matrix(K_trial, G_trial);
@@ -250,31 +256,32 @@ void Elastoplastic::compute_alpha_bounds(double &alpha_0, double &alpha_1) {
     BREAK: return;
 }
 
-void Elastoplastic::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H) {
+void Elastoplastic::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &H) {
     // Current state variables.
     double e = state[0];
     double p_c = state[1];
 
     // Compute mean effective stress, deviatoric stress tensor and derivatives of the stress state for current stress state.
-    q = compute_q(sigma_prime);
-    p_prime = compute_p_prime(sigma_prime);
-    s = compute_s(sigma_prime, p_prime);
-    sigma = compute_sigma(sigma_prime, u);
+    double q = compute_q(sigma_prime);
+    double p_prime = compute_p_prime(sigma_prime);
+    Cauchy s = compute_s(sigma_prime, p_prime);
+    Cauchy sigma = compute_sigma(sigma_prime, u);
+    double I_1, I_2, I_3, J_1, J_2, J_3, theta_c, theta_s, theta_s_bar;
     compute_stress_invariants(sigma, I_1, I_2, I_3, J_1, J_2, J_3);
     compute_lode(J_2, J_3, theta_c, theta_s, theta_s_bar);
-    dq_dsigma_prime = compute_dq_dsigma_prime(sigma_prime, s, q);
-    dtheta_dsigma_prime = compute_dtheta_dsigma_prime(sigma_prime);
+    Cauchy dq_dsigma_prime = compute_dq_dsigma_prime(sigma_prime, s, q);
+    Cauchy dtheta_dsigma_prime = compute_dtheta_dsigma_prime(sigma_prime);
     
     // Compute derivatives of the yield surface.
-    df_dq = compute_df_dq();
-    df_dp_prime = compute_df_dp_prime();
-    df_dtheta = compute_df_dtheta();
+    double df_dq = compute_df_dq();
+    double df_dp_prime = compute_df_dp_prime();
+    double df_dtheta = compute_df_dtheta();
     df_dsigma_prime = df_dq*dq_dsigma_prime + df_dp_prime*dp_prime_dsigma_prime + df_dtheta*dtheta_dsigma_prime;
 
     // Compute derivatives of the plastic potential function.
-    dg_dq = compute_dg_dq();
-    dg_dp_prime = compute_dg_dp_prime();
-    dg_dtheta = compute_dg_dtheta();
+    double dg_dq = compute_dg_dq();
+    double dg_dp_prime = compute_dg_dp_prime();
+    double dg_dtheta = compute_dg_dtheta();
     dg_dsigma_prime = dg_dq*dq_dsigma_prime + dg_dp_prime*dp_prime_dsigma_prime + dg_dtheta*dtheta_dsigma_prime;
     
     // Convert to Voigt notation.
@@ -290,10 +297,11 @@ bool Elastoplastic::check_unload_reload(Cauchy sigma_prime) {
     State state = get_state_variables();
     Cauchy df_dsigma_prime_check, dg_dsigma_prime_check;
     Voigt a_check, b_check;
-    double dg_dp_prime_check, H_check;
-    compute_derivatives(sigma_prime, state, df_dsigma_prime_check, a_check, dg_dsigma_prime_check, b_check, dg_dp_prime_check, H_check);
+    double H_check;
+    compute_derivatives(sigma_prime, state, df_dsigma_prime_check, a_check, dg_dsigma_prime_check, b_check, H_check);
 
     // Compute the elastic matrix using tangent moduli.
+    std::cout << "p_prime = " << p_prime << std::endl;
     double K_tan = compute_K(0, p_prime);
     double G_tan = compute_G(K_tan);
     Constitutive D_e_tan = compute_isotropic_linear_elastic_matrix(K_tan, G_tan);

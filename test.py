@@ -3,7 +3,7 @@ from models import MCC
 # from models import SMCC
 from matplotlib import pyplot as plt
 
-increments = 1000
+increments = 100
 parameters = np.array([0.92, 0.2, 1.195, 0.08, 0.02])
 state = np.array([1.7477796692480023, 10])
 # parameters = np.array([0.92, 0.2, 1.195, 0.08, 0.02, 3.0, 0.2, 0.5])
@@ -18,21 +18,21 @@ axial_strain = np.arange(0, increments*ea_increment, ea_increment)
 model = MCC(parameters, state)
 # model = SMCC(parameters, state)
 model.set_sigma_prime_tilde(stress)
+model.set_Delta_epsilon_tilde(Delta_epsilon_tilde)
 p = np.zeros(increments)
 q = np.zeros(increments)
 p[0] = model.p_prime
-print(model.p_prime)
 q[0] = model.q
 
 i = 0
-print("Increment {}: p = {} ; q = {} ; q/p = {}".format(i+1, p[i], q[i], q[i]/p[i]))
+print("Increment {}: q = {} ; p = {} ; q/p = {}".format(i+1, q[i], p[i], q[i]/p[i]))
 while i<=increments-2:
     i += 1
-    model.set_Delta_epsilon_tilde(Delta_epsilon_tilde)
     model.solve()
+    model.set_Delta_epsilon_tilde(Delta_epsilon_tilde)
     p[i] = model.p_prime
     q[i] = model.q
-    print("Increment {}: p = {} ; q = {} ; q/p = {}".format(i+1, p[i], q[i], q[i]/p[i]))
+    print("Increment {}: q = {} ; p = {} ; q/p = {}".format(i+1, q[i], p[i], q[i]/p[i]))
 
 plt.plot(axial_strain, q/p)
 plt.xlabel(r"$\epsilon_{a}$ (-)")

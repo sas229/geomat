@@ -96,7 +96,7 @@ void umat(
     // Do some work with it... (i.e. stress integration).
     int i = 0;
     std::cout << "Increment: " << i << "; q = " << model->get_q() << "; p_prime = " << model->get_p_prime() << std::endl;
-    while (i<1000) {
+    while (i<100) {
         model->solve();
         model->set_Delta_epsilon_tilde(Eigen_dstran);
         i += 1;

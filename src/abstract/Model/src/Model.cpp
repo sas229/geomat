@@ -101,7 +101,7 @@ void Model::set_Delta_epsilon_tilde(Voigt Delta_epsilon_tilde) {
     // Strain increment in Voigt notation form - change sign to use compression positive soil mechanics convention.
     this->Delta_epsilon_tilde = -Delta_epsilon_tilde;
     this->Delta_epsilon = this->to_cauchy(Delta_epsilon_tilde);
-    solved = false;   
+    solved = false;
 }
 
 // Getters.
@@ -148,7 +148,7 @@ double Model::compute_p(Cauchy sigma) {
 }
 
 double Model::compute_p_prime(Cauchy sigma_prime) {
-    return Model::compute_p(sigma_prime);
+    return 1.0/3.0*sigma_prime.trace();
 }
 
 void Model::compute_principal_stresses(Cauchy sigma_prime, double &sigma_1, double &sigma_2, double &sigma_3, Cauchy &R, Cauchy &S) {

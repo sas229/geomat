@@ -164,12 +164,11 @@ class Elastoplastic : public Elastic {
          * @param[in,out] a Vector of derivatives of the yield function with respect to the stress state.
          * @param[in,out] dg_dsigma_prime Derivatives of the plastic potential function with respect to the stress state.
          * @param[in,out] b Vector of derivatives of the plastic potential function with respect to the stress state.
-         * @param[in,out] dg_dp_prime Derivative of the plastic potential function with respect to the mean effective stress.
          * @param[in,out] H Hardening modulus.
          * 
          * @note Must be overriden by model implementations.
          */
-        void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H);
+        void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &H);
 
         /**
          * @brief Compute elstoplastic constitutive matrix via:
@@ -198,8 +197,10 @@ class Elastoplastic : public Elastic {
 
         /**
          * @brief Compute error estimate.
+         * 
+         * * @return double 
          */
-        void compute_error_estimate(void);
+        double compute_error_estimate(void);
 
         /**
          * @brief Compute new substep size.

@@ -31,8 +31,8 @@ State SMCC::compute_plastic_state_variable_increment(Voigt Delta_epsilon_tilde_p
     double Delta_epsilon_vol_p = compute_Delta_epsilon_vol(to_cauchy(Delta_epsilon_tilde_p));
     State delta_state(state.size());
     delta_state[0] = -(1+e)*Delta_epsilon_vol_p;
-    delta_state[1] = delta_lambda*H/(std::pow(M,2)*p_prime*s_ep);
-    delta_state[2] = delta_lambda*H/(std::pow(M,2)*p_prime*p_c);
+    delta_state[1] = delta_lambda*(-((std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star))*s_ep*df_dsigma_prime.trace()/-(std::pow(M,2)*p_prime*s_ep));
+    delta_state[2] = delta_lambda*(-((std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*-k*(s_ep-1.0)*std::sqrt((1-A)*std::pow(df_dsigma_prime.trace(),2) + (A*2.0/3.0*(df_dsigma_prime*(df_dsigma_prime.transpose())).trace())))/-(std::pow(M,2)*p_prime*p_c));
     return delta_state;
 }
 
@@ -101,7 +101,7 @@ double SMCC::compute_dg_dtheta(void) {
 }
 
 double SMCC::compute_H(void) {
-    double H_p_c = (std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*df_dsigma_prime.trace();
+    double H_p_c = (std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*s_ep*df_dsigma_prime.trace();
     double H_s_ep = (std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*-k*(s_ep-1.0)*std::sqrt((1-A)*std::pow(df_dsigma_prime.trace(),2) + (A*2.0/3.0*(df_dsigma_prime*(df_dsigma_prime.transpose())).trace()));
     double H = H_p_c + H_s_ep;
     return H;
