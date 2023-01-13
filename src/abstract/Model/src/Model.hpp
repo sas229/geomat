@@ -158,14 +158,12 @@ class Model {
         Cauchy compute_dq_dsigma_prime(Cauchy sigma_prime, Cauchy s, double q);
 
         /**
-         * @brief Method to compute the derivatives of the third deviatoric stress invariant with respect to the effective stress state.
+         * @brief Method to compute the derivatives of the Lode angle with respect to the effective stress state.
          * 
          * @param sigma_prime Effective stress tensor.
-         * @param s Deviatoric stress tensor.
-         * @param q Deviatoric stress.
          * @return Cauchy 
          */
-        Cauchy compute_dJ_3_dsigma_prime(Cauchy sigma_prime, Cauchy s, double q);
+        Cauchy compute_dtheta_dsigma_prime(Cauchy sigma_prime);
 
         // Computers.
 
@@ -593,7 +591,7 @@ class Model {
          * 
          * where \f$ \boldsymbol{I} \f$ is the identity matrix. 
          */
-        Cauchy dp_dsigma_prime = 1.0/3.0*eye;
+        Cauchy dp_prime_dsigma_prime = 1.0/3.0*eye;
 
         /**
          * @brief Derivative of the deviatoric stress with respect to the effective stress state.
@@ -601,9 +599,9 @@ class Model {
         Cauchy dq_dsigma_prime;
 
         /**
-         * @brief Derivatives of the thrid deviatoric stress invariant with respect to the effective stress state.
+         * @brief Derivatives of the Lode angle with respect to the effective stress state.
          */
-        Cauchy dJ_3_dsigma_prime;
+        Cauchy dtheta_dsigma_prime;
 };
 
 #endif

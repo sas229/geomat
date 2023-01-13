@@ -57,9 +57,6 @@ Linear Elastic
 
 The Linear Elastic model is implemented here. Theory to go here...
 
-.. doxygenfile:: LinearElastic_Definition.hpp
-    :project: umat
-
 .. doxygenclass:: LinearElastic
     :project: umat
     :members:
@@ -70,9 +67,6 @@ Modified Cam Clay (MCC)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 The Modified Cam Clay (MCC) model is implemented here. Theory to go here...
-
-.. doxygenfile:: MCC_Definition.hpp
-    :project: umat
 
 .. doxygenclass:: MCC
     :project: umat

@@ -91,7 +91,7 @@ void Model::set_sigma_prime_tilde(Voigt sigma_prime_tilde) {
     compute_stress_invariants(sigma, I_1, I_2, I_3, J_1, J_2, J_3);
     compute_lode(J_2, J_3, theta_c, theta_s, theta_s_bar);
     compute_principal_stresses(sigma_prime, sigma_1, sigma_2, sigma_3, R, S);
-    p = compute_p_prime(sigma_prime);
+    p_prime = compute_p_prime(sigma_prime);
     q = compute_q(sigma_prime);
     mises_stress = compute_mises_stress(J_2);
     max_shear = compute_max_shear(sigma_1, sigma_2, sigma_3);
@@ -205,15 +205,16 @@ void Model::compute_stress_invariants(Cauchy sigma, double &I_1, double &I_2, do
     J_3 = s.determinant();
 }
 
-Cauchy Model::compute_dJ_3_dsigma_prime(Cauchy sigma_prime, Cauchy s, double q) {
-    dJ_3_dsigma_prime(0,0) = (s(1,1)*s(2,2) - std::pow(sigma_prime(1,2),2)) + (1.0*std::pow(q,2)/3.0);
-    dJ_3_dsigma_prime(1,1) = (s(0,0)*s(2,2) - std::pow(sigma_prime(0,2),2)) + (1.0*std::pow(q,2)/3.0);
-    dJ_3_dsigma_prime(1,1) = (s(0,0)*s(1,1) - std::pow(sigma_prime(0,1),2)) + (1.0*std::pow(q,2)/3.0);
-    dJ_3_dsigma_prime(0,1) = 2.0*(sigma_prime(1,2)*sigma_prime(0,2) - s(2,2)*sigma_prime(0,1));
-    dJ_3_dsigma_prime(0,2) = 2.0*(sigma_prime(0,2)*sigma_prime(0,1) - s(0,0)*sigma_prime(1,2));
-    dJ_3_dsigma_prime(1,2) = 2.0*(sigma_prime(0,1)*sigma_prime(1,2) - s(1,1)*sigma_prime(0,2));
-    dJ_3_dsigma_prime(1,0) = dJ_3_dsigma_prime(0,1);
-    dJ_3_dsigma_prime(2,0) = dJ_3_dsigma_prime(0,2);
-    dJ_3_dsigma_prime(2,1) = dJ_3_dsigma_prime(1,2);
-    return dJ_3_dsigma_prime;
+Cauchy Model::compute_dtheta_dsigma_prime(Cauchy sigma_prime) {
+    // Requires implementation for Lode angle dependent models.
+    dtheta_dsigma_prime(0,0) = 0.0;
+    dtheta_dsigma_prime(1,1) = 0.0;
+    dtheta_dsigma_prime(1,1) = 0.0;
+    dtheta_dsigma_prime(0,1) = 0.0;
+    dtheta_dsigma_prime(0,2) = 0.0;
+    dtheta_dsigma_prime(1,2) = 0.0;
+    dtheta_dsigma_prime(1,0) = 0.0;
+    dtheta_dsigma_prime(2,0) = 0.0;
+    dtheta_dsigma_prime(2,1) = 0.0;
+    return dtheta_dsigma_prime;
 }

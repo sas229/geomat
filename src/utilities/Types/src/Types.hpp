@@ -3,7 +3,6 @@
 #define TYPES_H
 
 #include <Eigen/Core>
-#include <iostream>
  
 /** 
  * @brief Eigen vector with six indices for storing the Voigt tensor. 

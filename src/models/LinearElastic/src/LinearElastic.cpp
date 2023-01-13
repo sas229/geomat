@@ -1,5 +1,4 @@
 #include "LinearElastic.hpp"
-#include "LinearElastic_Definition.hpp"
 
 LinearElastic::LinearElastic(Parameters parameters, State state) : parameters(parameters), state(state) {
     set_name("LinearElastic");
@@ -12,15 +11,13 @@ LinearElastic::LinearElastic(Parameters parameters, State state) : parameters(pa
 }
 
 double LinearElastic::compute_K(double Delta_epsilon_e_vol, double p_prime) {
-    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     if (Delta_epsilon_e_vol != 0.0) {
-        return LINEAR_ELASTIC_SECANT_BULK_MODULUS;
+        return K;
     } else {
-        return LINEAR_ELASTIC_TANGENT_BULK_MODULUS;
+        return K;
     }
 }
 
 double LinearElastic::compute_G(double K) {
-    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
-    return LINEAR_ELASTIC_SHEAR_MODULUS;
+    return G;
 }

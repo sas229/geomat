@@ -26,11 +26,6 @@ class Elastoplastic : public Elastic {
          *  @brief Elastoplastic model destructor. 
          */
         virtual ~Elastoplastic() {}
-        
-        /**
-         *  @brief Solve current strain increment using refined explicit approach of Sloan et al. (2001). 
-         */
-        void solve(void);
 
         /**
          * @brief Pure virtual method to compute the yield surface value given the parameters, current state variables and stress state.
@@ -44,30 +39,67 @@ class Elastoplastic : public Elastic {
         virtual double compute_f(Cauchy sigma_prime, State state) = 0;
 
         /**
-         * @brief Pure virtual method to compute the yield surface value given the parameters, current state variables and stress state.
+         * @brief Pure virtual method to compute the derivative of the yield surface with respect to the deviatoric stress.
          * 
-         * @param p_prime Mean effective stress.
-         * @param q Deviatoric stress.
-         * @param state State variables.
          * @return double 
-         */
-        virtual double compute_f(double p_prime, double q, State state) = 0;
-
-        /** 
-         * @brief Pure virtual method to compute the derivatives for the constitutive model implemented.
-         * 
-         * @param[in] sigma_prime Effective stress tensor.
-         * @param[in] state State variables.
-         * @param[in,out] df_dsigma_prime Tensor of derivatives of the yield function with respect to the stress state.
-         * @param[in,out] a Vector of derivatives of the yield function with respect to the stress state.
-         * @param[in,out] dg_dsigma_prime Derivatives of the plastic potential function with respect to the stress state.
-         * @param[in,out] b Vector of derivatives of the plastic potential function with respect to the stress state.
-         * @param[in,out] dg_dp_prime Derivative of the plastic potential function with respect to the mean effective stress.
-         * @param[in,out] H Hardening modulus.
-         * 
+         *
          * @note Must be overriden by model implementations.
          */
-        virtual void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H) = 0;
+        virtual double compute_df_dq(void) = 0;
+
+        /**
+         * @brief Pure virtual method to compute the derivative of the yield surface with respect to the mean effective stress.
+         * 
+         * @return double 
+         *
+         * @note Must be overriden by model implementations.
+         */
+        virtual double compute_df_dp_prime(void) = 0;
+
+        /**
+         * @brief Pure virtual method to compute the derivative of the yield surface with respect to the Lode angle.
+         * 
+         * @return double 
+         *
+         * @note Must be overriden by model implementations.
+         */
+        virtual double compute_df_dtheta(void) = 0;
+
+        /**
+         * @brief Pure virtual method to compute the derivative of the plastic potential function with respect to the deviatoric stress.
+         * 
+         * @return double 
+         *
+         * @note Must be overriden by model implementations.
+         */
+        virtual double compute_dg_dq(void) = 0;
+
+        /**
+         * @brief Pure virtual method to compute the derivative of the plastic potential function with respect to the mean effective stress.
+         * 
+         * @return double 
+         *
+         * @note Must be overriden by model implementations.
+         */
+        virtual double compute_dg_dp_prime(void) = 0;
+
+        /**
+         * @brief Pure virtual method to compute the derivative of the plastic potential function with respect to the Lode angle.
+         * 
+         * @return double 
+         *
+         * @note Must be overriden by model implementations.
+         */
+        virtual double compute_dg_dtheta(void) = 0;
+
+        /**
+         * @brief Pure virtual method to compute the hardening modulus.
+         * 
+         * @return double 
+         *
+         * @note Must be overriden by model implementations.
+         */
+        virtual double compute_H(void) = 0;
 
         /**
          * @brief Pure virtual method to compute the elastic update of the state variables for the model implemented.
@@ -118,7 +150,26 @@ class Elastoplastic : public Elastic {
          */
         virtual void set_state_variables(State new_state) = 0;
 
-    // private:
+        /**
+         *  @brief Solve current strain increment using refined explicit approach of Sloan et al. (2001). 
+         */
+        void solve(void);
+
+        /** 
+         * @brief Method to compute the derivatives for the constitutive model implemented.
+         * 
+         * @param[in] sigma_prime Effective stress tensor.
+         * @param[in] state State variables.
+         * @param[in,out] df_dsigma_prime Tensor of derivatives of the yield function with respect to the stress state.
+         * @param[in,out] a Vector of derivatives of the yield function with respect to the stress state.
+         * @param[in,out] dg_dsigma_prime Derivatives of the plastic potential function with respect to the stress state.
+         * @param[in,out] b Vector of derivatives of the plastic potential function with respect to the stress state.
+         * @param[in,out] dg_dp_prime Derivative of the plastic potential function with respect to the mean effective stress.
+         * @param[in,out] H Hardening modulus.
+         * 
+         * @note Must be overriden by model implementations.
+         */
+        void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H);
 
         /**
          * @brief Compute elstoplastic constitutive matrix via:
@@ -158,14 +209,27 @@ class Elastoplastic : public Elastic {
         double compute_new_substep_size(void);
 
         /**
-         * @brief Compute yield surface correction.
+         * @brief Compute yield surface correction
+         * 
+         * @param f_u Yield surface function output for the current stress state and state variables.
+         * @param sigma_prime_u Uncorrected effective stress state.
+         * @param state_u Uncorrected state variables.
+         * @param sigma_prime_c Corrected stress state.
+         * @param state_c Corrected state variables.
          */
-        void compute_yield_surface_correction(void);
+        void compute_yield_surface_correction(double f_u, Cauchy sigma_prime_u, State state_u, Cauchy &sigma_prime_c, State &state_c);
 
         /**
-         * @brief Compute normal yield surface correction.
+         * @brief Compute yield surface correction
+         * 
+         * @param f_u Yield surface function output for the current stress state and state variables.
+         * @param sigma_prime_u Uncorrected effective stress state.
+         * @param state_u Uncorrected state variables.
+         * @param a_u Uncorrected derivatives of the yield surface with respect to the effective stress state in Voigt notation.
+         * @param sigma_prime_c Corrected stress state.
+         * @param state_c Corrected state variables.
          */
-        void compute_normal_yield_surface_correction(void);
+        void compute_normal_yield_surface_correction(double f_u, Cauchy sigma_prime_u, State state_u, Voigt a_u, Cauchy &sigma_prime_c, State &state_c);
         
         /**
          * @brief Compute plastic stress integration increment.
@@ -211,16 +275,6 @@ class Elastoplastic : public Elastic {
          * @param alpha_1 Upper bound for alpha.
          */
         void compute_alpha_bounds(double &alpha_0, double &alpha_1);
-
-        /**
-         * @brief Method to compute vectors of coordinates to visualise the yield surface for a given set of state variables.
-         * 
-         * @param state Vector of state variables.
-         * @param points Number of points on surface.
-         * @param p_prime_surface Surface coordinate for mean effective stress.
-         * @param q_surface Surface coordinate for deviatoric stress.
-         */
-        void compute_yield_surface(State state, int points, Eigen::VectorXd &p_prime_surface, Eigen::VectorXd &q_surface);
 
         /**
          * @brief Elastic fraction of strain increment.

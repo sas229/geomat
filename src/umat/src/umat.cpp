@@ -74,6 +74,8 @@ void umat(
             model.reset(new LinearElastic(parameters, state));    
         } else if (strcmp(cmname, "MCC") == 0) {
             model.reset(new MCC(parameters, state));   
+        } else if (strcmp(cmname, "SMCC") == 0) {
+            model.reset(new SMCC(parameters, state));   
         } else {
             PLOG_FATAL << "Model name given not implemented. Check name given in CAE / input file.";
             assert(true);
@@ -92,13 +94,15 @@ void umat(
     // model->update_lode();
 
     // Do some work with it... (i.e. stress integration).
-    // int i = 0;
-    // while (i<1000) {
-    //     model->solve();
-    //     model->set_Delta_epsilon_tilde(Eigen_dstran);
-    //     i += 1;
-    // }
-    model->solve();
+    int i = 0;
+    std::cout << "Increment: " << i << "; q = " << model->get_q() << "; p_prime = " << model->get_p_prime() << std::endl;
+    while (i<1000) {
+        model->solve();
+        model->set_Delta_epsilon_tilde(Eigen_dstran);
+        i += 1;
+        std::cout << "Increment: " << i << "; q = " << model->get_q() << "; p_prime = " << model->get_p_prime() << std::endl;
+    }
+    // model->solve();
 
     // // Equate map to updated variable in order to map back to input variable.
     // std::cout << "Stress prior to update:\n" << map_to_stress << "\n";

@@ -58,14 +58,14 @@ void Elastoplastic::solve(void) {
                     while (ITS_YSC < MAXITS_YSC) {
                         if (std::abs(f_c) > FTOL) {
                             // Compute consistent correction to yield surface.
-                            compute_yield_surface_correction();
+                            compute_yield_surface_correction(f_u, sigma_prime_u, state_u, sigma_prime_c, state_c);
 
                             // Check yield surface function.
                             f_c = compute_f(sigma_prime_c, state_c);
                             f_u = compute_f(sigma_prime_u, state_u);
                             if (std::abs(f_c) > std::abs(f_u)) {
                                 // Apply normal correction instead.
-                                compute_normal_yield_surface_correction();
+                                compute_normal_yield_surface_correction(f_u, sigma_prime_u, state_u, a_u, sigma_prime_c, state_c);
                             }
 
                             // Correct stress and state variables.
@@ -112,8 +112,6 @@ void Elastoplastic::solve(void) {
         p_prime = compute_p_prime(sigma_prime);
         q = compute_q(sigma_prime);
         compute_principal_stresses(sigma_prime, sigma_1, sigma_2, sigma_3, R, S);
-        Eigen::VectorXd p_prime_surface, q_surface;
-        compute_yield_surface(get_state_variables(), 1000, p_prime_surface, q_surface);
     }
 }
 
@@ -138,32 +136,35 @@ double Elastoplastic::compute_new_substep_size(void) {
     return dT;
 }
 
-void Elastoplastic::compute_yield_surface_correction(void) {
+void Elastoplastic::compute_yield_surface_correction(double f_u, Cauchy sigma_prime_u, State state_u, Cauchy &sigma_prime_c, State &state_c) {
     // Calculate elastic constitutive matrix using tangent moduli and elastic stress increment.
-    p_prime_u = compute_p_prime(sigma_prime_u);
-    K_tan_u = compute_K(0, p_prime_u);
-    G_tan_u = compute_G(K_tan_u);
-    D_e_u = compute_isotropic_linear_elastic_matrix(K_tan_u, G_tan_u);
+    double p_prime_u = compute_p_prime(sigma_prime_u);
+    double K_tan_u = compute_K(0, p_prime_u);
+    double G_tan_u = compute_G(K_tan_u);
+    Constitutive D_e_u = compute_isotropic_linear_elastic_matrix(K_tan_u, G_tan_u);
 
     // Calculate derivatives.
+    Cauchy df_dsigma_prime_u, dg_dsigma_prime_u;
+    Voigt a_u, b_u;
+    double H_u;
     compute_derivatives(sigma_prime_u, state_u, df_dsigma_prime_u, a_u, dg_dsigma_prime_u, b_u, dg_dp_prime_u, H_u);
 
     // Compute correction factor.
-    delta_lambda_c = f_u/(H_u + a_u.transpose()*D_e_u*b_u);
+    double delta_lambda_c = f_u/(H_u + a_u.transpose()*D_e_u*b_u);
 
     // Update stress and state variables using corrections.
-    Delta_sigma_prime_c = -delta_lambda_c*D_e_u*b_u;
-    delta_state_c = compute_plastic_state_variable_increment(delta_lambda_c, H_u);
+    Voigt Delta_sigma_prime_c = -delta_lambda_c*D_e_u*b_u;
+    State delta_state_c = compute_plastic_state_variable_increment(delta_lambda_c, H_u);
     sigma_prime_c = sigma_prime_u + to_cauchy(Delta_sigma_prime_c);
     state_c = state_u + delta_state_c;
 }
 
-void Elastoplastic::compute_normal_yield_surface_correction(void) {
+void Elastoplastic::compute_normal_yield_surface_correction(double f_u, Cauchy sigma_prime_u, State state_u, Voigt a_u, Cauchy &sigma_prime_c, State &state_c) {
     // Compute corretion factor.
-    delta_lambda_c = f_u/(a_u.transpose()*a_u);
+    double delta_lambda_c = f_u/(a_u.transpose()*a_u);
     
     //Update stress and state variables using correction.
-    Delta_sigma_prime_c = -delta_lambda_c*a_u;
+    Voigt Delta_sigma_prime_c = -delta_lambda_c*a_u;
     sigma_prime_c = sigma_prime_u + to_cauchy(Delta_sigma_prime_c);
     state_c = state_u; /* i.e. no correction to state variables. */
 }
@@ -249,6 +250,41 @@ void Elastoplastic::compute_alpha_bounds(double &alpha_0, double &alpha_1) {
     BREAK: return;
 }
 
+void Elastoplastic::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H) {
+    // Current state variables.
+    double e = state[0];
+    double p_c = state[1];
+
+    // Compute mean effective stress, deviatoric stress tensor and derivatives of the stress state for current stress state.
+    q = compute_q(sigma_prime);
+    p_prime = compute_p_prime(sigma_prime);
+    s = compute_s(sigma_prime, p_prime);
+    sigma = compute_sigma(sigma_prime, u);
+    compute_stress_invariants(sigma, I_1, I_2, I_3, J_1, J_2, J_3);
+    compute_lode(J_2, J_3, theta_c, theta_s, theta_s_bar);
+    dq_dsigma_prime = compute_dq_dsigma_prime(sigma_prime, s, q);
+    dtheta_dsigma_prime = compute_dtheta_dsigma_prime(sigma_prime);
+    
+    // Compute derivatives of the yield surface.
+    df_dq = compute_df_dq();
+    df_dp_prime = compute_df_dp_prime();
+    df_dtheta = compute_df_dtheta();
+    df_dsigma_prime = df_dq*dq_dsigma_prime + df_dp_prime*dp_prime_dsigma_prime + df_dtheta*dtheta_dsigma_prime;
+
+    // Compute derivatives of the plastic potential function.
+    dg_dq = compute_dg_dq();
+    dg_dp_prime = compute_dg_dp_prime();
+    dg_dtheta = compute_dg_dtheta();
+    dg_dsigma_prime = dg_dq*dq_dsigma_prime + dg_dp_prime*dp_prime_dsigma_prime + dg_dtheta*dtheta_dsigma_prime;
+    
+    // Convert to Voigt notation.
+    a = to_voigt(df_dsigma_prime);
+    b = to_voigt(dg_dsigma_prime);
+
+    // Compute hardening modulus.
+    H = compute_H();
+}
+
 bool Elastoplastic::check_unload_reload(Cauchy sigma_prime) {
     // Compute required derivatives for the given stress state.
     State state = get_state_variables();
@@ -316,6 +352,7 @@ void Elastoplastic::compute_alpha(void) {
         PLOG_INFO << "Plastic increment: finding alpha via the Pegasus algorithm using alpha_0 = 0.0 and alpha_1 = 1.0.";
         alpha = pegasus_regula_falsi(0.0, 1.0, f_0, f_1);
     } else {
+        std::cout << "f_0 = " << f_0 << "; f_1 = " << f_1 << std::endl;
         PLOG_FATAL << "Illegal stress state.";
         assert(false);
     }
@@ -359,10 +396,4 @@ double Elastoplastic::pegasus_regula_falsi(double alpha_0, double alpha_1, doubl
         assert(alpha >= 0.0 && alpha <= 1.0);
     }
     return alpha;
-}
-
-void Elastoplastic::compute_yield_surface(State state, int points, Eigen::VectorXd &p_prime_surface, Eigen::VectorXd &q_surface) {
-    // Calculate minimum and maximum p_prime.
-
-    // For the calculated range of p_prime, solve for q.  
 }

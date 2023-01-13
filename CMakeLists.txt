@@ -18,16 +18,16 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/src)
 # Create test executable.
 add_executable(umat_test src/main.cpp)
 target_include_directories(umat_test PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_link_libraries(umat_test PUBLIC umat Model LinearElastic MCC)
+target_link_libraries(umat_test PUBLIC umat Model LinearElastic MCC SMCC)
 
 # Create library for usage with Abaqus.
 add_library(umat_library SHARED src/umat/src/umat.cpp)
 target_include_directories(umat_library PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/umat)
-target_link_libraries(umat_library PUBLIC Model LinearElastic MCC)
+target_link_libraries(umat_library PUBLIC Model LinearElastic MCC SMCC)
 
 # Create Python module.
 pybind11_add_module(models src/PythonAPI.cpp)
-target_link_libraries(models PUBLIC Types Model Elastic LinearElastic Elastoplastic MCC Eigen3::Eigen)
+target_link_libraries(models PUBLIC Types Model Elastic LinearElastic Elastoplastic Eigen3::Eigen MCC SMCC)
 
 # Tests.
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

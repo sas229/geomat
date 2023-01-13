@@ -25,6 +25,8 @@ class LinearElastic : public Elastic {
         /**
          * @brief Overridden method to compute the bulk modulus.
          * 
+         * \f[ K = constant \f]
+         * 
          * @param Delta_epsilon_e_vol Elastic volumetric strain increment.
          * @param p_prime Mean effective stress.
          * @return K
@@ -33,6 +35,8 @@ class LinearElastic : public Elastic {
 
         /**
          * @brief Overriden method to compute the shear modulus.
+         * 
+         * \f[ G = constant \f]
          * 
          * @param K Bulk modulus.
          * @return G
