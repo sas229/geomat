@@ -7,6 +7,7 @@
 #include <plog/Log.h>
 #include <Eigen/Eigen>
 #include "Types.hpp"
+#include <plog/Log.h>
 
 /** @brief The Model class contains methods and attributes that are common to all genera of constitutive model. 
  * The Model class is the base class from which all constitutive models are derived. */
@@ -24,7 +25,12 @@ class Model {
          */
         virtual void solve(void) {};
 
-        // Setters.
+        /**
+         * @brief Method to set effective stress tensor in Voigt notation.
+         * 
+         * @param[in] sigma_prime_tilde Effective stress.
+         */ 
+        void set_sigma_prime_tilde(Voigt sigma_prime_tilde);
 
         /** 
          * @brief Method to set strain increment in Voigt notation. 
@@ -34,18 +40,11 @@ class Model {
         void set_Delta_epsilon_tilde(Voigt Delta_epsilon_tilde);
 
         /**
-         * @brief Method to set effective stress tensor in Voigt notation.
+         * @brief Method to set the integration point number.
          * 
-         * @param[in] sigma_prime_tilde Effective stress.
-         */ 
-        void set_sigma_prime_tilde(Voigt sigma_prime_tilde);
-
-        /**
-         * @brief Method to set name of model.
-         * 
-         * @param name Name of model.
+         * @param n Integration point number.
          */
-        void set_name(std::string name);
+        void set_IP_number(int n);
         
         // Getters.
 
@@ -55,6 +54,13 @@ class Model {
          * @return Jacobian 
          */
         Jacobian get_jacobian(void);
+
+        /**
+         * @brief Method to get the integration point number.
+         * 
+         * @return int 
+         */
+        int get_IP_number(void);
 
         /**
          * @brief Method to get the mean effective stress.
@@ -113,20 +119,75 @@ class Model {
         double get_J_3(void);
 
         /**
-         * @brief Method to get the effective stress tensor in Voigt notation.
-         * 
-         * @return Voigt 
-         */
-        Voigt get_sigma_prime(void);
-
-        /**
          * @brief Method to get name of model.
          * 
          * @return std::string 
          */
         std::string get_name(void);
 
+        /**
+         * @brief Method to get type of model.
+         * 
+         * @return std::string 
+         */
+        std::string get_model_type(void);
+
+        /**
+         * @brief Method to get the effective stress tensor in Voigt notation.
+         * 
+         * @return Voigt 
+         */
+        Voigt get_sigma_prime_tilde(void);
+
+        /**
+         * @brief Method to get the effective stress tensor in Cauchy notation.
+         * 
+         * @return Cauchy
+         */
+        Cauchy get_sigma_prime(void);
+
+        /**
+         * @brief Method to get the solved boolean.
+         * 
+         * @return true 
+         * @return false 
+         */
+        bool get_solved(void);
+
+        /**
+         * @brief Method to get the Mises stress.
+         * 
+         * @return double 
+         */
+        double get_mises_stress(void);
+
+        /**
+         * @brief Method to get the maximum shear stress.
+         * 
+         * @return double 
+         */
+        double get_max_shear(void);
+
     protected:
+
+        /**
+         * @brief Method to compute the stress variables from the current effective stress state.
+         */
+        void compute_stress_variables(void);
+
+        /**
+         * @brief Method to set name of model.
+         * 
+         * @param name Name of model.
+         */
+        void set_name(std::string name);
+
+        /**
+         * @brief Method to set the type of model.
+         * 
+         * @param model_type Type of model.
+         */
+        void set_model_type(std::string model_type);
 
         /** 
          * @brief Mean effective stress calculated via:
@@ -138,6 +199,16 @@ class Model {
          * @return double
          */
         double compute_p_prime(Cauchy sigma_prime);
+
+        /**
+         * @brief Method to compute the derivatives of the third deviatoric stress invariant with respect to the effective stress state.
+         * 
+         * @param sigma_prime Effective stress tensor.
+         * @param s Deviatoric stress tensor.
+         * @param q Deviatoric stress.
+         * @return Cauchy 
+         */
+        Cauchy compute_dJ_3_dsigma_prime(Cauchy sigma_prime, Cauchy s, double q);
 
         /**
          * @brief Method to compute the derivative of the deviatoric stress with respect to the effective stress state:
@@ -341,6 +412,8 @@ class Model {
          * where \f$ \mathbf{s} \f$ is the deviatoric stress tensor, which can be computed via compute_s().
          * 
          * @param[in] sigma Total stress tensor.
+         * @param[in] p Mean total stress.
+         * @param[in] s Deviatoric stress tensor.
          * @param[out] I_1 First stress invariant.
          * @param[out] I_2 Second stress invariant.
          * @param[out] I_3 Third stress invariant.
@@ -348,7 +421,7 @@ class Model {
          * @param[out] J_2 Second deviatoric stress invariant.
          * @param[out] J_3 Third deviatoric stress invariant.
          */
-        void compute_stress_invariants(Cauchy sigma, double &I_1, double &I_2, double &I_3, double &J_1, double &J_2, double &J_3);
+        void compute_stress_invariants(Cauchy sigma, double p, Cauchy s, double &I_1, double &I_2, double &I_3, double &J_1, double &J_2, double &J_3);
 
         /**
          * @brief Convert Cauchy tensor into Voigt form.
@@ -451,11 +524,16 @@ class Model {
          *      \end{array}\right] \f] 
          */
         Cauchy eye = Cauchy::Identity();
-         
-        /** 
-         * @brief Pore pressure. Computed for undrained (bulk modulus) approach, otherwise provided as a state variable.
+
+        /**
+         * @brief Integration point number. A value of -1 indicates the IP number has not been set.
          */
-        double u;
+        int IP_number = -1;
+
+        /** 
+         * @brief Pore pressure. Computed for undrained (bulk modulus) approach, otherwise provided as a state variable. Defaults to zero.
+         */
+        double u = 0;
 
         /** 
          * @brief Jacobian matrix. 
@@ -602,6 +680,11 @@ class Model {
          * @brief Derivatives of the Lode angle with respect to the effective stress state.
          */
         Cauchy dtheta_dsigma_prime;
+
+        /**
+         * @brief Model type.
+         */
+        std::string model_type = "None";
 };
 
 #endif

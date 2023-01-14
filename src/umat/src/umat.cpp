@@ -65,7 +65,7 @@ void umat(
         // Initialise logger.
         char log_filename[] = "umat.log";
         std::remove(log_filename);
-        plog::init(plog::debug, log_filename);
+        plog::init(plog::error, log_filename);
 
         // Instantiate model.
         PLOG_INFO << *ndi << "D problem defined with " << *ntens << " stress variables.";
@@ -74,8 +74,8 @@ void umat(
             model.reset(new LinearElastic(parameters, state));    
         } else if (strcmp(cmname, "MCC") == 0) {
             model.reset(new MCC(parameters, state));   
-        } else if (strcmp(cmname, "SMCC") == 0) {
-            model.reset(new SMCC(parameters, state));   
+        // } else if (strcmp(cmname, "SMCC") == 0) {
+        //     model.reset(new SMCC(parameters, state));   
         } else {
             PLOG_FATAL << "Model name given not implemented. Check name given in CAE / input file.";
             assert(true);
@@ -95,12 +95,10 @@ void umat(
 
     // Do some work with it... (i.e. stress integration).
     int i = 0;
-    std::cout << "Increment: " << i << "; q = " << model->get_q() << "; p_prime = " << model->get_p_prime() << std::endl;
-    while (i<100) {
+    while (i<1) {
         model->solve();
         model->set_Delta_epsilon_tilde(Eigen_dstran);
         i += 1;
-        std::cout << "Increment: " << i << "; q = " << model->get_q() << "; p_prime = " << model->get_p_prime() << std::endl;
     }
     // model->solve();
 

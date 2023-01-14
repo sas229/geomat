@@ -7,6 +7,7 @@
 #include <Eigen/Eigen>
 #include "Types.hpp"
 #include "Model.hpp"
+#include "Checks.hpp"
 
 /**
  * @brief Elastic class with methods to generate the elastic matrix in various forms. Inherits Model base class.

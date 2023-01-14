@@ -39,69 +39,6 @@ class Elastoplastic : public Elastic {
         virtual double compute_f(Cauchy sigma_prime, State state) = 0;
 
         /**
-         * @brief Pure virtual method to compute the derivative of the yield surface with respect to the deviatoric stress.
-         * 
-         * @return double 
-         *
-         * @note Must be overriden by model implementations.
-         */
-        virtual double compute_df_dq(void) = 0;
-
-        /**
-         * @brief Pure virtual method to compute the derivative of the yield surface with respect to the mean effective stress.
-         * 
-         * @return double 
-         *
-         * @note Must be overriden by model implementations.
-         */
-        virtual double compute_df_dp_prime(void) = 0;
-
-        /**
-         * @brief Pure virtual method to compute the derivative of the yield surface with respect to the Lode angle.
-         * 
-         * @return double 
-         *
-         * @note Must be overriden by model implementations.
-         */
-        virtual double compute_df_dtheta(void) = 0;
-
-        /**
-         * @brief Pure virtual method to compute the derivative of the plastic potential function with respect to the deviatoric stress.
-         * 
-         * @return double 
-         *
-         * @note Must be overriden by model implementations.
-         */
-        virtual double compute_dg_dq(void) = 0;
-
-        /**
-         * @brief Pure virtual method to compute the derivative of the plastic potential function with respect to the mean effective stress.
-         * 
-         * @return double 
-         *
-         * @note Must be overriden by model implementations.
-         */
-        virtual double compute_dg_dp_prime(void) = 0;
-
-        /**
-         * @brief Pure virtual method to compute the derivative of the plastic potential function with respect to the Lode angle.
-         * 
-         * @return double 
-         *
-         * @note Must be overriden by model implementations.
-         */
-        virtual double compute_dg_dtheta(void) = 0;
-
-        /**
-         * @brief Pure virtual method to compute the hardening modulus.
-         * 
-         * @return double 
-         *
-         * @note Must be overriden by model implementations.
-         */
-        virtual double compute_H(void) = 0;
-
-        /**
          * @brief Pure virtual method to compute the elastic update of the state variables for the model implemented.
          * 
          * @return Vector of state variables.
@@ -113,6 +50,7 @@ class Elastoplastic : public Elastic {
         /**
          * @brief Pure virtual method to compute the increment in the state variables for the model implemented.
          * 
+         * @param sigma_prime Effective stress state.
          * @param Delta_epsilon_tilde_p Plastic strain increment.
          * @param delta_lambda Plastic multiplier.
          * @param H Hardening modulus.
@@ -120,17 +58,19 @@ class Elastoplastic : public Elastic {
          * 
          * @note Must be overriden by model implementations.
          */
-        virtual State compute_plastic_state_variable_increment(Voigt Delta_epsilon_tilde_p, double delta_lambda, double H) = 0;
+        virtual State compute_plastic_state_variable_increment(Cauchy sigma_prime, Voigt Delta_epsilon_tilde_p, double delta_lambda, double H) = 0;
 
         /**
          * @brief Pure virtual method to compute the correction for the state variables for the model implemented (i.e. where the strain increment is constant).
          * 
+         * @param sigma_prime Effective stress state.
          * @param delta_lambda Plastic multiplier.
+         * @param H Hardening modulus.
          * @return Vector of state variable corrections.
          * 
          * @note Must be overriden by model implementations.
          */
-        virtual State compute_plastic_state_variable_increment(double delta_lambda, double H) = 0;
+        virtual State compute_plastic_state_variable_increment(Cauchy sigma_prime, double delta_lambda, double H) = 0;
 
         /**
          * @brief Pure virtual method to get the state variables from the model implementation.
@@ -144,7 +84,7 @@ class Elastoplastic : public Elastic {
         /**
          * @brief Pure virtual method to set the state variables in the model implementation.
          * 
-         * @param Vector of state variables.
+         * @param new_state Vector of state variables.
          *  
          * @note Must be overriden by model implementations.
          */
@@ -156,7 +96,7 @@ class Elastoplastic : public Elastic {
         void solve(void);
 
         /** 
-         * @brief Method to compute the derivatives for the constitutive model implemented.
+         * @brief Pure virtual method to compute the derivatives for the constitutive model implemented.
          * 
          * @param[in] sigma_prime Effective stress tensor.
          * @param[in] state State variables.
@@ -168,7 +108,7 @@ class Elastoplastic : public Elastic {
          * 
          * @note Must be overriden by model implementations.
          */
-        void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &H);
+        virtual void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &H) = 0;
 
         /**
          * @brief Compute elstoplastic constitutive matrix via:
@@ -212,26 +152,16 @@ class Elastoplastic : public Elastic {
         /**
          * @brief Compute yield surface correction
          * 
-         * @param f_u Yield surface function output for the current stress state and state variables.
+         * @param f_0 Initial yield surface function output for the uncorrected stress state and state variables.
+         * @param f_u Yield surface function output for the uncorrected stress state and state variables.
          * @param sigma_prime_u Uncorrected effective stress state.
          * @param state_u Uncorrected state variables.
+         * @param f_c Yield surface function output for the corrected stress state and state variables.
          * @param sigma_prime_c Corrected stress state.
          * @param state_c Corrected state variables.
          */
-        void compute_yield_surface_correction(double f_u, Cauchy sigma_prime_u, State state_u, Cauchy &sigma_prime_c, State &state_c);
+        void compute_yield_surface_correction(double f_0, double f_u, Cauchy sigma_prime_u, State state_u,  double &f_c, Cauchy &sigma_prime_c, State &state_c);
 
-        /**
-         * @brief Compute yield surface correction
-         * 
-         * @param f_u Yield surface function output for the current stress state and state variables.
-         * @param sigma_prime_u Uncorrected effective stress state.
-         * @param state_u Uncorrected state variables.
-         * @param a_u Uncorrected derivatives of the yield surface with respect to the effective stress state in Voigt notation.
-         * @param sigma_prime_c Corrected stress state.
-         * @param state_c Corrected state variables.
-         */
-        void compute_normal_yield_surface_correction(double f_u, Cauchy sigma_prime_u, State state_u, Voigt a_u, Cauchy &sigma_prime_c, State &state_c);
-        
         /**
          * @brief Compute plastic stress integration increment.
          * 
@@ -246,36 +176,57 @@ class Elastoplastic : public Elastic {
         /**
          * @brief Pegasus regula falsi algorithm to find root of general non-linear system of equations.
          * 
+         * @param sigma_prime Current stress state.
+         * @param state State variables.
          * @param alpha_0 Lower bound on alpha.
          * @param alpha_1 Upper bound on alpha.
          * @param f_0 Initial value of objective function with lower bound alpha.
          * @param f_1 Initial value of objective function with upper bound alpha.
          * @return alpha
          */
-        double pegasus_regula_falsi(double alpha_0, double alpha_1, double f_0, double f_1);
+        double pegasus_regula_falsi(Cauchy sigma_prime, State state, double alpha_0, double alpha_1, double f_0, double f_1);
 
         /**
          * @brief Method to determine if an increment is an unload-reload plastic increment.
          * 
          * @param sigma_prime Current stress state.
+         * @param state State variables.
          * @return true
          * @return false 
          */
-        bool check_unload_reload(Cauchy sigma_prime);
+        bool check_unload_reload(Cauchy sigma_prime, State state);
 
         /**
-         * @brief Method to compute the elastic fraction of the current strain increment following Sloan et al. (2001).
+         * @brief Method to compute the elastic proportion of the current strain increment following Sloan et al. (2001).
          * 
+         * @param sigma_prime Effective stress state.
+         * @param state State variables.
+         * @param Delta_epsilon_tilde Strain increment.
+         * @param FTOL Yield surface tolerance.
+         * @return double 
          */
-        void compute_alpha(void);
+        double compute_alpha(Cauchy sigma_prime, State state, Voigt Delta_epsilon_tilde, double FTOL);
 
         /**
          * @brief Method to compute bounds for alpha for elastoplastic unloading-reloading increment.
          * 
+         * @param sigma_prime Effective stress state.
+         * @param state State variables.
          * @param alpha_0 Lower bound for alpha.
          * @param alpha_1 Upper bound for alpha.
          */
-        void compute_alpha_bounds(double &alpha_0, double &alpha_1);
+        void compute_alpha_bounds(Cauchy sigma_prime, State state, double &alpha_0, double &alpha_1);
+
+        /**
+         * @brief Method to compute the value of the yield surface function given a proportion of the strain increment alpha.
+         * 
+         * @param sigma_prime Effective stress state.
+         * @param state State variables.
+         * @param alpha Proportion of strain increment to apply.
+         * @param Delta_epsilon_tilde Strain increment.
+         * @return double 
+         */
+        double compute_f_alpha(Cauchy sigma_prime, State state, double alpha, Voigt Delta_epsilon_tilde);
 
         /**
          * @brief Elastic fraction of strain increment.
@@ -502,6 +453,11 @@ class Elastoplastic : public Elastic {
          * @brief Elastic strain increment.
          */
         Cauchy Delta_epsilon_e;
+        
+        /**
+         * @brief Initial yield surface function for uncorrected stress state.
+         */
+        double f_0;
         
         /**
          * @brief Yield surface function for uncorrected stress state.

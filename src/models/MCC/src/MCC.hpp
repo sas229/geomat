@@ -4,8 +4,11 @@
 #include <plog/Log.h>
 #include <Eigen/Eigen>
 #include <cassert>
+#include <string>
 #include "Types.hpp"
 #include "Elastoplastic.hpp"
+#include "Logging.hpp"
+#include "Checks.hpp"
 
 class MCC : public Elastoplastic {
 
@@ -16,8 +19,9 @@ class MCC : public Elastoplastic {
          * 
          * @param[in] parameters Vector of parameters.
          * @param[in] state Vector of state variables.
+         * @param[in] log_severity Logger severity to output.
          */
-        MCC(State parameters, State state);
+        MCC(State parameters, State state, std::string log_severity="error");
 
         /** 
          * @brief MCC model destructor. 
@@ -96,103 +100,118 @@ class MCC : public Elastoplastic {
          * @return Vector of state variables.
          */
         State compute_elastic_state_variable(Voigt Delta_epsilon_tilde_e) override;
-
+        
         /**
-         * @brief Overridden method to compute the derivative of the yield surface with respect to the deviatoric stress.
+         * @brief Method to compute the derivatives of the yield surface and the plastic potential function.
          * 
-         * \f[ \frac{\partial f}{\partial q} = 2q \f]
-         * 
-         * where \f$ q \f$ is the deviatoric stress.
-         * 
-         * @return Derivative of the yield surface with respect to the deviatoric stress.
+         * @param sigma_prime Effectivee stress state.
+         * @param state State variables.
+         * @param df_dsigma_prime Derivatives of the yield surface with respect to the stress state.
+         * @param a Derivatives of the yield surface with respect to the stress state in Voigt notation.
+         * @param dg_dsigma_prime Derivatives of the plastic potential function with respect to the stress state.
+         * @param b Derivatives of the plastic potential function with respect to the stress state in Voigt notation.
+         * @param H Hardening modulus.
          */
-        double compute_df_dq(void) override;
+        void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &H);
 
-        /**
-         * @brief Overridden method to compute the derivative of the yield surface with respect to the mean effective stress.
-         * 
-         * \f[ \frac{\partial f}{\partial p} = M^2\left(2 p^{\prime}-p_c \right) \f]
-         * 
-         * where \f$ M \f$ is the frictional constant, \f$ p_{\prime} \f$ is the mean effective stress and \f$ p_c \f$
-         * is the pre-consolidation pressure.
-         * 
-         * @return Derivative of the yield surface with respect to the mean effective stress.
-         */
-        double compute_df_dp_prime(void) override;
+        // /**
+        //  * @brief Overridden method to compute the derivative of the yield surface with respect to the deviatoric stress.
+        //  * 
+        //  * \f[ \frac{\partial f}{\partial q} = 2q \f]
+        //  * 
+        //  * where \f$ q \f$ is the deviatoric stress.
+        //  * 
+        //  * @return Derivative of the yield surface with respect to the deviatoric stress.
+        //  */
+        // double compute_df_dq(void) override;
 
-        /**
-         * @brief Overridden method to compute the derivative of the yield surface with respect to the Lode angle.
-         * 
-         * \f[ \frac{\partial f}{\partial \theta} = 0 \f]
-         * 
-         * @return Derivative of the yield surface with respect to the Lode angle
-         */
-        double compute_df_dtheta(void) override;
+        // /**
+        //  * @brief Overridden method to compute the derivative of the yield surface with respect to the mean effective stress.
+        //  * 
+        //  * \f[ \frac{\partial f}{\partial p} = M^2\left(2 p^{\prime}-p_c \right) \f]
+        //  * 
+        //  * where \f$ M \f$ is the frictional constant, \f$ p_{\prime} \f$ is the mean effective stress and \f$ p_c \f$
+        //  * is the pre-consolidation pressure.
+        //  * 
+        //  * @return Derivative of the yield surface with respect to the mean effective stress.
+        //  */
+        // double compute_df_dp_prime(void) override;
 
-        /**
-         * @brief Overridden method to compute the derivative of the plastic potential function with respect to the deviatoric stress.
-         * 
-         * \f[ \frac{\partial g}{\partial q} = 2q \f]
-         * 
-         * where \f$ q \f$ is the deviatoric stress.
-         * 
-         * @return Derivative of the plastic potential function with respect to the deviatoric stress.
-         */
-        double compute_dg_dq(void) override;
+        // /**
+        //  * @brief Overridden method to compute the derivative of the yield surface with respect to the Lode angle.
+        //  * 
+        //  * \f[ \frac{\partial f}{\partial \theta} = 0 \f]
+        //  * 
+        //  * @return Derivative of the yield surface with respect to the Lode angle
+        //  */
+        // double compute_df_dtheta(void) override;
 
-        /**
-         * @brief Overridden method to compute the derivative of the plastic potential function with respect to the mean effective stress.
-         * 
-         * \f[ \frac{\partial g}{\partial p} = M^2\left(2 p^{\prime}-p_c \right) \f]
-         * 
-         * where \f$ M \f$ is the frictional constant, \f$ p_{\prime} \f$ is the mean effective stress and \f$ p_c \f$
-         * is the pre-consolidation pressure.
-         * 
-         * @return Derivative of the plastic potential function with respect to the mean effective stress.
-         */
-        double compute_dg_dp_prime(void) override;
+        // /**
+        //  * @brief Overridden method to compute the derivative of the plastic potential function with respect to the deviatoric stress.
+        //  * 
+        //  * \f[ \frac{\partial g}{\partial q} = 2q \f]
+        //  * 
+        //  * where \f$ q \f$ is the deviatoric stress.
+        //  * 
+        //  * @return Derivative of the plastic potential function with respect to the deviatoric stress.
+        //  */
+        // double compute_dg_dq(void) override;
 
-        /**
-         * @brief Overridden method to compute the derivative of the plastic potential function with respect to the Lode angle.
-         * 
-         * \f[ \frac{\partial g}{\partial \theta} = 0 \f]
-         * 
-         * @return Derivative of the plastic potential function with respect to the Lode angle.
-         */
-        double compute_dg_dtheta(void) override;
+        // /**
+        //  * @brief Overridden method to compute the derivative of the plastic potential function with respect to the mean effective stress.
+        //  * 
+        //  * \f[ \frac{\partial g}{\partial p} = M^2\left(2 p^{\prime}-p_c \right) \f]
+        //  * 
+        //  * where \f$ M \f$ is the frictional constant, \f$ p_{\prime} \f$ is the mean effective stress and \f$ p_c \f$
+        //  * is the pre-consolidation pressure.
+        //  * 
+        //  * @return Derivative of the plastic potential function with respect to the mean effective stress.
+        //  */
+        // double compute_dg_dp_prime(void) override;
 
-        /**
-         * @brief Overridden method to compute the hardening modulus.
-         * 
-         * \f[ H = \frac{M^2 p^{\prime} p_c}{\lambda^*-\kappa^*} \operatorname{tr}\left( \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} \right) \f]
-         * 
-         * where \f$ M \f$ is the frictional constant, f$ p_{\prime} \f$ is the mean effective stress, \f$ p_c \f$
-         * is the pre-consolidation pressure, \f$ \lambda \f$ is the slope of the NCL, \f$ \kappa \f$ is the slope 
-         * of the RCL and \f$ \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} \f$ are the derivatives of
-         * the yield surface with respect to the effective stress state.
-         * 
-         * @return Hardening modulus, H.
-         */
-        double compute_H(void) override;
+        // /**
+        //  * @brief Overridden method to compute the derivative of the plastic potential function with respect to the Lode angle.
+        //  * 
+        //  * \f[ \frac{\partial g}{\partial \theta} = 0 \f]
+        //  * 
+        //  * @return Derivative of the plastic potential function with respect to the Lode angle.
+        //  */
+        // double compute_dg_dtheta(void) override;
+
+        // /**
+        //  * @brief Overridden method to compute the hardening modulus.
+        //  * 
+        //  * \f[ H = \frac{M^2 p^{\prime} p_c}{\lambda^*-\kappa^*} \operatorname{tr}\left( \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} \right) \f]
+        //  * 
+        //  * where \f$ M \f$ is the frictional constant, f$ p_{\prime} \f$ is the mean effective stress, \f$ p_c \f$
+        //  * is the pre-consolidation pressure, \f$ \lambda \f$ is the slope of the NCL, \f$ \kappa \f$ is the slope 
+        //  * of the RCL and \f$ \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} \f$ are the derivatives of
+        //  * the yield surface with respect to the effective stress state.
+        //  * 
+        //  * @return Hardening modulus, H.
+        //  */
+        // double compute_H(void) override;
 
         /**
          * @brief Overriden method to compute the plastic increment in the models state variables.
          * 
+         * @param[in] sigma_prime Effective stress state.
          * @param[in] Delta_epsilon_tilde_p Plastic strain increment.
          * @param[in] delta_lambda Plastic multiplier increment.
          * @param[in] H Hardening modulus.
          * @return Vector of state variable increments.
          */
-        State compute_plastic_state_variable_increment(Voigt Delta_epsilon_tilde_p, double delta_lambda, double H) override;
+        State compute_plastic_state_variable_increment(Cauchy sigma_prime, Voigt Delta_epsilon_tilde_p, double delta_lambda, double H) override;
 
         /**
          * @brief Overriden method to compute the correction in the models state variables.
          * 
+         * @param[in] sigma_prime Effective stress state.
          * @param[in] delta_lambda Plastic multiplier.
          * @param[in] H Hardening modulus.
          * @return Vector of state variable corrections.
          */
-        State compute_plastic_state_variable_increment(double delta_lambda, double H) override;
+        State compute_plastic_state_variable_increment(Cauchy sigma_prime, double delta_lambda, double H) override;
 
        /** 
          * @brief Parameters. 
@@ -203,6 +222,16 @@ class MCC : public Elastoplastic {
          * @brief State variables. 
          */
         State state;
+
+        /**
+         * @brief Number of parameters required.
+         */
+        const int parameters_required = 5;
+
+        /**
+         * @brief Number of state variables required.
+         */
+        const int state_required = 2;
 
         /** 
          * @brief Parameter: frictional constant. 
@@ -239,6 +268,10 @@ class MCC : public Elastoplastic {
          */
         double &p_c = state[1];
 
+        /**
+         * @brief Log severity.
+         */
+        std::string log_severity;
 };
 
 #endif 

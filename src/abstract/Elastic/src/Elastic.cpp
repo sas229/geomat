@@ -1,18 +1,15 @@
 #include "Elastic.hpp"
 
 Constitutive Elastic::compute_isotropic_linear_elastic_matrix(double K, double G) {
-    std::cout << "K = " << K << "; G = " << G << std::endl;
     // Check elastic paramaters are valid.
-    PLOG_ERROR_IF(K <= 0.0) << "Bulk modulus less than or equal to zero.";
-    PLOG_ERROR_IF(G <= 0.0) << "Shear modulus less than or equal to zero.";
-    assert(K > 0.0 && G > 0.0);
-
+    Checks::check_elastic_parameters(K, G);
 
     // Fill elastic matrix with isotropic linear elastic coefficients.
     Constitutive D_e = Constitutive::Zero();
     D_e(0,0) = D_e(1,1) = D_e(2,2) += K + 4.0/3.0*G; 
     D_e(0,1) = D_e(0,2) = D_e(1,2) = D_e(1,0) = D_e(2,0) = D_e(2,1) += K - 2.0/3.0*G;
-    D_e(3,3) = D_e(4,4) = D_e(5,5) += G; 
+    D_e(3,3) = D_e(4,4) = D_e(5,5) += G;
+    PLOG_DEBUG << "D_e = \n" << D_e;  
     return D_e;
 }
 

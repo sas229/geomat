@@ -23,42 +23,33 @@ PYBIND11_MODULE(models, m) {
     // Models.
 
     // Isotropic linear elasticity.
-    py::class_<LinearElastic, Elastic>(m, "LinearElastic");
-    //     m.def(py::init<Parameters, State>()); // Constructor.
+    py::class_<LinearElastic, Elastic>(m, "LinearElastic")
+        .def(py::init<Parameters, State>()); // Constructor.
 
     // Modified Cam Clay (MCC).
     py::class_<MCC, Elastoplastic>(m, "MCC")
         .def(py::init<Parameters, State>()) // Constructor.
+        .def(py::init<Parameters, State, std::string>()) // Overloaded constructor.
         .def("set_sigma_prime_tilde", &MCC::set_sigma_prime_tilde)
-        .def("get_sigma_prime", &MCC::get_sigma_prime)
-        .def("get_p_prime", &MCC::get_p_prime)
-        .def("get_q", &MCC::get_q)
+        .def("set_Delta_epsilon_tilde", &MCC::set_Delta_epsilon_tilde)
+        .def("set_IP_number", &MCC::set_IP_number)
+        .def("solve", &MCC::solve)
+        .def_property_readonly("sigma_prime_tilde", &MCC::get_sigma_prime_tilde)
+        .def_property_readonly("sigma_prime", &MCC::get_sigma_prime)
+        .def_property_readonly("name", &MCC::get_name)
+        .def_property_readonly("model_type", &MCC::get_model_type)
+        .def_property_readonly("IP_number", &MCC::get_IP_number)
         .def_property_readonly("p_prime", &MCC::get_p_prime)
         .def_property_readonly("q", &MCC::get_q)
+        .def_property_readonly("jacobian", &MCC::get_jacobian)
         .def_property_readonly("I_1", &MCC::get_I_1)
         .def_property_readonly("I_2", &MCC::get_I_2)
         .def_property_readonly("I_3", &MCC::get_I_3)
         .def_property_readonly("J_1", &MCC::get_J_1)
         .def_property_readonly("J_2", &MCC::get_J_2)
         .def_property_readonly("J_3", &MCC::get_J_3)
-        .def("set_Delta_epsilon_tilde", &MCC::set_Delta_epsilon_tilde)
-        .def("solve", &MCC::solve);
-
-    // // Soft Modified Cam Clay (SMCC).
-    // py::class_<SMCC, Elastoplastic>(m, "SMCC")
-    //     .def(py::init<Parameters, State>()) // Constructor.
-    //     .def("set_sigma_prime_tilde", &SMCC::set_sigma_prime_tilde)
-    //     .def("get_sigma_prime", &SMCC::get_sigma_prime)
-    //     .def("get_p_prime", &SMCC::get_p_prime)
-    //     .def("get_q", &SMCC::get_q)
-    //     .def_property_readonly("p_prime", &SMCC::get_p_prime)
-    //     .def_property_readonly("q", &SMCC::get_q)
-    //     .def_property_readonly("I_1", &SMCC::get_I_1)
-    //     .def_property_readonly("I_2", &SMCC::get_I_2)
-    //     .def_property_readonly("I_3", &SMCC::get_I_3)
-    //     .def_property_readonly("J_1", &SMCC::get_J_1)
-    //     .def_property_readonly("J_2", &SMCC::get_J_2)
-    //     .def_property_readonly("J_3", &SMCC::get_J_3)
-    //     .def("set_Delta_epsilon_tilde", &SMCC::set_Delta_epsilon_tilde)
-    //     .def("solve", &SMCC::solve);
+        .def_property_readonly("solved", &MCC::get_solved)
+        .def_property_readonly("mises_stress", &MCC::get_mises_stress)
+        .def_property_readonly("max_shear", &MCC::get_max_shear)
+        ;
 }
