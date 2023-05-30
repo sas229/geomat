@@ -117,7 +117,7 @@ class Model {
          * 
          * @return Voigt 
          */
-        Voigt get_sigma_prime(void);
+        Voigt get_sigma_prime_tilde(void);
 
         /**
          * @brief Method to get name of model.

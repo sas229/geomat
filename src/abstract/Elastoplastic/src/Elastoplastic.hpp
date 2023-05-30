@@ -213,16 +213,6 @@ class Elastoplastic : public Elastic {
         void compute_alpha_bounds(double &alpha_0, double &alpha_1);
 
         /**
-         * @brief Method to compute vectors of coordinates to visualise the yield surface for a given set of state variables.
-         * 
-         * @param state Vector of state variables.
-         * @param points Number of points on surface.
-         * @param p_prime_surface Surface coordinate for mean effective stress.
-         * @param q_surface Surface coordinate for deviatoric stress.
-         */
-        void compute_yield_surface(State state, int points, Eigen::VectorXd &p_prime_surface, Eigen::VectorXd &q_surface);
-
-        /**
          * @brief Elastic fraction of strain increment.
          */
         double alpha;

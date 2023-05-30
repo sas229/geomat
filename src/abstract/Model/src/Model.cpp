@@ -91,7 +91,8 @@ void Model::set_sigma_prime_tilde(Voigt sigma_prime_tilde) {
     compute_stress_invariants(sigma, I_1, I_2, I_3, J_1, J_2, J_3);
     compute_lode(J_2, J_3, theta_c, theta_s, theta_s_bar);
     compute_principal_stresses(sigma_prime, sigma_1, sigma_2, sigma_3, R, S);
-    p = compute_p_prime(sigma_prime);
+    p_prime = compute_p_prime(sigma_prime);
+    p = compute_p(sigma);
     q = compute_q(sigma_prime);
     mises_stress = compute_mises_stress(J_2);
     max_shear = compute_max_shear(sigma_1, sigma_2, sigma_3);
@@ -110,7 +111,7 @@ std::string Model::get_name(void) {
     return name;
 }
 
-Voigt Model::get_sigma_prime(void) {
+Voigt Model::get_sigma_prime_tilde(void) {
     // Change sign back to tension positive sign convention.
     return -sigma_prime_tilde;
 }

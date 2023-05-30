@@ -112,8 +112,6 @@ void Elastoplastic::solve(void) {
         p_prime = compute_p_prime(sigma_prime);
         q = compute_q(sigma_prime);
         compute_principal_stresses(sigma_prime, sigma_1, sigma_2, sigma_3, R, S);
-        // Eigen::VectorXd p_prime_surface, q_surface;
-        // compute_yield_surface(get_state_variables(), 1000, p_prime_surface, q_surface);
     }
 }
 
@@ -359,10 +357,4 @@ double Elastoplastic::pegasus_regula_falsi(double alpha_0, double alpha_1, doubl
         assert(alpha >= 0.0 && alpha <= 1.0);
     }
     return alpha;
-}
-
-void Elastoplastic::compute_yield_surface(State state, int points, Eigen::VectorXd &p_prime_surface, Eigen::VectorXd &q_surface) {
-    // Calculate minimum and maximum p_prime.
-
-    // For the calculated range of p_prime, solve for q.  
 }
