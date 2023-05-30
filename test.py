@@ -1,5 +1,5 @@
 import numpy as np
-from models import MCC
+from build.models import MCC    # Note that this import statement is importing the current build directly from the build folder!
 from matplotlib import pyplot as plt
 
 increments = 1000
@@ -20,7 +20,7 @@ q[0] = model.q
 
 i = 0
 # print("Increment {}: p = {} ; q = {} ; q/p = {}".format(i, p[i], q[i], q[i]/p[i]))
-while i<=increments-2:
+while i<increments-1:
     i += 1
     model.set_Delta_epsilon_tilde(Delta_epsilon_tilde)
     model.solve()
