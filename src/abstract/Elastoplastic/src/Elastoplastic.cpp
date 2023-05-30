@@ -112,6 +112,7 @@ void Elastoplastic::solve(void) {
         p_prime = compute_p_prime(sigma_prime);
         q = compute_q(sigma_prime);
         compute_principal_stresses(sigma_prime, sigma_1, sigma_2, sigma_3, R, S);
+        sigma_prime_tilde = to_voigt(sigma_prime);
     }
 }
 

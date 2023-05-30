@@ -20,6 +20,7 @@ p[0] = model.p_prime
 q[0] = model.q
 sigma_prime[0,:] = model.sigma_prime_tilde
 print("Increment {}: p = {} ; q = {} ; q/p = {}".format(0, p[0], q[0], q[0]/p[0]))
+print("Increment {}: sigma_11 = {} ; sigma_22 = {} ; sigma_33 = {} ; sigma_12 = {} ; sigma_23 = {} ; sigma_13 = {}".format(0, sigma_prime[0,0], sigma_prime[0,1], sigma_prime[0,2], sigma_prime[0,3], sigma_prime[0,4], sigma_prime[0,5]))
 i = 0
 while i<increments-1:
     i += 1
@@ -28,9 +29,9 @@ while i<increments-1:
     p[i] = model.p_prime
     q[i] = model.q
     sigma_prime[i,:] = model.sigma_prime_tilde
-    # print("Increment {}: sigma_11 = {} ; sigma_22 = {} ; sigma_33 = {} ; sigma_12 = {} ; sigma_23 = {} ; sigma_13 = {}".format(i, sigma_prime[i,0], sigma_prime[i,1], sigma_prime[i,2], sigma_prime[i,3], sigma_prime[i,4], sigma_prime[i,5]))
     print("Increment {}: p = {} ; q = {} ; q/p = {}".format(i, p[i], q[i], q[i]/p[i]))
-
+    print("Increment {}: sigma_11 = {} ; sigma_22 = {} ; sigma_33 = {} ; sigma_12 = {} ; sigma_23 = {} ; sigma_13 = {}".format(i, sigma_prime[i,0], sigma_prime[i,1], sigma_prime[i,2], sigma_prime[i,3], sigma_prime[i,4], sigma_prime[i,5]))
+    
 plt.plot(axial_strain, q/p)
 plt.xlabel(r"$\epsilon_{a}$ (-)")
 plt.ylabel("q/p (-)")
