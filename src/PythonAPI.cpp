@@ -22,8 +22,22 @@ PYBIND11_MODULE(models, m) {
     // Models.
 
     // Isotropic linear elasticity.
-    py::class_<LinearElastic, Elastic>(m, "LinearElastic");
-    //     m.def(py::init<Parameters, State>()); // Constructor.
+    py::class_<LinearElastic, Elastic>(m, "LinearElastic")
+        .def(py::init<Parameters, State>()) // Constructor.
+        .def("set_sigma_prime_tilde", &LinearElastic::set_sigma_prime_tilde)
+        .def("get_sigma_prime", &LinearElastic::get_sigma_prime)
+        .def("get_p_prime", &LinearElastic::get_p_prime)
+        .def("get_q", &LinearElastic::get_q)
+        .def_property_readonly("p_prime", &LinearElastic::get_p_prime)
+        .def_property_readonly("q", &LinearElastic::get_q)
+        .def_property_readonly("I_1", &LinearElastic::get_I_1)
+        .def_property_readonly("I_2", &LinearElastic::get_I_2)
+        .def_property_readonly("I_3", &LinearElastic::get_I_3)
+        .def_property_readonly("J_1", &LinearElastic::get_J_1)
+        .def_property_readonly("J_2", &LinearElastic::get_J_2)
+        .def_property_readonly("J_3", &LinearElastic::get_J_3)
+        .def("set_Delta_epsilon_tilde", &LinearElastic::set_Delta_epsilon_tilde)
+        .def("solve", &LinearElastic::solve);
 
     // Modified Cam Clay (MCC).
     py::class_<MCC, Elastoplastic>(m, "MCC")

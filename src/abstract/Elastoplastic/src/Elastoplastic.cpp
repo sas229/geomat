@@ -112,8 +112,8 @@ void Elastoplastic::solve(void) {
         p_prime = compute_p_prime(sigma_prime);
         q = compute_q(sigma_prime);
         compute_principal_stresses(sigma_prime, sigma_1, sigma_2, sigma_3, R, S);
-        Eigen::VectorXd p_prime_surface, q_surface;
-        compute_yield_surface(get_state_variables(), 1000, p_prime_surface, q_surface);
+        // Eigen::VectorXd p_prime_surface, q_surface;
+        // compute_yield_surface(get_state_variables(), 1000, p_prime_surface, q_surface);
     }
 }
 

@@ -119,7 +119,7 @@ Jacobian Model::get_jacobian(void) {
     return jacobian;
 }
 
-// Computers.
+// Compute methods.
 
 Cauchy Model::compute_cartesian_stresses(Cauchy R, Cauchy S) {
     return R*S*R.transpose();
