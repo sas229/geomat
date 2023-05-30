@@ -1,2 +1,2 @@
-# umat
-Abaqus user material subroutine library.
+# geomat
+Geotechnical constitutive model library.
