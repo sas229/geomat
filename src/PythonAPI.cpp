@@ -23,11 +23,14 @@ PYBIND11_MODULE(models, m) {
 
     // Modified Cam Clay (MCC).
     py::class_<MCC, Elastoplastic>(m, "MCC")
-        .def(py::init<Parameters, State>()) // Constructor.
+        .def(py::init<Parameters, State>(), py::kw_only(), py::arg("parameters"), py::arg("state")) // Constructor.
+        .def(py::init<Parameters, State, std::string>(), py::kw_only(), py::arg("parameters"), py::arg("state"), py::arg("log_severity")) // Overloaded constructor.
         .def("set_sigma_prime_tilde", &MCC::set_sigma_prime_tilde)
         .def("get_sigma_prime_tilde", &MCC::get_sigma_prime_tilde)
         .def("get_p_prime", &MCC::get_p_prime)
         .def("get_q", &MCC::get_q)
+        .def_property_readonly("name", &MCC::get_model_name)
+        .def_property_readonly("type", &MCC::get_model_type)
         .def_property_readonly("p_prime", &MCC::get_p_prime)
         .def_property_readonly("q", &MCC::get_q)
         .def_property_readonly("sigma_prime_tilde", &MCC::get_sigma_prime_tilde)

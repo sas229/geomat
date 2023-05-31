@@ -2,7 +2,7 @@
 #include "LinearElastic_Definition.hpp"
 
 LinearElastic::LinearElastic(Parameters parameters, State state) : parameters(parameters), state(state) {
-    set_name("LinearElastic");
+    set_model_name("LinearElastic");
     int parameters_required = 2;
     int state_required = 0;
     PLOG_FATAL_IF(parameters.size() != parameters_required) << parameters.size() << " parameters supplied when " << parameters_required << " expected.";

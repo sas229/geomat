@@ -11,7 +11,9 @@ ea_increment = ea_max/increments
 Delta_epsilon_tilde = np.array([-ea_increment, ea_increment/2, ea_increment/2, 0.0, 0.0, 0.0])
 axial_strain = np.arange(0, increments*ea_increment, ea_increment)
 
-model = MCC(parameters, state)
+model = MCC(parameters=parameters, state=state, log_severity="none")
+print("Model name: {}".format(model.name))
+print("Model type: {}".format(model.type))
 model.set_sigma_prime_tilde(stress)
 p = np.zeros(increments)
 q = np.zeros(increments)
@@ -19,8 +21,7 @@ sigma_prime = np.zeros([increments, 6])
 p[0] = model.p_prime
 q[0] = model.q
 sigma_prime[0,:] = model.sigma_prime_tilde
-print("Increment {}: p = {} ; q = {} ; q/p = {}".format(0, p[0], q[0], q[0]/p[0]))
-print("Increment {}: sigma_11 = {} ; sigma_22 = {} ; sigma_33 = {} ; sigma_12 = {} ; sigma_23 = {} ; sigma_13 = {}".format(0, sigma_prime[0,0], sigma_prime[0,1], sigma_prime[0,2], sigma_prime[0,3], sigma_prime[0,4], sigma_prime[0,5]))
+print("Increment {}: p = {:.2f} ; q = {:.2f} ; q/p = {:.2f}".format(0, p[0], q[0], q[0]/p[0]))
 i = 0
 while i<increments-1:
     i += 1
@@ -29,8 +30,7 @@ while i<increments-1:
     p[i] = model.p_prime
     q[i] = model.q
     sigma_prime[i,:] = model.sigma_prime_tilde
-    print("Increment {}: p = {} ; q = {} ; q/p = {}".format(i, p[i], q[i], q[i]/p[i]))
-    print("Increment {}: sigma_11 = {} ; sigma_22 = {} ; sigma_33 = {} ; sigma_12 = {} ; sigma_23 = {} ; sigma_13 = {}".format(i, sigma_prime[i,0], sigma_prime[i,1], sigma_prime[i,2], sigma_prime[i,3], sigma_prime[i,4], sigma_prime[i,5]))
+    print("Increment {}: p = {:.2f} ; q = {:.2f} ; q/p = {:.2f}".format(i, p[i], q[i], q[i]/p[i]))
     
 plt.plot(axial_strain, q/p)
 plt.xlabel(r"$\epsilon_{a}$ (-)")

@@ -78,7 +78,12 @@
         "forward_list": "cpp",
         "regex": "cpp",
         "typeindex": "cpp",
-        "alignedvector3": "cpp"
+        "alignedvector3": "cpp",
+        "hash_set": "cpp",
+        "charconv": "cpp",
+        "format": "cpp",
+        "span": "cpp",
+        "stdfloat": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceFolder}",
 }

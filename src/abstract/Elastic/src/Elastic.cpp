@@ -2,9 +2,7 @@
 
 Constitutive Elastic::compute_isotropic_linear_elastic_matrix(double K, double G) {
     // Check elastic paramaters are valid.
-    PLOG_ERROR_IF(K <= 0.0) << "Bulk modulus less than or equal to zero.";
-    PLOG_ERROR_IF(G <= 0.0) << "Shear modulus less than or equal to zero.";
-    assert(K > 0.0 && G > 0.0);
+    Checks::check_elastic_parameters(K, G);
 
     // Fill elastic matrix with isotropic linear elastic coefficients.
     Constitutive D_e = Constitutive::Zero();

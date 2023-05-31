@@ -6,6 +6,8 @@
 #include <cassert>
 #include "Types.hpp"
 #include "Elastoplastic.hpp"
+#include "Logging.hpp"
+#include "Checks.hpp"
 
 class MCC : public Elastoplastic {
 
@@ -16,8 +18,9 @@ class MCC : public Elastoplastic {
          * 
          * @param[in] parameters Vector of parameters.
          * @param[in] state Vector of state variables.
+         * @param[in] log_severity Severity of message to log.
          */
-        MCC(State parameters, State state);
+        MCC(State parameters, State state, std::string log_severity="none");
 
         /** 
          * @brief MCC model destructor. 
@@ -163,6 +166,16 @@ class MCC : public Elastoplastic {
          * @brief State variable: preconsolidation pressure. 
          */
         double &p_c = state[1];
+
+        /**
+         * @brief Number of required parameters.
+         */
+        int parameters_required = 5;
+
+        /**
+         * @brief Number of required state variables.
+         */
+        int state_required = 2;
 
 };
 

@@ -5,6 +5,7 @@
 #include <plog/Log.h>
 #include <cassert>
 #include <Eigen/Eigen>
+#include "Checks.hpp"
 #include "Types.hpp"
 #include "Model.hpp"
 

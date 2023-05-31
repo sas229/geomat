@@ -45,7 +45,14 @@ class Model {
          * 
          * @param name Name of model.
          */
-        void set_name(std::string name);
+        void set_model_name(std::string name);
+
+        /**
+         * @brief Method to set the type of model.
+         * 
+         * @param model_type Type of model.
+         */
+        void set_model_type(std::string model_type);
         
         // Getters.
 
@@ -124,7 +131,14 @@ class Model {
          * 
          * @return std::string 
          */
-        std::string get_name(void);
+        std::string get_model_name(void);
+
+        /**
+         * @brief Method to get type of model.
+         * 
+         * @return std::string 
+         */
+        std::string get_model_type(void);
 
     protected:
 
@@ -604,6 +618,11 @@ class Model {
          * @brief Derivatives of the thrid deviatoric stress invariant with respect to the effective stress state.
          */
         Cauchy dJ_3_dsigma_prime;
+
+        /**
+         * @brief Model type.
+         */
+        std::string model_type = "None";
 };
 
 #endif

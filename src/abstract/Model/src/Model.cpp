@@ -2,8 +2,12 @@
 
 // Setters.
 
-void Model::set_name(std::string s) {
+void Model::set_model_name(std::string s) {
     name = s;
+}
+
+void Model::set_model_type(std::string t) {
+    model_type = t;
 }
 
 double Model::get_p_prime(void) {
@@ -107,8 +111,12 @@ void Model::set_Delta_epsilon_tilde(Voigt Delta_epsilon_tilde) {
 
 // Getters.
 
-std::string Model::get_name(void) {
+std::string Model::get_model_name(void) {
     return name;
+}
+
+std::string Model::get_model_type(void) {
+    return model_type;
 }
 
 Voigt Model::get_sigma_prime_tilde(void) {
