@@ -33,6 +33,11 @@ double MCC::compute_f(double p_prime, double q, State state) {
 }
 
 
+double MCC::compute_G(double K) {
+    return MCC_SHEAR_MODULUS;
+}
+
+
 double MCC::compute_K(double Delta_epsilon_e_vol, double p_prime) {
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     if (Delta_epsilon_e_vol != 0.0) {
@@ -40,10 +45,6 @@ double MCC::compute_K(double Delta_epsilon_e_vol, double p_prime) {
     } else {
         return MCC_TANGENT_BULK_MODULUS;
     }
-}
-
-double MCC::compute_G(double K) {
-    return MCC_SHEAR_MODULUS;
 }
 
 void MCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H) {

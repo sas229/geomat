@@ -120,8 +120,6 @@ class MCC : public Elastoplastic {
          */
         State compute_plastic_state_variable_increment(double delta_lambda, double H) override;
 
-        void compute_yield_surface(double p_prime, double q, int points, State state, Eigen::VectorXd &p_prime_surface, Eigen::VectorXd &q_surface);
-
        /** 
          * @brief Parameters. 
          */

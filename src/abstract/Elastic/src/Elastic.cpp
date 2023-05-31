@@ -37,6 +37,8 @@ void Elastic::solve(void) {
     Voigt Delta_sigma_prime_tilde = D_e*Delta_epsilon_tilde;
     sigma_prime_tilde += Delta_sigma_prime_tilde;
     sigma_prime = to_cauchy(sigma_prime_tilde);
+    p_prime = compute_p_prime(sigma_prime);
+    q = compute_q(sigma_prime);
 
     // Take the Jacobian as the tangent stiffness.
     jacobian = D_e;

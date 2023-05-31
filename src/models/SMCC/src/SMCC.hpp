@@ -4,6 +4,8 @@
 #include <plog/Log.h>
 #include <Eigen/Eigen>
 #include <cassert>
+#include "Checks.hpp"
+#include "Logging.hpp"
 #include "Types.hpp"
 #include "Elastoplastic.hpp"
 
@@ -16,8 +18,9 @@ class SMCC : public Elastoplastic {
          * 
          * @param[in] parameters Vector of parameters.
          * @param[in] state Vector of state variables.
+         * @param[in] log_severity Severity of message to log.
          */
-        SMCC(State parameters, State state);
+        SMCC(State parameters, State state, std::string log_severity="none");
 
         /** 
          * @brief SMCC model destructor. 
@@ -55,6 +58,16 @@ class SMCC : public Elastoplastic {
         double compute_f(Cauchy sigma_prime, State state) override;
 
         /**
+         * @brief Overridden method to compute the current value of the yield surface function.
+         * 
+         * @param p_prime Mean effective stress.
+         * @param q Deviatoric stress.
+         * @param state State variables.
+         * @return double 
+         */
+        double compute_f(double p_prime, double q, State state) override;
+
+        /**
          * @brief Overridden method to compute the bulk modulus.
          *  
          * If the increment exhibits non-zero volumetric strain:
@@ -89,6 +102,20 @@ class SMCC : public Elastoplastic {
          */
         double compute_G(double K) override;
 
+        /** 
+         * @brief Method to compute the derivatives for the constitutive model implemented.
+         * 
+         * @param[in] sigma_prime Effective stress tensor.
+         * @param[in] state State variables.
+         * @param[in,out] df_dsigma_prime Derivatives of yield function with respect to the stress state.
+         * @param[in,out] a Vector of derivatives of yield function with respect to the stress state.
+         * @param[in,out] dg_dsigma_prime Derivatives of plastic potential function with respect to the stress state.
+         * @param[in,out] b Vector of derivatives of plastic potential function with respect to the stress state.
+         * @param[in,out] dg_dp_prime Derivative of plastic potential function with respect to the effective mean stress.
+         * @param[in,out] H Hardening modulus.
+         */
+        void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &dg_dp_prime, double &H);
+
         /**
          * @brief Overriden method to compute the elastic update of the models state variables.
          * 
@@ -106,7 +133,7 @@ class SMCC : public Elastoplastic {
          * 
          * @return Derivative of the yield surface with respect to the deviatoric stress.
          */
-        double compute_df_dq(void) override;
+        double compute_df_dq(void);
 
         /**
          * @brief Overridden method to compute the derivative of the yield surface with respect to the mean effective stress.
@@ -118,7 +145,7 @@ class SMCC : public Elastoplastic {
          * 
          * @return Derivative of the yield surface with respect to the mean effective stress.
          */
-        double compute_df_dp_prime(void) override;
+        double compute_df_dp_prime(void);
 
         /**
          * @brief Overridden method to compute the derivative of the yield surface with respect to the Lode angle.
@@ -127,7 +154,7 @@ class SMCC : public Elastoplastic {
          * 
          * @return Derivative of the yield surface with respect to the Lode angle
          */
-        double compute_df_dtheta(void) override;
+        double compute_df_dtheta(void);
 
         /**
          * @brief Overridden method to compute the derivative of the plastic potential function with respect to the deviatoric stress.
@@ -138,7 +165,7 @@ class SMCC : public Elastoplastic {
          * 
          * @return Derivative of the plastic potential function with respect to the deviatoric stress.
          */
-        double compute_dg_dq(void) override;
+        double compute_dg_dq(void);
 
         /**
          * @brief Overridden method to compute the derivative of the plastic potential function with respect to the mean effective stress.
@@ -150,7 +177,7 @@ class SMCC : public Elastoplastic {
          * 
          * @return Derivative of the plastic potential function with respect to the mean effective stress.
          */
-        double compute_dg_dp_prime(void) override;
+        double compute_dg_dp_prime(void);
 
         /**
          * @brief Overridden method to compute the derivative of the plastic potential function with respect to the Lode angle.
@@ -159,7 +186,7 @@ class SMCC : public Elastoplastic {
          * 
          * @return Derivative of the plastic potential function with respect to the Lode angle.
          */
-        double compute_dg_dtheta(void) override;
+        double compute_dg_dtheta(void);
 
         /**
          * @brief Overridden method to compute the hardening modulus.
@@ -173,7 +200,7 @@ class SMCC : public Elastoplastic {
          * 
          * @return Hardening modulus, H.
          */
-        double compute_H(void) override;
+        double compute_H(void);
 
         /**
          * @brief Overriden method to compute the plastic increment in the models state variables.
@@ -255,9 +282,19 @@ class SMCC : public Elastoplastic {
         double &p_c = state[1];
 
         /** 
-         * @brief State variable: preconsolidation pressure. 
+         * @brief State variable: current sensitivity. 
          */
         double &s_ep = state[2];
+
+        /**
+         * @brief Number of required parameters.
+         */
+        int parameters_required = 8;
+
+        /**
+         * @brief Number of required state variables.
+         */
+        int state_required = 3;
 
 };
 

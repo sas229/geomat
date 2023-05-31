@@ -71,9 +71,11 @@ void umat(
         PLOG_INFO << *ndi << "D problem defined with " << *ntens << " stress variables.";
         PLOG_INFO << "Attempting to instantiate " << cmname << " model.";
         if (strcmp(cmname, "LinearElastic") == 0) {
-            model.reset(new LinearElastic(parameters, state));    
+            model.reset(new LinearElastic(parameters, state, "verbose"));    
         } else if (strcmp(cmname, "MCC") == 0) {
-            model.reset(new MCC(parameters, state));   
+            model.reset(new MCC(parameters, state, "verbose"));   
+        } else if (strcmp(cmname, "SMCC") == 0) {
+            model.reset(new SMCC(parameters, state, "verbose"));    
         } else {
             PLOG_FATAL << "Model name given not implemented. Check name given in CAE / input file.";
             assert(true);

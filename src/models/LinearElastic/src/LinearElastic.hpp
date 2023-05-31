@@ -4,8 +4,9 @@
 #include <plog/Log.h>
 #include <Eigen/Eigen>
 #include <cassert>
-#include "Types.hpp"
 #include "Elastic.hpp"
+#include "Checks.hpp"
+#include "Logging.hpp"
 #include "Types.hpp"
 
 class LinearElastic : public Elastic {
@@ -14,8 +15,12 @@ class LinearElastic : public Elastic {
 
         /** 
          * @brief LinearElastic model constructor. 
+         * 
+         * @param[in] parameters Vector of parameters.
+         * @param[in] state Vector of state variables.
+         * @param[in] log_severity Severity of message to log.
          */
-        LinearElastic(Parameters parameters, State state);
+        LinearElastic(Parameters parameters, State state, std::string log_severity="none");
 
         /** 
          * @brief LinearElastic model destructor. 
@@ -60,6 +65,16 @@ class LinearElastic : public Elastic {
          * @brief Parameter: shear modulus. 
          */
         const double &G = parameters[1];
+
+        /**
+         * @brief Number of required parameters.
+         */
+        int parameters_required = 2;
+
+        /**
+         * @brief Number of required state variables.
+         */
+        int state_required = 0;
 
 };
 
