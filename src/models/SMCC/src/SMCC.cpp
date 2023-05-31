@@ -15,19 +15,21 @@ double SMCC::compute_f(Cauchy sigma_prime, State state) {
     // State variables.
     double e = state[0];
     double p_c = state[1];
+    double s_ep = state[2];
 
     // Stress invariants.
     double q = compute_q(sigma_prime);
     double p_prime = compute_p_prime(sigma_prime);
     
     // Yield surface function.
-    return compute_f(sigma_prime, state);
+    return compute_f(p_prime, q, state);
 }
 
 double SMCC::compute_f(double p_prime, double q, State state) {
     // State variables.
     double e = state[0];
     double p_c = state[1];
+    double s_ep = state[2];
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     return std::pow(q,2) + std::pow(M,2)*p_prime*(p_prime-p_c*s_ep);
 }
@@ -59,6 +61,7 @@ void SMCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     // State variables.
     double e = state[0];
     double p_c = state[1];
+    double s_ep = state[2];
 
     // Compute mean effective stress, deviatoric stress tensor and derivatives of the stress state for current stress state.
     q = compute_q(sigma_prime);

@@ -82,7 +82,7 @@ class Elastic : public Model {
         */
        virtual double compute_G(double K = 0.0) = 0;
 
-       /**
+        /**
          *  @brief Solve current strain increment. 
          */
         void solve(void);
