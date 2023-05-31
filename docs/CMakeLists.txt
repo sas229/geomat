@@ -10,7 +10,7 @@ set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/sphinx_html)
 add_custom_target(Sphinx ALL
     COMMAND ${SPHINX_EXECUTABLE} -b html
     # Tell Breathe where to find the Doxygen output.
-    -Dbreathe_projects.umat=${DOXYGEN_OUTPUT_DIR}
+    -Dbreathe_projects.geomat=${DOXYGEN_OUTPUT_DIR}
     ${SPHINX_SOURCE} ${SPHINX_BUILD}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     COMMENT "Generating documentation with Sphinx...")

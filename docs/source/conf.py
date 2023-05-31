@@ -16,7 +16,7 @@ import subprocess
 # Generate xml using oxygen.
 subprocess.call('doxygen Doxyfile.in', shell=True)
 
-project = 'umat'
+project = 'geomat'
 copyright = '2022, Sam Stanier'
 author = 'Sam Stanier'
 
@@ -67,8 +67,8 @@ html_static_path = ['_static']
 # Breathe configuration.
 
 breathe_projects = {
-	"umat": "../../build/xml"
+	"geomat": "../../build/xml"
 }
-breathe_default_project = "umat"
+breathe_default_project = "geomat"
 breathe_default_members = ('members', 'protected-members', 'private-members')
 breathe_show_define_initializer = True

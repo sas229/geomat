@@ -1,5 +1,5 @@
-User material development framework
-===================================
+Geotechnical constitutive model development framework
+=====================================================
 
 .. toctree::
    installation   

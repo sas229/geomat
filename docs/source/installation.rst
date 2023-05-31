@@ -1,12 +1,12 @@
 Installation
 ============
 
-To install and build the umat development library simply:
+To install and build this geotechnical constitutive model development library simply:
 
 .. code-block:: console
 
-    git clone https://github.com/sas229/umat.git
-    cd umat
+    git clone https://github.com/sas229/geomat.git
+    cd geomat
     git submodule init src/external
     git submodule update --recursive
     mkdir build && cd build

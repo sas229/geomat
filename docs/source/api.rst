@@ -5,7 +5,7 @@ Abaqus Interface
 ----------------
 
 .. doxygenfunction:: umat
-   :project: umat
+   :project: geomat
 
 Abstract Classes
 ----------------
@@ -18,7 +18,7 @@ Model
 The base class from which all constitutive models are derived.
 
 .. doxygenclass:: Model
-    :project: umat
+    :project: geomat
     :members:
     :protected-members:
     :private-members:
@@ -29,7 +29,7 @@ Elastic
 Elastic model class that contains basic elastic functionality. Inherits the Model class.
 
 .. doxygenclass:: Elastic
-    :project: umat
+    :project: geomat
     :members:
     :protected-members:
     :private-members:
@@ -41,7 +41,7 @@ Elastoplastic model class that contains basic elastoplastic functionality based 
 automatic error control after Sloan et al. (2001). Inherits the Model and Elastic classes.
 
 .. doxygenclass:: Elastoplastic
-    :project: umat
+    :project: geomat
     :members:
     :protected-members:
     :private-members:
@@ -58,10 +58,10 @@ Linear Elastic
 The Linear Elastic model is implemented here. Theory to go here...
 
 .. doxygenfile:: LinearElastic_Definition.hpp
-    :project: umat
+    :project: geomat
 
 .. doxygenclass:: LinearElastic
-    :project: umat
+    :project: geomat
     :members:
     :protected-members:
     :private-members:
@@ -72,10 +72,10 @@ Modified Cam Clay (MCC)
 The Modified Cam Clay (MCC) model is implemented here. Theory to go here...
 
 .. doxygenfile:: MCC_Definition.hpp
-    :project: umat
+    :project: geomat
 
 .. doxygenclass:: MCC
-    :project: umat
+    :project: geomat
     :members:
     :protected-members:
     :private-members:
@@ -86,7 +86,7 @@ The Modified Cam Clay (MCC) model is implemented here. Theory to go here...
 .. The Soft Modified Cam Clay (MCC) model is implemented here.
 
 .. .. doxygenclass:: SMCC
-..     :project: umat
+..     :project: geomat
 ..     :members:
 ..     :protected-members:
 ..     :private-members:
@@ -100,10 +100,10 @@ Types
 ^^^^^
 
 .. doxygentypedef:: Voigt
-   :project: umat
+   :project: geomat
 
 .. doxygentypedef:: Cauchy
-   :project: umat
+   :project: geomat
 
 .. doxygentypedef:: Constitutive
-   :project: umat
+   :project: geomat
