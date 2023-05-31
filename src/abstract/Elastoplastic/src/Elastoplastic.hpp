@@ -101,6 +101,12 @@ class Elastoplastic : public Elastic {
         virtual State compute_plastic_state_variable_increment(double delta_lambda, double H) = 0;
 
         /**
+         * @brief Sloan et al. explicit substepping algorithm for solving the plastic portion of a strain increment.
+         * 
+         */
+        void sloan_substepping(void);
+
+        /**
          * @brief Pure virtual method to get the state variables from the model implementation.
          * 
          * @return Vector of state variables.
@@ -181,28 +187,34 @@ class Elastoplastic : public Elastic {
         /**
          * @brief Pegasus regula falsi algorithm to find root of general non-linear system of equations.
          * 
+         * @param sigma_prime Current stress state.
+         * @param state Current state variables.
          * @param alpha_0 Lower bound on alpha.
          * @param alpha_1 Upper bound on alpha.
          * @param f_0 Initial value of objective function with lower bound alpha.
          * @param f_1 Initial value of objective function with upper bound alpha.
          * @return alpha
          */
-        double pegasus_regula_falsi(double alpha_0, double alpha_1, double f_0, double f_1);
+        double pegasus_regula_falsi(Cauchy sigma_prime, State state, double alpha_0, double alpha_1, double f_0, double f_1);
 
         /**
          * @brief Method to determine if an increment is an unload-reload plastic increment.
          * 
          * @param sigma_prime Current stress state.
+         * @param state Current state variables.
          * @return true
          * @return false 
          */
-        bool check_unload_reload(Cauchy sigma_prime);
+        bool check_unload_reload(Cauchy sigma_prime, State state);
 
         /**
          * @brief Method to compute the elastic fraction of the current strain increment following Sloan et al. (2001).
          * 
+         * @param sigma_prime Current stress state.
+         * @param state Current state variables.
+         * 
          */
-        void compute_alpha(void);
+        void compute_alpha(Cauchy sigma_prime, State state);
 
         /**
          * @brief Method to compute bounds for alpha for elastoplastic unloading-reloading increment.

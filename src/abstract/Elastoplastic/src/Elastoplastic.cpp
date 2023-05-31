@@ -2,7 +2,8 @@
 
 void Elastoplastic::solve(void) {
     if (!solved) {
-        compute_alpha();
+        State state = get_state_variables();
+        compute_alpha(sigma_prime, state);
         substeps = 0;
         corrections = 0;
 
@@ -25,82 +26,7 @@ void Elastoplastic::solve(void) {
             Delta_epsilon_tilde_p = (1.0-alpha)*Delta_epsilon_tilde;
             sigma_prime_ep = sigma_prime_e;
             state_ep = state_e;
-
-            // Substepping with automatic error control.
-            dT = 1.0;
-            T = 0.0;
-            while (T < 1.0) {
-                Delta_epsilon_tilde_p_dT = Delta_epsilon_tilde_p*dT;
-                Delta_epsilon_vol_p_dT = to_cauchy(Delta_epsilon_tilde_p_dT).trace();
-
-                // Compute stress and state variable increment estimates.
-                compute_plastic_increment(sigma_prime_ep, state_ep, Delta_epsilon_tilde_p_dT, Delta_sigma_prime_1, delta_state_1);
-                sigma_prime_1 = sigma_prime_ep + to_cauchy(Delta_sigma_prime_1);
-                state_1 = state_ep + delta_state_1;
-                compute_plastic_increment(sigma_prime_1, state_ep, Delta_epsilon_tilde_p_dT, Delta_sigma_prime_2, delta_state_2);
-
-                // Calculate modified Euler stresses and state variables.
-                sigma_prime_ini = sigma_prime_ep + to_cauchy(1.0/2.0*(Delta_sigma_prime_1 + Delta_sigma_prime_2));
-                state_ini = state_ep + 1.0/2.0*(delta_state_1+delta_state_2);
-
-                // Compute error estimate.
-                accepted = false;
-                compute_error_estimate();
-                if (R_n < STOL) {
-                    // Accept increment and correct stresses and state variables back to yield surface.a
-                    accepted = true;
-                    sigma_prime_u = sigma_prime_c = sigma_prime_ini;
-                    state_u = state_c = state_ini;
-
-                    // Correct stresses and state variables back to yield surface. 
-                    f_u = f_c = compute_f(sigma_prime_u, state_u);
-                    ITS_YSC = 0;
-                    while (ITS_YSC < MAXITS_YSC) {
-                        if (std::abs(f_c) > FTOL) {
-                            // Compute consistent correction to yield surface.
-                            compute_yield_surface_correction();
-
-                            // Check yield surface function.
-                            f_c = compute_f(sigma_prime_c, state_c);
-                            f_u = compute_f(sigma_prime_u, state_u);
-                            if (std::abs(f_c) > std::abs(f_u)) {
-                                // Apply normal correction instead.
-                                compute_normal_yield_surface_correction();
-                            }
-
-                            // Correct stress and state variables.
-                            sigma_prime_u = sigma_prime_c;
-                            state_u = state_c;
-                            ITS_YSC += 1;
-                        } else {
-                            // Stresses and state variables corrected; breakout of correction while loop.
-                            sigma_prime_c = sigma_prime_u;
-                            state_c = state_u;
-                            goto CORRECTED;
-                        }
-                        // If yield surface drift correction unsuccessful, log fault.
-                        if (ITS_YSC >= MAXITS_YSC && std::abs(f_c) > FTOL) {
-                            PLOG_FATAL << "Maximum number of yield surface correction iterations performed and f = " << f_c << " > FTOL = " << FTOL << ".";
-                            assert(false);
-                        } 
-                    }
-
-                    // Update stress state and state variables.
-                    CORRECTED: corrections += ITS_YSC;
-                    sigma_prime_ep = sigma_prime_c;
-                    state_ep = state_c;
-
-                    // Increment substep and pseudotime T.
-                    substeps += 1;
-                    T += dT;
-                }
-                dT = compute_new_substep_size();
-            }
-            // Set stress and state variables as final elastoplastic values.
-            sigma_prime = sigma_prime_ep;
-            set_state_variables(state_ep);
-            solved = true;
-            PLOG_INFO << "Elastoplastic stress increment integrated to within a tolerance FTOL = " << FTOL << " via " << substeps << " substeps and " << corrections << " drift corrections.";
+            sloan_substepping();
         } else {
             // Fully elastic increment. Update stress and state variables.
             sigma_prime = sigma_prime_e;
@@ -114,6 +40,84 @@ void Elastoplastic::solve(void) {
         compute_principal_stresses(sigma_prime, sigma_1, sigma_2, sigma_3, R, S);
         sigma_prime_tilde = to_voigt(sigma_prime);
     }
+}
+
+void Elastoplastic::sloan_substepping(void) {
+    // Substepping with automatic error control.
+    dT = 1.0;
+    T = 0.0;
+    while (T < 1.0) {
+        Delta_epsilon_tilde_p_dT = Delta_epsilon_tilde_p*dT;
+        Delta_epsilon_vol_p_dT = to_cauchy(Delta_epsilon_tilde_p_dT).trace();
+
+        // Compute stress and state variable increment estimates.
+        compute_plastic_increment(sigma_prime_ep, state_ep, Delta_epsilon_tilde_p_dT, Delta_sigma_prime_1, delta_state_1);
+        sigma_prime_1 = sigma_prime_ep + to_cauchy(Delta_sigma_prime_1);
+        state_1 = state_ep + delta_state_1;
+        compute_plastic_increment(sigma_prime_1, state_ep, Delta_epsilon_tilde_p_dT, Delta_sigma_prime_2, delta_state_2);
+
+        // Calculate modified Euler stresses and state variables.
+        sigma_prime_ini = sigma_prime_ep + to_cauchy(1.0/2.0*(Delta_sigma_prime_1 + Delta_sigma_prime_2));
+        state_ini = state_ep + 1.0/2.0*(delta_state_1+delta_state_2);
+
+        // Compute error estimate.
+        accepted = false;
+        compute_error_estimate();
+        if (R_n < STOL) {
+            // Accept increment and correct stresses and state variables back to yield surface.a
+            accepted = true;
+            sigma_prime_u = sigma_prime_c = sigma_prime_ini;
+            state_u = state_c = state_ini;
+
+            // Correct stresses and state variables back to yield surface. 
+            f_u = f_c = compute_f(sigma_prime_u, state_u);
+            ITS_YSC = 0;
+            while (ITS_YSC < MAXITS_YSC) {
+                if (std::abs(f_c) > FTOL) {
+                    // Compute consistent correction to yield surface.
+                    compute_yield_surface_correction();
+
+                    // Check yield surface function.
+                    f_c = compute_f(sigma_prime_c, state_c);
+                    f_u = compute_f(sigma_prime_u, state_u);
+                    if (std::abs(f_c) > std::abs(f_u)) {
+                        // Apply normal correction instead.
+                        compute_normal_yield_surface_correction();
+                    }
+
+                    // Correct stress and state variables.
+                    sigma_prime_u = sigma_prime_c;
+                    state_u = state_c;
+                    ITS_YSC += 1;
+                } else {
+                    // Stresses and state variables corrected; breakout of correction while loop.
+                    sigma_prime_c = sigma_prime_u;
+                    state_c = state_u;
+                    goto CORRECTED;
+                }
+                // If yield surface drift correction unsuccessful, log fault.
+                if (ITS_YSC >= MAXITS_YSC && std::abs(f_c) > FTOL) {
+                    PLOG_FATAL << "Maximum number of yield surface correction iterations performed and f = " << f_c << " > FTOL = " << FTOL << ".";
+                    assert(false);
+                } 
+            }
+
+            // Update stress state and state variables.
+            CORRECTED: corrections += ITS_YSC;
+            sigma_prime_ep = sigma_prime_c;
+            state_ep = state_c;
+
+            // Increment substep and pseudotime T.
+            substeps += 1;
+            T += dT;
+        }
+        dT = compute_new_substep_size();
+    }
+    // Set stress and state variables as final elastoplastic values.
+    sigma_prime = sigma_prime_ep;
+    set_state_variables(state_ep);
+    solved = true;
+    PLOG_INFO << "Elastoplastic stress increment integrated to within a tolerance FTOL = " << FTOL << " via " << substeps << " substeps and " << corrections << " drift corrections.";
 }
 
 double Elastoplastic::compute_new_substep_size(void) {
@@ -248,9 +252,8 @@ void Elastoplastic::compute_alpha_bounds(double &alpha_0, double &alpha_1) {
     BREAK: return;
 }
 
-bool Elastoplastic::check_unload_reload(Cauchy sigma_prime) {
+bool Elastoplastic::check_unload_reload(Cauchy sigma_prime, State state) {
     // Compute required derivatives for the given stress state.
-    State state = get_state_variables();
     Cauchy df_dsigma_prime_check, dg_dsigma_prime_check;
     Voigt a_check, b_check;
     double dg_dp_prime_check, H_check;
@@ -275,9 +278,8 @@ bool Elastoplastic::check_unload_reload(Cauchy sigma_prime) {
     }
 }
 
-void Elastoplastic::compute_alpha(void) {
+void Elastoplastic::compute_alpha(Cauchy sigma_prime, State state) {
     // Current stress state (i.e. alpha = 0.0).
-    State state = get_state_variables();
     double f_0 = compute_f(sigma_prime, state);
 
     // Fully elastic increment trial stress state.
@@ -290,7 +292,7 @@ void Elastoplastic::compute_alpha(void) {
         alpha = 1.0;
     } else if (std::abs(f_0) <= FTOL && f_1> FTOL) {
         PLOG_INFO << "Check potential for elastoplastic unloading-reloading.";
-        if (!check_unload_reload(sigma_prime)) {
+        if (!check_unload_reload(sigma_prime, state)) {
             // Compute bounds on alpha.
             double alpha_0 = 0.0;
             double alpha_1 = 1.0;
@@ -306,26 +308,26 @@ void Elastoplastic::compute_alpha(void) {
 
             // Perform Pegasus intersection within the bounds of alpha_0 and alpha_1.
             PLOG_INFO << "Plastic increment: finding alpha via the Pegasus algorithm using alpha_0 = " << alpha_0 << " and alpha_1 = " << alpha_1 <<".";
-            alpha = pegasus_regula_falsi(alpha_0, alpha_1, f_0, f_1);
+            alpha = pegasus_regula_falsi(sigma_prime, state, alpha_0, alpha_1, f_0, f_1);
         } else {
             PLOG_INFO << "Fully plastic increment; alpha = 0.0.";
             alpha = 0.0;
         } 
     } else if (f_0 < -FTOL && f_1 > FTOL) {
         PLOG_INFO << "Plastic increment: finding alpha via the Pegasus algorithm using alpha_0 = 0.0 and alpha_1 = 1.0.";
-        alpha = pegasus_regula_falsi(0.0, 1.0, f_0, f_1);
+        alpha = pegasus_regula_falsi(sigma_prime, state, 0.0, 1.0, f_0, f_1);
     } else {
         PLOG_FATAL << "Illegal stress state.";
         assert(false);
     }
 }
 
-double Elastoplastic::pegasus_regula_falsi(double alpha_0, double alpha_1, double f_0, double f_1) {
+double Elastoplastic::pegasus_regula_falsi(Cauchy sigma_prime, State state, double alpha_0, double alpha_1, double f_0, double f_1) {
     // Pegasus algorithm.
     double alpha_n;
     double f_n = FTOL;
     Cauchy sigma_prime_n = sigma_prime;
-    State state_n = get_state_variables();
+    State state_n = state;
 
     // Iterate to find optimal alpha if a plastic increment.
     ITS_YSI = 0;
