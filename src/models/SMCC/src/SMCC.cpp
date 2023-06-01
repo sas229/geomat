@@ -1,4 +1,5 @@
 #include "SMCC.hpp"
+#include "SMCC_Definition.hpp"
 
 SMCC::SMCC(Parameters parameters, State state, std::string log_severity) : parameters(parameters), state(state) {   
     set_model_name("SMCC");
@@ -27,20 +28,20 @@ double SMCC::compute_f(double p_prime, double q, State state) {
     double p_c = state[1];
     double s_ep = state[2];
 
-    return std::pow(q,2) + std::pow(M,2)*p_prime*(p_prime-p_c*s_ep);
+    return SMCC_YIELD;
 }
 
 double SMCC::compute_G(double K) {
-    return (3.0*(1-2.0*nu)*K)/(2.0*(1.0+nu));
+    return SMCC_SHEAR_MODULUS;
 }
 
 double SMCC::compute_K(double Delta_epsilon_e_vol, double p_prime) {
     if (Delta_epsilon_e_vol != 0.0) {
         // Return secant bulk modulus.
-        return (p_prime/Delta_epsilon_e_vol)*(std::exp(Delta_epsilon_e_vol/kappa_star)-1);
+        return SMCC_SECANT_BULK_MODULUS;
     } else {
         // Return tangent bulk modulus.
-        return p_prime/kappa_star;
+        return SMCC_TANGENT_BULK_MODULUS;
     }
 }
 
@@ -69,9 +70,9 @@ void SMCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     compute_lode(J_2, J_3, theta_c, theta_s, theta_s_bar);
     
     // Compute derivatives.
-    df_dq = compute_df_dq();
-    df_dp_prime = compute_df_dp_prime();
-    df_dtheta = compute_df_dtheta();
+    df_dq = SMCC_DF_DQ;
+    df_dp_prime = SMCC_DF_DP_PRIME;
+    df_dtheta = SMCC_DF_DTHETA;
     double pi = 2*std::acos(0.0);
     Cauchy one = Cauchy::Constant(1.0); 
     if (q > 0.0 && df_dtheta != 0.0) {
@@ -80,9 +81,9 @@ void SMCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
         df_dsigma_prime = (df_dp_prime*dp_dsigma_prime) + (df_dq*dq_dsigma_prime);
     }
     
-    dg_dq = compute_dg_dq();
-    dg_dp_prime = compute_dg_dp_prime();
-    dg_dtheta = compute_dg_dtheta();
+    dg_dq = SMCC_DG_DQ;
+    dg_dp_prime = SMCC_DG_DP_PRIME;
+    dg_dtheta = SMCC_DG_DTHETA;
     if (q > 0.0 && dg_dtheta != 0.0) {
         dg_dsigma_prime = (dg_dp_prime*dp_dsigma_prime) + ((dg_dq - dg_dtheta*tan(3*theta_s)/q)*dq_dsigma_prime) + (one*(sqrt(3)/(2.0*pow(q,3)*cos(3*theta_s)))*dg_dtheta);
     } else { 
@@ -90,24 +91,24 @@ void SMCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     }
     a = to_voigt(df_dsigma_prime);
     b = to_voigt(dg_dsigma_prime);
-    H = compute_H();
+    H = SMCC_HARDENING_MODULUS;
 }
 
 State SMCC::compute_elastic_state_variable(Voigt Delta_epsilon_tilde_e) {
     double Delta_epsilon_vol_e = compute_Delta_epsilon_vol(to_cauchy(Delta_epsilon_tilde_e));
     State elastic_state(state.size());
-    elastic_state[0] = e-(e*Delta_epsilon_vol_e);
-    elastic_state[1] = p_c;
-    elastic_state[2] = s_ep;
+    elastic_state[0] = SMCC_STATE_0_ELASTIC_UPDATE;
+    elastic_state[1] = SMCC_STATE_1_ELASTIC_UPDATE;
+    elastic_state[2] = SMCC_STATE_2_ELASTIC_UPDATE;
     return elastic_state;
 }
 
 State SMCC::compute_plastic_state_variable_increment(Voigt Delta_epsilon_tilde_p, double delta_lambda, double H) {
     double Delta_epsilon_vol_p = compute_Delta_epsilon_vol(to_cauchy(Delta_epsilon_tilde_p));
     State delta_state(state.size());
-    delta_state[0] = -(1+e)*Delta_epsilon_vol_p;
-    delta_state[1] = delta_lambda*(((std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star))*s_ep*df_dsigma_prime.trace()/(std::pow(M,2)*p_prime*s_ep));
-    delta_state[2] = delta_lambda*(((std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*-k*(s_ep-1.0)*std::sqrt((1-A)*std::pow(df_dsigma_prime.trace(),2) + (A*2.0/3.0*(df_dsigma_prime*(df_dsigma_prime.transpose())).trace())))/(std::pow(M,2)*p_prime*p_c));
+    delta_state[0] = SMCC_STATE_0_PLASTIC_INCREMENT;
+    delta_state[1] = SMCC_STATE_1_PLASTIC_INCREMENT;
+    delta_state[2] = SMCC_STATE_2_PLASTIC_INCREMENT;
     return delta_state;
 }
 
@@ -115,35 +116,4 @@ State SMCC::compute_plastic_state_variable_increment(double delta_lambda, double
     // Note: only correct state variables that do not depend on the magnitude of the strain increment (hence strain increment is not passed in).
     Voigt Delta_epsilon_tilde_p = Voigt::Zero();
     return compute_plastic_state_variable_increment(Delta_epsilon_tilde_p, delta_lambda, H);
-}
-
-double SMCC::compute_df_dq(void) {
-    return 2*q;
-}
-
-double SMCC::compute_df_dp_prime(void) {
-    return std::pow(M,2)*(2*p_prime-p_c*s_ep);
-}
-
-double SMCC::compute_df_dtheta(void) {
-    return 0.0;
-}
-
-double SMCC::compute_dg_dq(void) {
-    return 2*q;
-}
-
-double SMCC::compute_dg_dp_prime(void) {
-    return std::pow(M,2)*(2*p_prime-p_c*s_ep);
-}
-
-double SMCC::compute_dg_dtheta(void) {
-    return 0.0;
-}
-
-double SMCC::compute_H(void) {
-    double H_p_c = (std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*s_ep*df_dsigma_prime.trace();
-    double H_s_ep = (std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*-k*(s_ep-1.0)*std::sqrt((1-A)*std::pow(df_dsigma_prime.trace(),2) + (A*2.0/3.0*(df_dsigma_prime*(df_dsigma_prime.transpose())).trace()));
-    double H = H_p_c + H_s_ep;
-    return H;
 }
