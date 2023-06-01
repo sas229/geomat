@@ -40,14 +40,14 @@ from matplotlib import pyplot as plt
 # MCC test.
 increments = 100
 parameters = np.array([0.92, 0.2, 1.195, 0.08, 0.02])
-state = np.array([1.7477796692480023, 10])
-stress = np.array([-10, -10, -10, 0, 0, 0])
+state = np.array([1.7477796692480023, 30])
+stress = np.array([-30, -30, -30, 0, 0, 0])
 ea_max = 0.5
 ea_increment = ea_max/increments
 Delta_epsilon_tilde = np.array([-ea_increment, ea_increment/2, ea_increment/2, 0.0, 0.0, 0.0])
 axial_strain = np.arange(0, increments*ea_increment, ea_increment)
 
-model = MCC(log_severity="verbose", parameters=parameters, state=state)
+model = MCC(log_severity="none", parameters=parameters, state=state)
 print("Model name: {}".format(model.name))
 print("Model type: {}".format(model.type))
 model.set_sigma_prime_tilde(stress)
@@ -75,15 +75,15 @@ plt.show()
 
 # SMCC test.
 increments = 100
-parameters = np.array([0.92, 0.2, 1.195, 0.08, 0.02, 4, 0.2, 0.5])
-state = np.array([1.7477796692480023, 10, 4])
-stress = np.array([-40, -40, -40, 0, 0, 0])
+parameters = np.array([0.92, 0.2, 1.195, 0.08, 0.02, 3, 0.2, 0.5])
+state = np.array([1.7477796692480023, 10, 3])
+stress = np.array([-30, -30, -30, 0, 0, 0])
 ea_max = 0.5
 ea_increment = ea_max/increments
 Delta_epsilon_tilde = np.array([-ea_increment, ea_increment/2, ea_increment/2, 0.0, 0.0, 0.0])
 axial_strain = np.arange(0, increments*ea_increment, ea_increment)
 
-model = SMCC(log_severity="verbose", parameters=parameters, state=state)
+model = SMCC(log_severity="none", parameters=parameters, state=state)
 print("Model name: {}".format(model.name))
 print("Model type: {}".format(model.type))
 model.set_sigma_prime_tilde(stress)
