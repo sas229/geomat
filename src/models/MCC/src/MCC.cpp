@@ -13,21 +13,19 @@ MCC::MCC(Parameters parameters, State state, std::string log_severity) : paramet
 }
 
 double MCC::compute_f(Cauchy sigma_prime, State state) {
-    // State variables.
-    double e = state[0];
-    double p_c = state[1];
 
     // Stress invariants.
     double q = compute_q(sigma_prime);
     double p_prime = compute_p_prime(sigma_prime);
     
-    return MCC_YIELD;
+    return compute_f(p_prime, q, state);
 }
 
 double MCC::compute_f(double p_prime, double q, State state) {
     // State variables.
     double e = state[0];
     double p_c = state[1];
+    
     using namespace std; /* Use std namespace for eye-pleasing model definitions. */
     return MCC_YIELD;
 }

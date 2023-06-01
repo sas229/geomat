@@ -26,8 +26,7 @@ from matplotlib import pyplot as plt
 # i = 0
 # while i<increments-1:
 #     i += 1
-#     model.set_Delta_epsilon_tilde(Delta_epsilon_tilde)
-#     model.solve()
+#     model.set_Delta_epsilon_tilde(Delta_epsilon_tildt
 #     p[i] = model.p_prime
 #     q[i] = model.q
 #     sigma_prime[i,:] = model.sigma_prime_tilde
@@ -69,16 +68,16 @@ while i<increments-1:
     sigma_prime[i,:] = model.sigma_prime_tilde
     print("Increment {}: p = {:.2f} ; q = {:.2f} ; q/p = {:.2f}".format(i, p[i], q[i], q[i]/p[i]))
 
-plt.plot(axial_strain, q/p)
+plt.plot(axial_strain, q)
 plt.xlabel(r"$\epsilon_{a}$ (-)")
-plt.ylabel("q/p (-)")
+plt.ylabel("q (kPa)")
 plt.show()
 
 # SMCC test.
 increments = 100
-parameters = np.array([0.92, 0.2, 1.195, 0.08, 0.02, 3, 0.2, 0.5])
-state = np.array([1.7477796692480023, 10, 3])
-stress = np.array([-10, -10, -10, 0, 0, 0])
+parameters = np.array([0.92, 0.2, 1.195, 0.08, 0.02, 4, 0.2, 0.5])
+state = np.array([1.7477796692480023, 10, 4])
+stress = np.array([-40, -40, -40, 0, 0, 0])
 ea_max = 0.5
 ea_increment = ea_max/increments
 Delta_epsilon_tilde = np.array([-ea_increment, ea_increment/2, ea_increment/2, 0.0, 0.0, 0.0])
@@ -105,7 +104,7 @@ while i<increments-1:
     sigma_prime[i,:] = model.sigma_prime_tilde
     print("Increment {}: p = {:.2f} ; q = {:.2f} ; q/p = {:.2f}".format(i, p[i], q[i], q[i]/p[i]))
     
-plt.plot(axial_strain, q/p)
+plt.plot(axial_strain, q)
 plt.xlabel(r"$\epsilon_{a}$ (-)")
-plt.ylabel("q/p (-)")
+plt.ylabel("q (kPa)")
 plt.show()
