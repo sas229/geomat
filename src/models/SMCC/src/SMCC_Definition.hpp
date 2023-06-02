@@ -65,7 +65,7 @@
  * where \f$ M \f$ is the frictional constant, \f$ p_{\prime} \f$ is the mean effective stress, \f$ p_c \f$
  * is the pre-consolidation pressure and \f$ s_{ep} \f$ is the senstivity state variable.
  */
-#define SMCC_DF_DP_PRIME std::pow(M,2)*(2*p_prime-p_c)
+#define SMCC_DF_DP_PRIME std::pow(M,2)*(2*p_prime-p_c*s_ep)
 
 /**
  * @brief Derivatives of the plastic potential function with respect to the deviatoric stress:
@@ -89,7 +89,7 @@
  * where \f$ M \f$ is the frictional constant, \f$ p_{\prime} \f$ is the mean effective stress, \f$ p_c \f$
  * is the pre-consolidation pressure and \f$ s_{ep} \f$ is the senstivity state variable.
  */
-#define SMCC_DG_DP_PRIME std::pow(M,2)*(2*p_prime-p_c)
+#define SMCC_DG_DP_PRIME std::pow(M,2)*(2*p_prime-p_c*s_ep)
 
 /**
  * @brief Hardening modulus.
@@ -101,7 +101,7 @@
  * of the RCL and \f$ \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} \f$ are the derivatives of
  * the yield surface with respect to the effective stress state.
  */
-#define SMCC_HARDENING_MODULUS ((std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*s_ep*df_dsigma_prime.trace() + (std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*-k*(s_ep-1.0)*std::sqrt((1-A)*std::pow(df_dsigma_prime.trace(),2) + (A*2.0/3.0*(df_dsigma_prime* (df_dsigma_prime.transpose())).trace())))
+#define SMCC_HARDENING_MODULUS ((std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*s_ep*df_dsigma_prime.trace()+(std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*-k*(s_ep-1.0)*std::sqrt((1-A)*std::pow(df_dsigma_prime.trace(),2)+(A*2.0/3.0*(df_dsigma_prime*(df_dsigma_prime.transpose())).trace())))
 
 /**
  * @brief State variable elastic update for void ratio:
@@ -135,16 +135,16 @@
 /**
  * @brief State variable plastic increment for preconsolidation pressure:
  * 
- * /f[ \Delta p_{c} = \Delta \lambda \frac{H_{p_{c}}}{M^2 p} /f]
+ * /f[ \Delta p_{c} = \Delta \lambda \frac{H_{p_{c}}}{M^2 p s_{ep}} /f]
  * 
  */
-#define SMCC_STATE_1_PLASTIC_INCREMENT delta_lambda*(((std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star))*s_ep*df_dsigma_prime.trace()/(std::pow(M,2)*p_prime*s_ep))
+#define SMCC_STATE_1_PLASTIC_INCREMENT delta_lambda*((((std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star))*s_ep*df_dsigma_prime.trace())/(std::pow(M,2)*p_prime*s_ep))
 
 /**
  * @brief State variable plastic increment for sensitivity:
  * 
- * /f[ \Delta s_{ep} = \Delta \lambda \frac{H_{s_{ep}}}{M^2 p} /f]
+ * /f[ \Delta s_{ep} = \Delta \lambda \frac{H_{s_{ep}}}{M^2 p p_{c}} /f]
  * 
  */
-#define SMCC_STATE_2_PLASTIC_INCREMENT delta_lambda*(((std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*-k*(s_ep-1.0)*std::sqrt((1-A)*std::pow(df_dsigma_prime.trace(),2) + (A*2.0/3.0*(df_dsigma_prime*(df_dsigma_prime.transpose())).trace())))/(std::pow(M,2)*p_prime*p_c))
+#define SMCC_STATE_2_PLASTIC_INCREMENT delta_lambda*((std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*-k*(s_ep-1.0)*std::sqrt((1-A)*std::pow(df_dsigma_prime.trace(),2)+(A*2.0/3.0*(df_dsigma_prime*(df_dsigma_prime.transpose())).trace())))/(std::pow(M,2)*p_prime*p_c)
 

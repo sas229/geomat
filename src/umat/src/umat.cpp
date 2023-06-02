@@ -84,8 +84,8 @@ void umat(
     } 
 
     // Set variables within model.    
-    model->set_sigma_prime_tilde(Eigen_sigma);
-    model->set_Delta_epsilon_tilde(Eigen_dstran);
+    model->set_sigma_prime_tilde(-Eigen_sigma);
+    model->set_Delta_epsilon_tilde(-Eigen_dstran);
 
     // model->update_stress_invariants();
     // model->update_principal_stresses();

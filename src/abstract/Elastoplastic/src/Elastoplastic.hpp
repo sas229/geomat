@@ -448,7 +448,7 @@ class Elastoplastic : public Elastic {
         /**
          * @brief Elastic strain increment.
          */
-        Cauchy Delta_epsilon_e;
+        Cauchy Delta_epsilon_e = Cauchy::Zero();
         
         /**
          * @brief Yield surface function for uncorrected stress state.
@@ -508,12 +508,12 @@ class Elastoplastic : public Elastic {
         /**
          * @brief Elastic strain increment.
          */
-        Voigt Delta_epsilon_tilde_e;
+        Voigt Delta_epsilon_tilde_e = Voigt::Zero();
 
         /**
          * @brief Plastic strain increment.
          */
-        Voigt Delta_epsilon_tilde_p;
+        Voigt Delta_epsilon_tilde_p = Voigt::Zero();
 
         /**
          * @brief Stress state after application of elastic increment.

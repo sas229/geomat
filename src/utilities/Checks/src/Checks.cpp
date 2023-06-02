@@ -13,5 +13,4 @@ void Checks::check_elastic_parameters(double K, double G) {
     PLOG_FATAL_IF(K <= 0.0) << "Bulk modulus less than or equal to zero.";
     PLOG_FATAL_IF(G <= 0.0) << "Shear modulus less than or equal to zero.";
     assert(K > 0.0 && G > 0.0);
-    PLOG_DEBUG << "K = " << K << " and G = " << G;
 }

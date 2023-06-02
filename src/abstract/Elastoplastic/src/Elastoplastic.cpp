@@ -3,7 +3,11 @@
 void Elastoplastic::solve(void) {
     if (!solved) {
         State state = get_state_variables();
+        PLOG_DEBUG << "Strain increment, Delta_epsilon_tilde = \n" << Delta_epsilon_tilde;
+        PLOG_DEBUG << "Initial stress state, sigma_prime = \n" << sigma_prime;
+        PLOG_DEBUG << "Initial state variables, state = \n" << state;
         compute_alpha(sigma_prime, state);
+        PLOG_INFO << "Plastic increment; alpha = " << alpha << ".";
         substeps = 0;
         corrections = 0;
 
@@ -21,11 +25,17 @@ void Elastoplastic::solve(void) {
             sigma_prime_e = compute_isotropic_linear_elastic_stress(sigma_prime, alpha, Delta_epsilon_tilde_e);
             state_e = compute_elastic_state_variable(Delta_epsilon_tilde_e);
         } 
+        PLOG_DEBUG << "Elastic strain increment, Delta_epsilon_e = \n" << Delta_epsilon_tilde_e;
+        PLOG_DEBUG << "Stress state after elastic increment, sigma_prime_e = \n" << sigma_prime_e;
+        PLOG_DEBUG << "State variables after elastic increment, state_e = \n" << state_e;
         if (alpha < 1.0) {
             // Perform elastoplastic stress integration on plastic portion of strain increment.
             Delta_epsilon_tilde_p = (1.0-alpha)*Delta_epsilon_tilde;
-            sigma_prime_ep = sigma_prime_e;
+            PLOG_DEBUG << "Plastic strain increment, Delta_epsilon_tilde_p = \n" << Delta_epsilon_tilde_p;
+            sigma_prime_ep = sigma_prime_e; 
             state_ep = state_e;
+            PLOG_DEBUG << "Initial elastoplastic stress state, sigma_prime_ep = \n" <<sigma_prime_ep;
+            PLOG_DEBUG << "Initial elastoplastic state variables, state_ep = \n" <<state_ep;
             sloan_substepping();
         } else {
             // Fully elastic increment. Update stress and state variables.
@@ -33,6 +43,8 @@ void Elastoplastic::solve(void) {
             set_state_variables(state_e);
             PLOG_INFO << "Fully elastic stress increment integrated directly.";
         }
+        PLOG_DEBUG << "Final stress state, sigma_prime = \n" << sigma_prime;
+        PLOG_DEBUG << "Final state variables, state = \n" << state;
 
         // Compute final stress invariants.
         p_prime = compute_p_prime(sigma_prime);
@@ -47,6 +59,7 @@ void Elastoplastic::sloan_substepping(void) {
     dT = 1.0;
     T = 0.0;
     while (T < 1.0) {
+        PLOG_DEBUG << "Plastic increment, dT = " << dT;
         Delta_epsilon_tilde_p_dT = Delta_epsilon_tilde_p*dT;
         Delta_epsilon_vol_p_dT = to_cauchy(Delta_epsilon_tilde_p_dT).trace();
 
@@ -55,10 +68,14 @@ void Elastoplastic::sloan_substepping(void) {
         sigma_prime_1 = sigma_prime_ep + to_cauchy(Delta_sigma_prime_1);
         state_1 = state_ep + delta_state_1;
         compute_plastic_increment(sigma_prime_1, state_ep, Delta_epsilon_tilde_p_dT, Delta_sigma_prime_2, delta_state_2);
+        PLOG_DEBUG << "State variable increment 1, delta_state_1 = \n" << delta_state_1;
+        PLOG_DEBUG << "State variable increment 2, delta_state_2 = \n" << delta_state_2;
 
         // Calculate modified Euler stresses and state variables.
         sigma_prime_ini = sigma_prime_ep + to_cauchy(1.0/2.0*(Delta_sigma_prime_1 + Delta_sigma_prime_2));
         state_ini = state_ep + 1.0/2.0*(delta_state_1+delta_state_2);
+        PLOG_DEBUG << "Initial stress estimate, sigma_prime_ini = \n" << sigma_prime_ini;
+        PLOG_DEBUG << "State variable estimate, state_ini = \n" << state_ini;
 
         // Compute error estimate.
         accepted = false;
@@ -180,12 +197,13 @@ void Elastoplastic::compute_plastic_increment(Cauchy sigma_prime, State state, V
     Voigt Delta_sigma_prime_e = D_e*Delta_epsilon_tilde_p_dT;
 
     // Compute elastoplastic constitutive matrix and elastoplastic multiplier. 
-    Cauchy df_dsigma_prime, dg_dsigma_prime;
-    Voigt a, b;
-    double dg_dp_prime, H;
+    // Cauchy df_dsigma_prime, dg_dsigma_prime;
+    // Voigt a, b;
+    // double dg_dp_prime, H;
     compute_derivatives(sigma_prime, state, df_dsigma_prime, a, dg_dsigma_prime, b, dg_dp_prime, H);
     Constitutive D_ep = compute_elastoplastic_matrix(D_e, a, b, H);
     double delta_lambda = compute_elastoplastic_multiplier(Delta_sigma_prime_e, D_e, a, b, H);
+    PLOG_DEBUG << "Plastic multiplier, delta_lambda = " << delta_lambda;
 
     // Update stress and state variable increment by reference.
     Delta_sigma_prime = D_ep*Delta_epsilon_tilde_p_dT;

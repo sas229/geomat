@@ -84,8 +84,8 @@ Cauchy Model::to_cauchy(Voigt voigt) {
 }
 
 void Model::set_sigma_prime_tilde(Voigt sigma_prime_tilde) {
-    // Stress in Voigt notation form - change sign to use compression positive soil mechanics convention.
-    this->sigma_prime_tilde = -sigma_prime_tilde;
+    // Stress in Voigt notation form - using compression positive soil mechanics convention.
+    this->sigma_prime_tilde = sigma_prime_tilde;
     this->sigma_prime = to_cauchy(this->sigma_prime_tilde);
 
     // Total stresses given pore pressure, u.
@@ -104,7 +104,7 @@ void Model::set_sigma_prime_tilde(Voigt sigma_prime_tilde) {
 
 void Model::set_Delta_epsilon_tilde(Voigt Delta_epsilon_tilde) {
     // Strain increment in Voigt notation form - change sign to use compression positive soil mechanics convention.
-    this->Delta_epsilon_tilde = -Delta_epsilon_tilde;
+    this->Delta_epsilon_tilde = Delta_epsilon_tilde;
     this->Delta_epsilon = this->to_cauchy(Delta_epsilon_tilde);
     solved = false;   
 }
@@ -120,8 +120,7 @@ std::string Model::get_model_type(void) {
 }
 
 Voigt Model::get_sigma_prime_tilde(void) {
-    // Change sign back to tension positive sign convention.
-    return -sigma_prime_tilde;
+    return sigma_prime_tilde;
 }
 
 Jacobian Model::get_jacobian(void) {

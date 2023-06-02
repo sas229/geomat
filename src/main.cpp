@@ -95,7 +95,7 @@ int main() {
     int kinc;
 
     // Try ten increments.
-    for (int i=0; i < 1; ++i) {
+    for (int i=0; i < 100; ++i) {
         umat(
             stress,
             statev,
