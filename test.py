@@ -38,7 +38,7 @@ from matplotlib import pyplot as plt
 # plt.show()
 
 # MCC test.
-increments = 100
+increments = 1000
 parameters = np.array([0.92, 0.2, 1.195, 0.08, 0.02])
 state = np.array([1.7477796692480023, 30])
 stress = np.array([-30, -30, -30, 0, 0, 0])
@@ -74,7 +74,7 @@ plt.ylabel("q (kPa)")
 plt.show()
 
 # SMCC test.
-increments = 100
+increments = 1000
 parameters = np.array([0.92, 0.2, 1.195, 0.08, 0.02, 3, 0.2, 0.5])
 state = np.array([1.7477796692480023, 10, 3])
 stress = np.array([-30, -30, -30, 0, 0, 0])
