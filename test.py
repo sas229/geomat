@@ -3,7 +3,7 @@ from build.models import LinearElastic, MCC, SMCC    # Note that this import sta
 from matplotlib import pyplot as plt
 
 # LinearElastic test.
-increments = 100
+increments = 1000
 parameters = np.array([500.0, 1000.0])
 state = np.array([])
 stress = np.array([50, 50, 50, 0, 0, 0])
@@ -39,7 +39,7 @@ plt.ylabel("q/p (-)")
 # plt.show()
 
 # MCC test.
-increments = 100
+increments = 1000
 parameters = np.array([0.92, 0.2, 1.195, 0.08, 0.02])
 state = np.array([1.7477796692480023, 50])
 stress = np.array([50, 50, 50, 0, 0, 0])
@@ -75,7 +75,7 @@ plt.ylabel("q (kPa)")
 # plt.show()
 
 # SMCC test.
-increments = 100
+increments = 1000
 parameters = np.array([0.92, 0.2, 1.195, 0.08, 0.02, 5, 1.0, 0.5])
 state = np.array([1.7477796692480023, 10, 5])
 stress = np.array([50, 50, 50, 0, 0, 0])
