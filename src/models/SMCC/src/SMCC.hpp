@@ -71,9 +71,10 @@ class SMCC : public Elastoplastic {
          * @brief Overridden method to compute the elastic constitutive matrix.
          * 
          * @param sigma_prime Effective stress tensor.
+         * @param Delta_epsilon_e_vol Elastic volumetric strain.
          * @return Constitutive 
          */
-        Constitutive compute_elastic_matrix(Cauchy sigma_prime, double Delta_epsilon_vol) override;
+        Constitutive compute_elastic_matrix(Cauchy sigma_prime, double Delta_epsilon_e_vol) override;
 
         /**
          * @brief Overridden method to compute the bulk modulus.

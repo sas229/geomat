@@ -30,9 +30,9 @@ Cauchy MCC::compute_elastic_stress(Cauchy sigma_prime, double alpha, Voigt Delta
     return compute_isotropic_linear_elastic_stress(sigma_prime, alpha, Delta_epsilon_tilde);
 }
 
-Constitutive MCC::compute_elastic_matrix(Cauchy sigma_prime, double Delta_epsilon_vol) {
+Constitutive MCC::compute_elastic_matrix(Cauchy sigma_prime, double Delta_epsilon_e_vol) {
     double p_prime = compute_p_prime(sigma_prime);
-    double K = compute_K(Delta_epsilon_vol, p_prime);
+    double K = compute_K(Delta_epsilon_e_vol, p_prime);
     double G = compute_G(K);
     return compute_isotropic_linear_elastic_matrix(K, G);
 }
