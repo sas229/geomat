@@ -71,25 +71,22 @@ Modified Cam Clay (MCC)
 
 The Modified Cam Clay (MCC) model is implemented here. Theory to go here...
 
-.. doxygenfile:: MCC_Definition.hpp
-    :project: geomat
-
 .. doxygenclass:: MCC
     :project: geomat
     :members:
     :protected-members:
     :private-members:
 
-.. Soft Modified Cam Clay (MCC)
-.. ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Soft Modified Cam Clay (SMCC)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. The Soft Modified Cam Clay (MCC) model is implemented here.
+The Soft Modified Cam Clay (SMCC) model is implemented here. Theory to go here...
 
-.. .. doxygenclass:: SMCC
-..     :project: geomat
-..     :members:
-..     :protected-members:
-..     :private-members:
+.. doxygenclass:: SMCC
+    :project: geomat
+    :members:
+    :protected-members:
+    :private-members:
 
 Utilities
 ---------

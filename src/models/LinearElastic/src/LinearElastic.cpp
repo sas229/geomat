@@ -1,5 +1,4 @@
 #include "LinearElastic.hpp"
-#include "LinearElastic_Definition.hpp"
 
 LinearElastic::LinearElastic(Parameters parameters, State state, std::string log_severity) : parameters(parameters), state(state) {
     set_model_name("LinearElastic");

@@ -88,19 +88,19 @@ class Elastoplastic : public Elastic {
          * 
          * @note Must be overriden by model implementations.
          */
-        virtual State compute_plastic_state_variable_increment(Voigt Delta_epsilon_tilde_p, double delta_lambda, Cauchy df_dsigma_prime, double H) = 0;
+        virtual State compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, double H, Voigt Delta_epsilon_tilde_p=Voigt::Zero()) = 0;
 
-        /**
-         * @brief Pure virtual method to compute the correction for the state variables for the model implemented (i.e. where the strain increment is constant).
-         * 
-         * @param delta_lambda Plastic multiplier.
-         * @param df_dsigma_prime Tensor of derivatives of the yield function with respect to the stress state.
-         * @param H Hardening modulus.
-         * @return Vector of state variable corrections.
-         * 
-         * @note Must be overriden by model implementations.
-         */
-        virtual State compute_plastic_state_variable_increment(double delta_lambda,  Cauchy df_dsigma_prime, double H) = 0;
+        // /**
+        //  * @brief Pure virtual method to compute the correction for the state variables for the model implemented (i.e. where the strain increment is constant).
+        //  * 
+        //  * @param delta_lambda Plastic multiplier.
+        //  * @param df_dsigma_prime Tensor of derivatives of the yield function with respect to the stress state.
+        //  * @param H Hardening modulus.
+        //  * @return Vector of state variable corrections.
+        //  * 
+        //  * @note Must be overriden by model implementations.
+        //  */
+        // virtual State compute_plastic_state_variable_increment(double delta_lambda,  Cauchy df_dsigma_prime, double H) = 0;
 
         /**
          * @brief Sloan et al. explicit substepping algorithm for solving the plastic portion of a strain increment.
@@ -110,16 +110,6 @@ class Elastoplastic : public Elastic {
          * @param Delta_epsilon_tilde_p Plastic strain increment.
          */
         void sloan_substepping(Cauchy sigma_prime_ep, State state_ep, Voigt Delta_epsilon_tilde_p);
-
-        /**
-         * @brief Pure virtual method to compute the elastic stress state given an increment of strain.
-         * 
-         * @param sigma_prime Effective stress tensor.
-         * @param alpha Fraction of strain increment to apply.
-         * @param Delta_epsilon_tilde Strain increment. 
-         * @return Cauchy 
-         */
-        virtual Cauchy compute_elastic_stress(Cauchy sigma_prime, double alpha, Voigt Delta_epsilon_tilde) = 0;
 
         /**
          * @brief Compute elstoplastic constitutive matrix via:

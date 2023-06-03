@@ -43,16 +43,6 @@ class Elastic : public Model {
        Constitutive compute_isotropic_linear_elastic_matrix(double K, double G);
 
        /**
-        * @brief Method to compute the isotropic linear elastic trial stress state.
-        * 
-        * @param[in] sigma_prime Effective stress tensor.
-        * @param[in] alpha Elastic fraction of strain increment. 
-        * @param[in] Delta_epsilon_tilde Strain increment.
-        * @return Elastic trial stress tensor.
-        */
-       Cauchy compute_isotropic_linear_elastic_stress(Cauchy sigma_prime, double alpha, Voigt Delta_epsilon_tilde);
-
-       /**
         * @brief Method to compute the elastic stress increment given an elastic matrix and a strain increment.
         * 
         * @param[in] D_e Elastic matrix.
@@ -60,27 +50,15 @@ class Elastic : public Model {
         * @return Stress increment.
         */
        Voigt compute_elastic_stress_increment(Constitutive D_e, Voigt Delta_epsilon_tilde);
-       
-       // /**
-       //  * @brief Method to compute the bulk modulus. The default implementation simply passes the parameter K.
-       //  * 
-       //  * @param Delta_epsilon_vol 
-       //  * @param p_prime 
-       //  * @return Bulk modulus. 
-       //  * 
-       //  * @note Must be overriden by model implementations.
-       //  */
-       // virtual double compute_K(double Delta_epsilon_vol = 0.0, double p_prime = 0.0) = 0;
-       
-       // /**
-       //  * @brief Method to compute the shear modulus. The default implementation simply passes the parameter G.
-       //  * 
-       //  * @param K Bulk modulus. 
-       //  * @return Shear modulus.
-       //  * 
-       //  * @note Must be overriden by model implementations.
-       //  */
-       // virtual double compute_G(double K = 0.0) = 0;
+
+       /**
+        * @brief Method to compute the elastic stress given a strain increment.
+        * 
+        * @param sigma_prime Effective stress tensor.
+        * @param Delta_epsilon_tilde Strain increment.
+        * @return Cauchy 
+        */
+       Cauchy compute_elastic_stress(Cauchy sigma_prime, Voigt Delta_epsilon_tilde);
 
        /**
          * @brief Pure virtual method to compute the elastic matrix.

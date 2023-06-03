@@ -18,7 +18,7 @@ void Elastoplastic::solve(void) {
         }
         if (alpha > 0.0) {
             // Update stress and state variables based on elastic portion of strain increment.
-            sigma_prime_e = compute_elastic_stress(sigma_prime, alpha, Delta_epsilon_tilde);
+            sigma_prime_e = sigma_prime + to_cauchy(D_e*alpha*Delta_epsilon_tilde);
             state_e = compute_elastic_state_variable(Delta_epsilon_tilde_e);
         } 
         PLOG_DEBUG << "Elastic strain increment, Delta_epsilon_e = \n" << Delta_epsilon_tilde_e;
@@ -209,7 +209,7 @@ void Elastoplastic::compute_plastic_increment(Cauchy sigma_prime, State state, V
 
     // Update stress and state variable increment by reference.
     Delta_sigma_prime = D_ep*Delta_epsilon_tilde_p_dT;
-    delta_state = compute_plastic_state_variable_increment(Delta_epsilon_tilde_p_dT, delta_lambda, df_dsigma_prime, H);
+    delta_state = compute_plastic_state_variable_increment(delta_lambda, df_dsigma_prime, H, Delta_epsilon_tilde_p_dT);
 }
 
 double Elastoplastic::compute_error_estimate(Cauchy sigma_prime_ini, State state_ini, Voigt Delta_sigma_prime_1, Voigt Delta_sigma_prime_2, State delta_state_1, State delta_state_2) {
@@ -299,7 +299,7 @@ double Elastoplastic::compute_alpha(Cauchy sigma_prime, State state) {
     double f_0 = compute_f(sigma_prime, state);
 
     // Fully elastic increment trial stress state.
-    Cauchy sigma_prime_1 = compute_elastic_stress(sigma_prime, 1.0, Delta_epsilon_tilde);
+    Cauchy sigma_prime_1 = compute_elastic_stress(sigma_prime, 1.0*Delta_epsilon_tilde);
     double f_1 = compute_f(sigma_prime_1, state);
 
     // Check increment type by finding alpha.
@@ -315,11 +315,11 @@ double Elastoplastic::compute_alpha(Cauchy sigma_prime, State state) {
             compute_alpha_bounds(alpha_0, alpha_1);
 
             // Trial stress state for alpha_0.
-            Cauchy sigma_prime_0 = compute_elastic_stress(sigma_prime, alpha_0, Delta_epsilon_tilde);
+            Cauchy sigma_prime_0 = compute_elastic_stress(sigma_prime, alpha_0*Delta_epsilon_tilde);
             double f_0 = compute_f(sigma_prime_0, state);
 
             // Trial stress state for alpha_1.
-            Cauchy sigma_prime_1 = compute_elastic_stress(sigma_prime, alpha_1, Delta_epsilon_tilde);
+            Cauchy sigma_prime_1 = compute_elastic_stress(sigma_prime, alpha_1*Delta_epsilon_tilde);
             double f_1 = compute_f(sigma_prime_1, state);
 
             // Perform Pegasus intersection within the bounds of alpha_0 and alpha_1.
@@ -351,7 +351,7 @@ double Elastoplastic::pegasus_regula_falsi(Cauchy sigma_prime, State state, doub
     while (ITS_YSI < MAXITS_YSI && std::abs(f_n) >= FTOL) {
         alpha_n = alpha_1 - f_1*(alpha_1-alpha_0)/(f_1-f_0);  
             
-        sigma_prime_n = compute_elastic_stress(sigma_prime, alpha_n, Delta_epsilon_tilde);
+        sigma_prime_n = compute_elastic_stress(sigma_prime, alpha_n*Delta_epsilon_tilde);
         f_n = compute_f(sigma_prime_n, state_n);
 
         // Update trial using Pegasus method rules.

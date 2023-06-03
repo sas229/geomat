@@ -44,7 +44,50 @@ class SMCC : public Elastoplastic {
         void set_state_variables(State new_state);
 
         /**
+         * @brief Overriden method to compute the elastic constitutive matrix.
+         * 
+         * An isotropic stress-dependent linear elastic constitutive matrix is used in the MCC model:
+         * 
+         * \f[ D_e = \left[\begin{array}{cccccc}
+                     K + \frac{4}{3}G & K - \frac{2}{3}G & K - \frac{2}{3}G & 0 & 0 & 0 \\
+                     K - \frac{2}{3}G & K + \frac{4}{3}G & K - \frac{2}{3}G & 0 & 0 & 0 \\
+                     K - \frac{2}{3}G & K - \frac{2}{3}G & K + \frac{4}{3}G & 0 & 0 & 0 \\
+                     0 & 0 & 0 & G & 0 & 0 \\
+                     0 & 0 & 0 & 0 & G & 0 \\
+                     0 & 0 & 0 & 0 & 0 & G
+                     \end{array}\right] \f]
+         * where \f$ K \f$ is the bulk modulus and \f$ G \f$ is the shear modulus.
+         * 
+         * The secant bulk modulus is defined as:
+         * 
+         * \f[ K = \left(p^{\prime}/\Delta \epsilon_{e}^{vol}\right)  \left( \exp \left( \Delta \epsilon_{e}^{vol}/\kappa^{*} \right) -1 \right)    \f]
+         * 
+         * where \f$ p^{\prime} \f$ is the effective mean stress, \f$ \Delta \epsilon_{e}^{vol} \f$ is the elastic volumetric strain increment
+         * and \f$ \kappa^{*} \f$ is the slope of the recompression line in \f$ \ln \left( e \right)-\ln \left( p^{\prime} \right)\f$ space.
+         * 
+         * The tangent bulk modulus is defined as:
+         * 
+         * \f[ K = \frac{p^{\prime}}{\kappa^{*}} \f]
+         * 
+         * where \f$ p^{\prime} \f$ is the mean effective stress and \f$ \kappa^{*} \f$ is the slope 
+         * of the recompression line in \f$ \ln \left( e \right)-\ln \left( p^{\prime} \right)\f$ space.
+         * 
+         * The shear modulus is defined as:
+         * 
+         * \f[ G = \frac{3 \left( 1-2\nu \right)K}{2 \left( 1+\nu \right)}\f]
+         * 
+         * where \f$ \nu \f$ is Poisson's ratio and \f$ K \f$ is the bulk modulus.
+         * 
+         * @param sigma_prime Effective stress state.
+         * @param Delta_epsilon Strain increment.
+         * @return Constitutive 
+         */
+        Constitutive compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon=Cauchy::Zero()) override;
+
+        /**
          * @brief Overridden method to compute the current value of the yield surface function.
+         * 
+         * Yield surface function definition for the SMCC model:
          * 
          * \f[ f = q^2 + M^2 p^{\prime}\left( p^{\prime}-p_c*s_ep \right)\f]
          * 
@@ -53,66 +96,63 @@ class SMCC : public Elastoplastic {
          * 
          * @param[in] sigma_prime Effective stress state.
          * @param[in] state State variables.
-         * @return Yield function, f. 
+         * @return double
          */
         double compute_f(Cauchy sigma_prime, State state) override;
 
-        /**
-         * @brief Overridden method to compute the elastic stress state given an increment of strain.
-         * 
-         * @param sigma_prime Effective stress tensor.
-         * @param alpha Fraction of strain increment to apply.
-         * @param Delta_epsilon_tilde Strain increment.
-         * @return Cauchy
-         */
-        Cauchy compute_elastic_stress(Cauchy sigma_prime, double alpha, Voigt Delta_epsilon_tilde) override;
-
-        /**
-         * @brief Overriden method to compute the elastic constitutive matrix.
-         * 
-         * @param sigma_prime Effective stress state.
-         * @param Delta_epsilon Strain increment.
-         * @return Constitutive 
-         */
-        Constitutive compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon=Cauchy::Zero()) override;
-
-        // /**
-        //  * @brief Overridden method to compute the bulk modulus.
-        //  *  
-        //  * If the increment exhibits non-zero volumetric strain:
-        //  * 
-        //  * \f[ K = \left(p^{\prime}/\Delta \epsilon_{e}^{vol}\right)  \left( \exp \left( \Delta \epsilon_{e}^{vol}/\kappa^{*} \right) -1 \right) \f]
-        //  * 
-        //  * where \f$ p^{\prime} \f$ is the effective mean stress, \f$ \Delta \epsilon_{e}^{vol} \f$ is the elastic volumetric strain increment
-        //  * and \f$ \kappa^{*} \f$ is the slope of the recompression line in \f$ \ln \left( e \right)-\ln \left( p^{\prime} \right)\f$ space.
-        //  * 
-        //  * If there is no volumetric strain then the bulk modulus is defined as the tangent bulk modulus:
-        //  * 
-        //  * \f[ K = \frac{p^{\prime}}{\kappa^{*}} \f]
-        //  * 
-        //  * where \f$ p^{\prime} \f$ is the mean effective stress and \f$ \kappa^{*} \f$ is the slope 
-        //  * of the recompression line in \f$ \ln \left( e \right)-\ln \left( p^{\prime} \right)\f$ space.
-        //  *  
-        //  * @param[in] Delta_epsilon_e_vol Elastic volumetric strain increment.
-        //  * @param[in] p_prime Mean effective stress.
-        //  * @return Bulk modulus, K.
-        //  */
-        // double compute_K(double Delta_epsilon_e_vol, double p_prime) override;
-
-        // /**
-        //  * @brief Overriden method to compute the shear modulus.
-        //  * 
-        //  * \f[ G = \frac{3 \left( 1-2\nu \right)K}{2 \left( 1+\nu \right)}\f]
-        //  * 
-        //  * where \f$ \nu \f$ is Poisson's ratio and \f$ K \f$ is the bulk modulus.
-        //  * 
-        //  * @param[in] K Bulk modulus.
-        //  * @return Shear modulus, G.
-        //  */
-        // double compute_G(double K) override;
-
         /** 
          * @brief Method to compute the derivatives for the constitutive model implemented.
+         * 
+         * Derivative of the yield surface with respect to the deviatoric stress:
+         * 
+         * \f[ \frac{\partial f}{\partial q} = 2q \f]
+         * 
+         * where \f$ q \f$ is the deviatoric stress.
+         * 
+         * Derivative of the plastic potential function with respect to the Lode angle:
+         * 
+         * \f[ \frac{\partial f}{\partial \theta} = 0 \f]
+         * 
+         * Derivatives of the yield surface with respect to the mean effective stress:
+         * 
+         * \f[ \frac{\partial f}{\partial p^{\prime}} = M^2\left(2 p^{\prime}-p_{c} s_{ep} \right) \f]
+         * 
+         * where \f$ M \f$ is a frictional constant, \f$ p^{\prime} \f$ is the mean effective stress
+         * and \f$ p_{c} \f$ is the preconsolidation pressure.
+         * 
+         * Derivative of the plastic potential function with respect to the deviatoric stress:
+         * 
+         * \f[ \frac{\partial g}{\partial q} = 2q \f]
+         * 
+         * where \f$ q \f$ is the deviatoric stress.
+         * 
+         * Derivative of the plastic potential function with respect to the Lode angle:
+         * 
+         * \f[ \frac{\partial g}{\partial \theta} = 0 \f]
+         * 
+         * Derivative of the plastic potential function with respect to the mean effective stress:
+         * 
+         * \f[ \frac{\partial g}{\partial p^{\prime}} = M^2 \left( 2 p^{\prime}-p_c  s_{ep} \right) \f]
+         * 
+         * where \f$ M \f$ is a frictional constant, \f$ p^{\prime} \f$ is the mean effective stress
+         * and \f$ p_{c} \f$ is the preconsolidation pressure.
+         * 
+         * The hardening modulus is comprised of two components:
+         * 
+         * \f[ H = H_{p_{c}} + H_{s_{ep}} \f]
+         * 
+         * where:
+         *  
+         * \f[ H_{p_{c}} = \frac{M^2 p^{\prime} p_c}{\lambda^*-\kappa^*} s_{ep} \operatorname{tr}\left( \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} \right) \f]
+         * 
+         * and:
+         * 
+         * \f[ H_{s_{ep}} = \frac{M^2 p^{\prime} p_c}{\lambda^*-\kappa^*} -k \left(s_{ep}-1\right) \sqrt{\left(1-A\right) {\operatorname{tr}\left( \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} \right)}^2 
+         * + A \frac{2}{3} \operatorname{tr} \left( \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} {\frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}}}^T \right) } \f]
+         * 
+         * where \f$ M \f$ is a frictional constant,\f$ p^{\prime} \f$ is the mean effective stress,
+         * \f$ p_{c} \f$ is the preconsolidation pressure, \f$ \lambda^* \f$ and \f$ \kappa^* \f$ are the slopes of the normal compression 
+         * and re-compression lines in \f$ \ln \left(e\right)-\ln \left(p^{\prime}\right)\f$ space.
          * 
          * @param[in] sigma_prime Effective stress tensor.
          * @param[in] state State variables.
@@ -141,17 +181,7 @@ class SMCC : public Elastoplastic {
          * @param[in] H Hardening modulus.
          * @return Vector of state variable increments.
          */
-        State compute_plastic_state_variable_increment(Voigt Delta_epsilon_tilde_p, double delta_lambda, Cauchy df_dsigma_prime, double H) override;
-
-        /**
-         * @brief Overriden method to compute the correction in the models state variables.
-         * 
-         * @param[in] delta_lambda Plastic multiplier.
-         * @param[in] df_dsigma_prime Derivatives of yield function with respect to the stress state.
-         * @param[in] H Hardening modulus.
-         * @return Vector of state variable corrections.
-         */
-        State compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, double H) override;
+        State compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, double H, Voigt Delta_epsilon_tilde_p=Voigt::Zero()) override;
 
        /** 
          * @brief Parameters. 

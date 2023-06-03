@@ -12,20 +12,14 @@ Constitutive Elastic::compute_isotropic_linear_elastic_matrix(double K, double G
     return D_e;
 }
 
-Cauchy Elastic::compute_isotropic_linear_elastic_stress(Cauchy sigma_prime, double alpha, Voigt Delta_epsilon_tilde) {
-    Voigt Delta_epsilon_tilde_trial = alpha*Delta_epsilon_tilde;
-    // double Delta_epsilon_e_vol = compute_Delta_epsilon_vol(to_cauchy(Delta_epsilon_tilde_trial)); 
-    // double p_prime_trial = compute_p_prime(sigma_prime);
-    // double K_trial = compute_K(Delta_epsilon_e_vol, p_prime_trial);
-    // double G_trial = compute_G(K_trial);
-    // Constitutive D_e_trial = compute_isotropic_linear_elastic_matrix(K_trial, G_trial);
-    Constitutive D_e_trial = compute_D_e(sigma_prime, alpha*Delta_epsilon);
-    Voigt Delta_sigma_prime_tilde_trial = compute_elastic_stress_increment(D_e_trial, Delta_epsilon_tilde_trial);
-    return sigma_prime + to_cauchy(Delta_sigma_prime_tilde_trial);
-}
-
 Voigt Elastic::compute_elastic_stress_increment(Constitutive D_e, Voigt Delta_epsilon_tilde) {
     return D_e*Delta_epsilon_tilde;
+}
+
+Cauchy Elastic::compute_elastic_stress(Cauchy sigma_prime, Voigt Delta_epsilon_tilde) {
+    Constitutive D_e = compute_D_e(sigma_prime, to_cauchy(Delta_epsilon_tilde));
+    Voigt Delta_sigma_prime_tilde = compute_elastic_stress_increment(D_e, Delta_epsilon_tilde);
+    return sigma_prime + to_cauchy(Delta_sigma_prime_tilde);
 }
 
 void Elastic::solve(void) {
