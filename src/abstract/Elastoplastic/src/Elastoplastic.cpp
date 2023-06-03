@@ -95,10 +95,7 @@ void Elastoplastic::sloan_substepping(Cauchy sigma_prime_ep, State state_ep, Voi
             while (ITS_YSC < MAXITS_YSC) {
                 if (std::abs(f_c) > FTOL) {
                     // Calculate uncorrected elastic constitutive matrix using tangent moduli and elastic stress increment.
-                    double p_prime_u = compute_p_prime(sigma_prime_u);
-                    double K_tan_u = compute_K(0, p_prime_u);
-                    double G_tan_u = compute_G(K_tan_u);
-                    Constitutive D_e_u = compute_isotropic_linear_elastic_matrix(K_tan_u, G_tan_u);
+                    Constitutive D_e_u = compute_elastic_matrix(sigma_prime_u, 0);
 
                     // Calculate uncorrected derivatives.
                     Cauchy df_dsigma_prime_u, dg_dsigma_prime_u;
