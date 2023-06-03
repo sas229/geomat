@@ -26,6 +26,23 @@ class LinearElastic : public Elastic {
          * @brief LinearElastic model destructor. 
          */
         virtual ~LinearElastic() {}
+        
+
+    protected:
+
+        /**
+         * @brief Get the state variables vector.
+         * 
+         * @return Vector of state variables.
+         */
+        State get_state_variables(void);
+
+        /**
+         * @brief Set the state variables vector.
+         * 
+         * @param[in] new_state Vector of new state variables.
+         */
+        void set_state_variables(State new_state);
 
         /**
          * @brief Overriden method to compute the elastic matrix.
@@ -36,12 +53,6 @@ class LinearElastic : public Elastic {
          */
         Constitutive compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon=Cauchy::Zero());
 
-        State get_state_variables(void);
-
-        void set_state_variables(State new_state);
-
-    protected:
-       
         /** 
          * @brief Parameters. 
          */
