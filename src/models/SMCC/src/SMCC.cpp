@@ -26,10 +26,10 @@ Constitutive SMCC::compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) {
     double p_prime = compute_p_prime(sigma_prime);
     double K;
     if (Delta_epsilon_e_vol != 0.0) {
-        // Return secant bulk modulus.
+        // Secant bulk modulus.
         K = (p_prime/Delta_epsilon_e_vol)*(std::exp(Delta_epsilon_e_vol/kappa_star)-1);
     } else {
-        // Return tangent bulk modulus.
+        // Tangent bulk modulus.
         K = p_prime/kappa_star;
     }
     double G = (3.0*(1-2.0*nu)*K)/(2.0*(1.0+nu));
