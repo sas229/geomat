@@ -50,6 +50,18 @@ class LinearElastic : public Elastic {
          * @param sigma_prime Effective stress tensor.
          * @param Delta_epsilon Strain increment.
          * @return Constitutive 
+         * 
+         * Isotropic linear elastic constitutive matrix:
+         * 
+         * \f[ D_e = \left[\begin{array}{cccccc}
+                     K + \frac{4}{3}G & K - \frac{2}{3}G & K - \frac{2}{3}G & 0 & 0 & 0 \\
+                     K - \frac{2}{3}G & K + \frac{4}{3}G & K - \frac{2}{3}G & 0 & 0 & 0 \\
+                     K - \frac{2}{3}G & K - \frac{2}{3}G & K + \frac{4}{3}G & 0 & 0 & 0 \\
+                     0 & 0 & 0 & G & 0 & 0 \\
+                     0 & 0 & 0 & 0 & G & 0 \\
+                     0 & 0 & 0 & 0 & 0 & G
+                     \end{array}\right] \f]
+         * where \f$ K \f$ is the bulk modulus and \f$ G \f$ is the shear modulus.
          */
         Constitutive compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon=Cauchy::Zero());
 
