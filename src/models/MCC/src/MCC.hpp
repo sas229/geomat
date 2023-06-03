@@ -55,24 +55,7 @@ class MCC : public Elastoplastic {
          * @param Delta_epsilon Strain increment.
          * @return Constitutive 
          */
-        Constitutive compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) override;
-
-        // /**
-        //  * @brief Overridden method to compute the bulk modulus.
-        //  * 
-        //  * @param[in] Delta_epsilon_e_vol Elastic volumetric strain increment.
-        //  * @param[in] p_prime Mean effective stress.
-        //  * @return Bulk modulus, K.
-        //  */
-        // double compute_K(double Delta_epsilon_e_vol, double p_prime) override;
-
-        // /**
-        //  * @brief Overriden method to compute the shear modulus.
-        //  * 
-        //  * @param[in] K Bulk modulus.
-        //  * @return Shear modulus, G.
-        //  */
-        // double compute_G(double K) override;
+        Constitutive compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon=Cauchy::Zero()) override;
 
         /** 
          * @brief Method to compute the derivatives for the constitutive model implemented.

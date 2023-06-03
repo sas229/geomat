@@ -34,7 +34,7 @@ class LinearElastic : public Elastic {
          * @param Delta_epsilon Strain increment.
          * @return Constitutive 
          */
-        Constitutive compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon);
+        Constitutive compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon=Cauchy::Zero());
 
         State get_state_variables(void);
 

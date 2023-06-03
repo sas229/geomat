@@ -74,7 +74,7 @@ class SMCC : public Elastoplastic {
          * @param Delta_epsilon Strain increment.
          * @return Constitutive 
          */
-        Constitutive compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) override;
+        Constitutive compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon=Cauchy::Zero()) override;
 
         // /**
         //  * @brief Overridden method to compute the bulk modulus.

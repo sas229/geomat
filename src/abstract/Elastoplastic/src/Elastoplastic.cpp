@@ -95,7 +95,7 @@ void Elastoplastic::sloan_substepping(Cauchy sigma_prime_ep, State state_ep, Voi
             while (ITS_YSC < MAXITS_YSC) {
                 if (std::abs(f_c) > FTOL) {
                     // Calculate uncorrected elastic constitutive matrix using tangent moduli and elastic stress increment.
-                    Constitutive D_e_u = compute_D_e(sigma_prime_u, Cauchy::Zero());
+                    Constitutive D_e_u = compute_D_e(sigma_prime_u);
 
                     // Calculate uncorrected derivatives.
                     Cauchy df_dsigma_prime_u, dg_dsigma_prime_u;
@@ -195,7 +195,7 @@ void Elastoplastic::compute_normal_yield_surface_correction(Cauchy sigma_prime_u
 
 void Elastoplastic::compute_plastic_increment(Cauchy sigma_prime, State state, Voigt Delta_epsilon_tilde_p_dT, Voigt &Delta_sigma_prime, State &delta_state) {   
     // Calculate elastic constitutive matrix using tangent moduli and elastic stress increment.
-    Constitutive D_e = compute_D_e(sigma_prime, Cauchy::Zero());
+    Constitutive D_e = compute_D_e(sigma_prime);
 
     // Compute elastoplastic constitutive matrix and elastoplastic multiplier. 
     Cauchy df_dsigma_prime, dg_dsigma_prime;
@@ -278,7 +278,7 @@ bool Elastoplastic::check_unload_reload(Cauchy sigma_prime, State state) {
     compute_derivatives(sigma_prime, state, df_dsigma_prime_check, a_check, dg_dsigma_prime_check, b_check, H_check);
 
     // Compute the elastic matrix using tangent moduli.
-    Constitutive D_e_tan = compute_D_e(sigma_prime, Cauchy::Zero());
+    Constitutive D_e_tan = compute_D_e(sigma_prime);
 
     // Compute elastic stress increment.
     Voigt Delta_sigma_e = D_e_tan*Delta_epsilon_tilde;
