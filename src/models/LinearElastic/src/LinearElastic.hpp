@@ -25,9 +25,6 @@ class LinearElastic : public Elastic {
          * @brief LinearElastic model destructor. 
          */
         virtual ~LinearElastic() {}
-        
-
-    protected:
 
         /**
          * @brief Get the state variables vector.
@@ -35,6 +32,8 @@ class LinearElastic : public Elastic {
          * @return Vector of state variables.
          */
         State get_state_variables(void);
+        
+    protected:
 
         /**
          * @brief Set the state variables vector.

@@ -26,14 +26,14 @@ class SMCC : public Elastoplastic {
          */
         virtual ~SMCC() {}
 
-    protected:
-
         /**
          * @brief Get the state variables vector.
          * 
          * @return Vector of state variables.
          */
         State get_state_variables(void);
+
+    protected:
 
         /**
          * @brief Set the state variables vector.
@@ -146,7 +146,7 @@ class SMCC : public Elastoplastic {
          * 
          * and:
          * 
-         * \f[ H_{s_{ep}} = \frac{M^2 p^{\prime} p_c}{\lambda^*-\kappa^*} -k \left(s_{ep}-1\right) \sqrt{\left(1-A\right) {\operatorname{tr}\left( \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} \right)}^2 
+         * \f[ H_{s_{ep}} = -\frac{M^2 p^{\prime} p_c}{\lambda^*-\kappa^*} k \left(s_{ep}-1\right) \sqrt{\left(1-A\right) {\operatorname{tr}\left( \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} \right)}^2 
          * + A \frac{2}{3} \operatorname{tr} \left( \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} {\frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}}}^T \right) } \f]
          * 
          * where \f$ M \f$ is a frictional constant,\f$ p^{\prime} \f$ is the mean effective stress,

@@ -26,14 +26,14 @@ class MCC : public Elastoplastic {
          */
         virtual ~MCC() {}
 
-    protected:
-
         /**
          * @brief Get the state variables vector.
          * 
          * @return Vector of state variables.
          */
         State get_state_variables(void);
+
+    protected:
 
         /**
          * @brief Set the state variables vector.
