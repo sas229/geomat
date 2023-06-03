@@ -61,27 +61,37 @@ class Elastic : public Model {
         */
        Voigt compute_elastic_stress_increment(Constitutive D_e, Voigt Delta_epsilon_tilde);
        
-       /**
-        * @brief Method to compute the bulk modulus. The default implementation simply passes the parameter K.
-        * 
-        * @param Delta_epsilon_vol 
-        * @param p_prime 
-        * @return Bulk modulus. 
-        * 
-        * @note Must be overriden by model implementations.
-        */
-       virtual double compute_K(double Delta_epsilon_vol = 0.0, double p_prime = 0.0) = 0;
+       // /**
+       //  * @brief Method to compute the bulk modulus. The default implementation simply passes the parameter K.
+       //  * 
+       //  * @param Delta_epsilon_vol 
+       //  * @param p_prime 
+       //  * @return Bulk modulus. 
+       //  * 
+       //  * @note Must be overriden by model implementations.
+       //  */
+       // virtual double compute_K(double Delta_epsilon_vol = 0.0, double p_prime = 0.0) = 0;
        
-       /**
-        * @brief Method to compute the shear modulus. The default implementation simply passes the parameter G.
-        * 
-        * @param K Bulk modulus. 
-        * @return Shear modulus.
-        * 
-        * @note Must be overriden by model implementations.
-        */
-       virtual double compute_G(double K = 0.0) = 0;
+       // /**
+       //  * @brief Method to compute the shear modulus. The default implementation simply passes the parameter G.
+       //  * 
+       //  * @param K Bulk modulus. 
+       //  * @return Shear modulus.
+       //  * 
+       //  * @note Must be overriden by model implementations.
+       //  */
+       // virtual double compute_G(double K = 0.0) = 0;
 
+       /**
+         * @brief Pure virtual method to compute the elastic matrix.
+         * 
+         * @param sigma_prime Effective stress tensor.
+         * @param state Stave variables.
+         * @param Delta_epsilon Strain increment.
+         * @return Constitutive
+         */
+        virtual Constitutive compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon=Cauchy::Zero()) = 0;
+       
         /**
          *  @brief Solve current strain increment. 
          */

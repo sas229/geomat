@@ -112,24 +112,6 @@ class Elastoplastic : public Elastic {
         void sloan_substepping(Cauchy sigma_prime_ep, State state_ep, Voigt Delta_epsilon_tilde_p);
 
         /**
-         * @brief Pure virtual method to get the state variables from the model implementation.
-         * 
-         * @return Vector of state variables.
-         *  
-         * @note Must be overriden by model implementations.
-         */
-        virtual State get_state_variables(void) = 0;
-
-        /**
-         * @brief Pure virtual method to set the state variables in the model implementation.
-         * 
-         * @param Vector of state variables.
-         *  
-         * @note Must be overriden by model implementations.
-         */
-        virtual void set_state_variables(State new_state) = 0;
-
-        /**
          * @brief Pure virtual method to compute the elastic stress state given an increment of strain.
          * 
          * @param sigma_prime Effective stress tensor.
@@ -138,16 +120,6 @@ class Elastoplastic : public Elastic {
          * @return Cauchy 
          */
         virtual Cauchy compute_elastic_stress(Cauchy sigma_prime, double alpha, Voigt Delta_epsilon_tilde) = 0;
-
-        /**
-         * @brief Pure virtual method to compute the elastic matrix.
-         * 
-         * @param sigma_prime Effective stress tensor.
-         * @return Constitutive
-         */
-        virtual Constitutive compute_elastic_matrix(Cauchy sigma_prime, double Delta_epsilon_vol) = 0;
-
-    // private:
 
         /**
          * @brief Compute elstoplastic constitutive matrix via:

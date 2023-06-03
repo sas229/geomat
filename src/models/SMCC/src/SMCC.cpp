@@ -30,7 +30,8 @@ Cauchy SMCC::compute_elastic_stress(Cauchy sigma_prime, double alpha, Voigt Delt
     return compute_isotropic_linear_elastic_stress(sigma_prime, alpha, Delta_epsilon_tilde);
 }
 
-Constitutive SMCC::compute_elastic_matrix(Cauchy sigma_prime, double Delta_epsilon_e_vol) {
+Constitutive SMCC::compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) {
+    double Delta_epsilon_e_vol = Delta_epsilon.trace();
     double p_prime = compute_p_prime(sigma_prime);
     double K;
     if (Delta_epsilon_e_vol != 0.0) {
@@ -41,22 +42,7 @@ Constitutive SMCC::compute_elastic_matrix(Cauchy sigma_prime, double Delta_epsil
         K = SMCC_TANGENT_BULK_MODULUS;
     }
     double G = SMCC_SHEAR_MODULUS;
-    D_e = compute_isotropic_linear_elastic_matrix(K, G);
-    return D_e;
-}
-
-double SMCC::compute_G(double K) {
-    return SMCC_SHEAR_MODULUS;
-}
-
-double SMCC::compute_K(double Delta_epsilon_e_vol, double p_prime) {
-    if (Delta_epsilon_e_vol != 0.0) {
-        // Return secant bulk modulus.
-        return SMCC_SECANT_BULK_MODULUS;
-    } else {
-        // Return tangent bulk modulus.
-        return SMCC_TANGENT_BULK_MODULUS;
-    }
+    return compute_isotropic_linear_elastic_matrix(K, G);
 }
 
 State SMCC::get_state_variables(void) {

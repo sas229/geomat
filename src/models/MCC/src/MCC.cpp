@@ -30,24 +30,19 @@ Cauchy MCC::compute_elastic_stress(Cauchy sigma_prime, double alpha, Voigt Delta
     return compute_isotropic_linear_elastic_stress(sigma_prime, alpha, Delta_epsilon_tilde);
 }
 
-Constitutive MCC::compute_elastic_matrix(Cauchy sigma_prime, double Delta_epsilon_e_vol) {
+Constitutive MCC::compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) {
+    double Delta_epsilon_e_vol = Delta_epsilon.trace();
     double p_prime = compute_p_prime(sigma_prime);
-    double K = compute_K(Delta_epsilon_e_vol, p_prime);
-    double G = compute_G(K);
-    return compute_isotropic_linear_elastic_matrix(K, G);
-}
-
-double MCC::compute_G(double K) {
-    return MCC_SHEAR_MODULUS;
-}
-
-double MCC::compute_K(double Delta_epsilon_e_vol, double p_prime) {
-    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
+    double K;
     if (Delta_epsilon_e_vol != 0.0) {
-        return MCC_SECANT_BULK_MODULUS;
+        // Return secant bulk modulus.
+        K = MCC_SECANT_BULK_MODULUS;
     } else {
-        return MCC_TANGENT_BULK_MODULUS;
+        // Return tangent bulk modulus.
+        K = MCC_TANGENT_BULK_MODULUS;
     }
+    double G = MCC_SHEAR_MODULUS;
+    return compute_isotropic_linear_elastic_matrix(K, G);
 }
 
 void MCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &H) {

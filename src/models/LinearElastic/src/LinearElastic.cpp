@@ -12,16 +12,15 @@ LinearElastic::LinearElastic(Parameters parameters, State state, std::string log
     Checks::check_inputs(name, parameters.size(), state.size(), parameters_required, state_required);
 }
 
-double LinearElastic::compute_K(double Delta_epsilon_e_vol, double p_prime) {
-    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
-    if (Delta_epsilon_e_vol != 0.0) {
-        return LINEAR_ELASTIC_SECANT_BULK_MODULUS;
-    } else {
-        return LINEAR_ELASTIC_TANGENT_BULK_MODULUS;
-    }
+Constitutive LinearElastic::compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) {
+    D_e = compute_isotropic_linear_elastic_matrix(K, G);
+    return D_e;
 }
 
-double LinearElastic::compute_G(double K) {
-    using namespace std; /* Use std namespace for eye-pleasing model definitions. */
-    return LINEAR_ELASTIC_SHEAR_MODULUS;
+State LinearElastic::get_state_variables(void) {
+    return state;
+}
+
+void LinearElastic::set_state_variables(State new_state) {
+    state = new_state;
 }

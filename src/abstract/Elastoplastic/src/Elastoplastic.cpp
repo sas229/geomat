@@ -95,7 +95,7 @@ void Elastoplastic::sloan_substepping(Cauchy sigma_prime_ep, State state_ep, Voi
             while (ITS_YSC < MAXITS_YSC) {
                 if (std::abs(f_c) > FTOL) {
                     // Calculate uncorrected elastic constitutive matrix using tangent moduli and elastic stress increment.
-                    Constitutive D_e_u = compute_elastic_matrix(sigma_prime_u, 0);
+                    Constitutive D_e_u = compute_D_e(sigma_prime_u, Cauchy::Zero());
 
                     // Calculate uncorrected derivatives.
                     Cauchy df_dsigma_prime_u, dg_dsigma_prime_u;
@@ -195,7 +195,7 @@ void Elastoplastic::compute_normal_yield_surface_correction(Cauchy sigma_prime_u
 
 void Elastoplastic::compute_plastic_increment(Cauchy sigma_prime, State state, Voigt Delta_epsilon_tilde_p_dT, Voigt &Delta_sigma_prime, State &delta_state) {   
     // Calculate elastic constitutive matrix using tangent moduli and elastic stress increment.
-    Constitutive D_e = compute_elastic_matrix(sigma_prime, 0);
+    Constitutive D_e = compute_D_e(sigma_prime, Cauchy::Zero());
 
     // Compute elastoplastic constitutive matrix and elastoplastic multiplier. 
     Cauchy df_dsigma_prime, dg_dsigma_prime;
@@ -235,7 +235,6 @@ Constitutive Elastoplastic::compute_elastoplastic_matrix(Constitutive D_e, Voigt
 }
 
 void Elastoplastic::compute_alpha_bounds(double &alpha_0, double &alpha_1) {
-    double Delta_epsilon_vol_e = Delta_epsilon.trace();
     double alpha_n, d_alpha;
     int i = 0;
     int j = 0;
@@ -244,7 +243,7 @@ void Elastoplastic::compute_alpha_bounds(double &alpha_0, double &alpha_1) {
         alpha_n = alpha_0+d_alpha;
         while (j < NSUB) {
             // Compute the elastic matrix.
-            Constitutive D_e_trial = compute_elastic_matrix(sigma_prime, alpha_n*Delta_epsilon_vol_e);
+            Constitutive D_e_trial = compute_D_e(sigma_prime, alpha_n*Delta_epsilon);
 
             // Compute elastic stress increment.
             Voigt Delta_sigma_e_trial = compute_elastic_stress_increment(D_e_trial, alpha_n*Delta_epsilon_tilde);
@@ -279,7 +278,7 @@ bool Elastoplastic::check_unload_reload(Cauchy sigma_prime, State state) {
     compute_derivatives(sigma_prime, state, df_dsigma_prime_check, a_check, dg_dsigma_prime_check, b_check, H_check);
 
     // Compute the elastic matrix using tangent moduli.
-    Constitutive D_e_tan = compute_elastic_matrix(sigma_prime, 0.0);
+    Constitutive D_e_tan = compute_D_e(sigma_prime, Cauchy::Zero());
 
     // Compute elastic stress increment.
     Voigt Delta_sigma_e = D_e_tan*Delta_epsilon_tilde;

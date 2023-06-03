@@ -28,33 +28,29 @@ class LinearElastic : public Elastic {
         virtual ~LinearElastic() {}
 
         /**
-         * @brief Overridden method to compute the bulk modulus.
+         * @brief Overriden method to compute the elastic matrix.
          * 
-         * @param Delta_epsilon_e_vol Elastic volumetric strain increment.
-         * @param p_prime Mean effective stress.
-         * @return K
+         * @param sigma_prime Effective stress tensor.
+         * @param Delta_epsilon Strain increment.
+         * @return Constitutive 
          */
-        double compute_K(double Delta_epsilon_e_vol, double p_prime);
+        Constitutive compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon);
 
-        /**
-         * @brief Overriden method to compute the shear modulus.
-         * 
-         * @param K Bulk modulus.
-         * @return G
-         */
-        double compute_G(double K);
+        State get_state_variables(void);
+
+        void set_state_variables(State new_state);
 
     protected:
        
         /** 
          * @brief Parameters. 
          */
-        State parameters {{0.0, 0.0}};
+        State parameters;
 
         /** 
          * @brief State variables. 
          */
-        State state {};
+        State state;
     
         /** 
          * @brief Parameter: bulk modulus. 

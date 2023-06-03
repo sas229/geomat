@@ -49,30 +49,30 @@ class MCC : public Elastoplastic {
         Cauchy compute_elastic_stress(Cauchy sigma_prime, double alpha, Voigt Delta_epsilon_tilde) override;
 
         /**
-         * @brief Overridden method to compute the elastic constitutive matrix.
+         * @brief Overriden method to compute the elastic constitutive matrix.
          * 
-         * @param sigma_prime Effective stress tensor.
-         * @param Delta_epsilon_e_vol Elastic volumetric strain.
+         * @param sigma_prime Effective stress state.
+         * @param Delta_epsilon Strain increment.
          * @return Constitutive 
          */
-        Constitutive compute_elastic_matrix(Cauchy sigma_prime, double Delta_epsilon_e_vol) override;
+        Constitutive compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) override;
 
-        /**
-         * @brief Overridden method to compute the bulk modulus.
-         * 
-         * @param[in] Delta_epsilon_e_vol Elastic volumetric strain increment.
-         * @param[in] p_prime Mean effective stress.
-         * @return Bulk modulus, K.
-         */
-        double compute_K(double Delta_epsilon_e_vol, double p_prime) override;
+        // /**
+        //  * @brief Overridden method to compute the bulk modulus.
+        //  * 
+        //  * @param[in] Delta_epsilon_e_vol Elastic volumetric strain increment.
+        //  * @param[in] p_prime Mean effective stress.
+        //  * @return Bulk modulus, K.
+        //  */
+        // double compute_K(double Delta_epsilon_e_vol, double p_prime) override;
 
-        /**
-         * @brief Overriden method to compute the shear modulus.
-         * 
-         * @param[in] K Bulk modulus.
-         * @return Shear modulus, G.
-         */
-        double compute_G(double K) override;
+        // /**
+        //  * @brief Overriden method to compute the shear modulus.
+        //  * 
+        //  * @param[in] K Bulk modulus.
+        //  * @return Shear modulus, G.
+        //  */
+        // double compute_G(double K) override;
 
         /** 
          * @brief Method to compute the derivatives for the constitutive model implemented.

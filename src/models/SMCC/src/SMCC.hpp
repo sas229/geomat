@@ -68,48 +68,48 @@ class SMCC : public Elastoplastic {
         Cauchy compute_elastic_stress(Cauchy sigma_prime, double alpha, Voigt Delta_epsilon_tilde) override;
 
         /**
-         * @brief Overridden method to compute the elastic constitutive matrix.
+         * @brief Overriden method to compute the elastic constitutive matrix.
          * 
-         * @param sigma_prime Effective stress tensor.
-         * @param Delta_epsilon_e_vol Elastic volumetric strain.
+         * @param sigma_prime Effective stress state.
+         * @param Delta_epsilon Strain increment.
          * @return Constitutive 
          */
-        Constitutive compute_elastic_matrix(Cauchy sigma_prime, double Delta_epsilon_e_vol) override;
+        Constitutive compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) override;
 
-        /**
-         * @brief Overridden method to compute the bulk modulus.
-         *  
-         * If the increment exhibits non-zero volumetric strain:
-         * 
-         * \f[ K = \left(p^{\prime}/\Delta \epsilon_{e}^{vol}\right)  \left( \exp \left( \Delta \epsilon_{e}^{vol}/\kappa^{*} \right) -1 \right) \f]
-         * 
-         * where \f$ p^{\prime} \f$ is the effective mean stress, \f$ \Delta \epsilon_{e}^{vol} \f$ is the elastic volumetric strain increment
-         * and \f$ \kappa^{*} \f$ is the slope of the recompression line in \f$ \ln \left( e \right)-\ln \left( p^{\prime} \right)\f$ space.
-         * 
-         * If there is no volumetric strain then the bulk modulus is defined as the tangent bulk modulus:
-         * 
-         * \f[ K = \frac{p^{\prime}}{\kappa^{*}} \f]
-         * 
-         * where \f$ p^{\prime} \f$ is the mean effective stress and \f$ \kappa^{*} \f$ is the slope 
-         * of the recompression line in \f$ \ln \left( e \right)-\ln \left( p^{\prime} \right)\f$ space.
-         *  
-         * @param[in] Delta_epsilon_e_vol Elastic volumetric strain increment.
-         * @param[in] p_prime Mean effective stress.
-         * @return Bulk modulus, K.
-         */
-        double compute_K(double Delta_epsilon_e_vol, double p_prime) override;
+        // /**
+        //  * @brief Overridden method to compute the bulk modulus.
+        //  *  
+        //  * If the increment exhibits non-zero volumetric strain:
+        //  * 
+        //  * \f[ K = \left(p^{\prime}/\Delta \epsilon_{e}^{vol}\right)  \left( \exp \left( \Delta \epsilon_{e}^{vol}/\kappa^{*} \right) -1 \right) \f]
+        //  * 
+        //  * where \f$ p^{\prime} \f$ is the effective mean stress, \f$ \Delta \epsilon_{e}^{vol} \f$ is the elastic volumetric strain increment
+        //  * and \f$ \kappa^{*} \f$ is the slope of the recompression line in \f$ \ln \left( e \right)-\ln \left( p^{\prime} \right)\f$ space.
+        //  * 
+        //  * If there is no volumetric strain then the bulk modulus is defined as the tangent bulk modulus:
+        //  * 
+        //  * \f[ K = \frac{p^{\prime}}{\kappa^{*}} \f]
+        //  * 
+        //  * where \f$ p^{\prime} \f$ is the mean effective stress and \f$ \kappa^{*} \f$ is the slope 
+        //  * of the recompression line in \f$ \ln \left( e \right)-\ln \left( p^{\prime} \right)\f$ space.
+        //  *  
+        //  * @param[in] Delta_epsilon_e_vol Elastic volumetric strain increment.
+        //  * @param[in] p_prime Mean effective stress.
+        //  * @return Bulk modulus, K.
+        //  */
+        // double compute_K(double Delta_epsilon_e_vol, double p_prime) override;
 
-        /**
-         * @brief Overriden method to compute the shear modulus.
-         * 
-         * \f[ G = \frac{3 \left( 1-2\nu \right)K}{2 \left( 1+\nu \right)}\f]
-         * 
-         * where \f$ \nu \f$ is Poisson's ratio and \f$ K \f$ is the bulk modulus.
-         * 
-         * @param[in] K Bulk modulus.
-         * @return Shear modulus, G.
-         */
-        double compute_G(double K) override;
+        // /**
+        //  * @brief Overriden method to compute the shear modulus.
+        //  * 
+        //  * \f[ G = \frac{3 \left( 1-2\nu \right)K}{2 \left( 1+\nu \right)}\f]
+        //  * 
+        //  * where \f$ \nu \f$ is Poisson's ratio and \f$ K \f$ is the bulk modulus.
+        //  * 
+        //  * @param[in] K Bulk modulus.
+        //  * @return Shear modulus, G.
+        //  */
+        // double compute_G(double K) override;
 
         /** 
          * @brief Method to compute the derivatives for the constitutive model implemented.

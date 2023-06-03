@@ -24,6 +24,24 @@ class Model {
          */
         virtual void solve(void) {};
 
+        /**
+         * @brief Pure virtual method to get the state variables from the model implementation.
+         * 
+         * @return Vector of state variables.
+         *  
+         * @note Must be overriden by model implementations.
+         */
+        virtual State get_state_variables(void) = 0;
+
+        /**
+         * @brief Pure virtual method to set the state variables in the model implementation.
+         * 
+         * @param new_state Vector of state variables.
+         *  
+         * @note Must be overriden by model implementations.
+         */
+        virtual void set_state_variables(State new_state) = 0;
+
         // Setters.
 
         /** 
