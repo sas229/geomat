@@ -278,11 +278,6 @@ class Elastoplastic : public Elastic {
         void compute_alpha_bounds(double &alpha_0, double &alpha_1);
 
         /**
-         * @brief Elastic fraction of strain increment.
-         */
-        double alpha;
-
-        /**
          * @brief Minimum pseudo-time increment for stress integration procedure.
          */
         double DT_MIN = 1e-6;
@@ -331,26 +326,6 @@ class Elastoplastic : public Elastic {
          * @brief Double precision tolerance.
          */
         double EPS = 1e-16;
-        
-        /**
-         * @brief Number of stress integration substeps performed.
-         */
-        int substeps;
-
-        /**
-         * @brief Number of yield surface corrections performed during current strain increment.
-         */
-        int corrections;
-
-        /**
-         * @brief Elastic strain increment.
-         */
-        Voigt Delta_epsilon_tilde_e = Voigt::Zero();
-
-        /**
-         * @brief Plastic strain increment.
-         */
-        Voigt Delta_epsilon_tilde_p = Voigt::Zero();
 
 };
 

@@ -3,14 +3,12 @@
 void Elastoplastic::solve(void) {
     if (!solved) {
         State state = get_state_variables();
-        alpha = compute_alpha(sigma_prime, state);
+        double alpha = compute_alpha(sigma_prime, state);
         Voigt Delta_epsilon_tilde_e = alpha*Delta_epsilon_tilde;
         PLOG_DEBUG << "Strain increment, Delta_epsilon_tilde = \n" << Delta_epsilon_tilde;
         PLOG_DEBUG << "Initial stress state, sigma_prime = \n" << sigma_prime;
         PLOG_DEBUG << "Initial state variables, state = \n" << state;
         PLOG_INFO << "Plastic increment; alpha = " << alpha;
-        substeps = 0;
-        corrections = 0;
         Cauchy sigma_prime_e, sigma_prime_ep;
         State state_e, state_ep;
         if (alpha == 0.0) {
@@ -54,6 +52,8 @@ void Elastoplastic::solve(void) {
 
 void Elastoplastic::sloan_substepping(Cauchy sigma_prime_ep, State state_ep, Voigt Delta_epsilon_tilde_p) {
     // Substepping with automatic error control.
+    int substeps = 0;
+    int corrections = 0;
     double dT = 1.0;
     double T = 0.0;
     while (T < 1.0) {
@@ -345,7 +345,7 @@ double Elastoplastic::compute_alpha(Cauchy sigma_prime, State state) {
 
 double Elastoplastic::pegasus_regula_falsi(Cauchy sigma_prime, State state, double alpha_0, double alpha_1, double f_0, double f_1) {
     // Pegasus algorithm.
-    double alpha_n;
+    double alpha, alpha_n;
     double f_n = FTOL;
     Cauchy sigma_prime_n = sigma_prime;
     State state_n = state;
