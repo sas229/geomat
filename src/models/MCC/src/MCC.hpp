@@ -3,7 +3,6 @@
 
 #include <plog/Log.h>
 #include <Eigen/Eigen>
-#include <cassert>
 #include "Types.hpp"
 #include "Elastoplastic.hpp"
 #include "Logging.hpp"

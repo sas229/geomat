@@ -3,7 +3,6 @@
 
 #include <plog/Log.h>
 #include <Eigen/Eigen>
-#include <cassert>
 #include "Checks.hpp"
 #include "Logging.hpp"
 #include "Types.hpp"
