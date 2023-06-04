@@ -92,47 +92,41 @@ void Elastoplastic::sloan_substepping(Cauchy sigma_prime_ep, State state_ep, Voi
             double f_u, f_c;
             f_u = f_c = compute_f(sigma_prime_u, state_u);
             ITS_YSC = 0;
-            while (ITS_YSC < MAXITS_YSC) {
-                if (std::abs(f_c) > FTOL) {
-                    // Calculate uncorrected elastic constitutive matrix using tangent moduli and elastic stress increment.
-                    Constitutive D_e_u = compute_D_e(sigma_prime_u);
-
-                    // Calculate uncorrected derivatives.
-                    Cauchy df_dsigma_prime_u, dg_dsigma_prime_u;
-                    Voigt a_u, b_u;
-                    double H_u;
-                    compute_derivatives(sigma_prime_u, state_u, df_dsigma_prime_u, a_u, dg_dsigma_prime_u, b_u, H_u);
-
-                    // Compute consistent correction to yield surface.
-                    compute_yield_surface_correction(sigma_prime_u, state_u, f_u, H_u, a_u, b_u, D_e_u, sigma_prime_c, state_c);
-
-                    // Check yield surface function.
-                    f_c = compute_f(sigma_prime_c, state_c);
-                    f_u = compute_f(sigma_prime_u, state_u);
-                    if (std::abs(f_c) > std::abs(f_u)) {
-                        // Apply normal correction instead.
-                        compute_normal_yield_surface_correction(sigma_prime_u, state_u, f_u, a_u, sigma_prime_c, state_c);
-                    }
-
-                    // Correct stress and state variables.
-                    sigma_prime_u = sigma_prime_c;
-                    state_u = state_c;
-                    ITS_YSC += 1;
-                } else {
-                    // Stresses and state variables corrected; breakout of correction while loop.
-                    sigma_prime_c = sigma_prime_u;
-                    state_c = state_u;
-                    goto CORRECTED;
-                }
+            while (ITS_YSC < MAXITS_YSC && std::abs(f_c) > FTOL) {
                 // If yield surface drift correction unsuccessful, log fault.
                 if (ITS_YSC >= MAXITS_YSC && std::abs(f_c) > FTOL) {
                     PLOG_FATAL << "Maximum number of yield surface correction iterations performed and f = " << f_c << " > FTOL = " << FTOL << ".";
                     assert(false);
                 } 
-            }
 
+                // Calculate uncorrected elastic constitutive matrix using tangent moduli and elastic stress increment.
+                Constitutive D_e_u = compute_D_e(sigma_prime_u);
+
+                // Calculate uncorrected derivatives.
+                Cauchy df_dsigma_prime_u, dg_dsigma_prime_u;
+                Voigt a_u, b_u;
+                double H_u;
+                compute_derivatives(sigma_prime_u, state_u, df_dsigma_prime_u, a_u, dg_dsigma_prime_u, b_u, H_u);
+
+                // Compute consistent correction to yield surface.
+                compute_yield_surface_correction(sigma_prime_u, state_u, f_u, H_u, a_u, b_u, D_e_u, sigma_prime_c, state_c);
+
+                // Check yield surface function.
+                f_c = compute_f(sigma_prime_c, state_c);
+                f_u = compute_f(sigma_prime_u, state_u);
+                if (std::abs(f_c) > std::abs(f_u)) {
+                    // Apply normal correction instead.
+                    compute_normal_yield_surface_correction(sigma_prime_u, state_u, f_u, a_u, sigma_prime_c, state_c);
+                }
+
+                // Correct stress and state variables.
+                sigma_prime_u = sigma_prime_c;
+                state_u = state_c;
+                ITS_YSC += 1;
+            }
+            
             // Update stress state and state variables.
-            CORRECTED: corrections += ITS_YSC;
+            corrections += ITS_YSC;
             sigma_prime_ep = sigma_prime_c;
             state_ep = state_c;
 
