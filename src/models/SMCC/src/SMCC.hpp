@@ -29,7 +29,7 @@ class SMCC : public Elastoplastic {
         /**
          * @brief Get the state variables vector.
          * 
-         * @return Vector of state variables.
+         * @return State
          */
         State get_state_variables(void);
 
@@ -167,7 +167,7 @@ class SMCC : public Elastoplastic {
          * @brief Overriden method to compute the elastic update of the models state variables.
          * 
          * @param[in] Delta_epsilon_tilde_e Elastic strain increment. 
-         * @return Vector of state variables.
+         * @return State
          */
         State compute_elastic_state_variable(Voigt Delta_epsilon_tilde_e) override;
 
@@ -178,7 +178,7 @@ class SMCC : public Elastoplastic {
          * @param[in] delta_lambda Plastic multiplier increment.
          * @param[in] df_dsigma_prime Derivatives of yield function with respect to the stress state.
          * @param[in] H Hardening modulus.
-         * @return Vector of state variable increments.
+         * @return State
          */
         State compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, double H, Voigt Delta_epsilon_tilde_p=Voigt::Zero()) override;
 
