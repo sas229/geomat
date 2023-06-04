@@ -124,7 +124,7 @@ void Elastoplastic::sloan_substepping(Cauchy sigma_prime_ep, State state_ep, Voi
                 state_u = state_c;
                 ITS_YSC += 1;
             }
-            
+
             // Update stress state and state variables.
             corrections += ITS_YSC;
             sigma_prime_ep = sigma_prime_c;
@@ -231,7 +231,7 @@ Constitutive Elastoplastic::compute_elastoplastic_matrix(Constitutive D_e, Voigt
 void Elastoplastic::compute_alpha_bounds(double &alpha_0, double &alpha_1) {
     double alpha_n, d_alpha;
     int i = 0;
-    int j = 0;
+    int j = 0;   
     while (i < MAXITS_YSI) {
         d_alpha = (alpha_1-alpha_0)/NSUB;
         alpha_n = alpha_0+d_alpha;
@@ -251,7 +251,7 @@ void Elastoplastic::compute_alpha_bounds(double &alpha_0, double &alpha_1) {
             if (f_trial > FTOL) {
                 // Break from loops.
                 alpha_1 = alpha_n;
-                goto BREAK;
+                return;
             } else {
                 // Continue iterating.
                 alpha_0 = alpha_n;
@@ -261,7 +261,8 @@ void Elastoplastic::compute_alpha_bounds(double &alpha_0, double &alpha_1) {
         }
         i += 1;
     }
-    BREAK: return;
+    PLOG_FATAL << "Maximum number of iterations MAXITS_YSI = " << MAXITS_YSI << " therefore failed to compute valid bounds on alpha.";
+    assert(false);
 }
 
 bool Elastoplastic::check_unload_reload(Cauchy sigma_prime, State state) {
