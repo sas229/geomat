@@ -29,7 +29,7 @@ class MCC : public Elastoplastic {
         /**
          * @brief Get the state variables vector.
          * 
-         * @return Vector of state variables.
+         * @return State
          */
         State get_state_variables(void);
 
@@ -95,7 +95,7 @@ class MCC : public Elastoplastic {
          * 
          * @param[in] sigma_prime Effective stress state.
          * @param[in] state State variables.
-         * @return Yield function, f. 
+         * @return double
          */
         double compute_f(Cauchy sigma_prime, State state) override;
 
@@ -166,7 +166,7 @@ class MCC : public Elastoplastic {
          * \f[ p_{c} = constant \f]
          *
          * @param[in] Delta_epsilon_tilde_e Elastic strain increment. 
-         * @return Vector of state variables.
+         * @return State
          */
         State compute_elastic_state_variable(Voigt Delta_epsilon_tilde_e) override;
 
@@ -191,7 +191,7 @@ class MCC : public Elastoplastic {
          * @param[in] df_dsigma_prime Derivatives of yield function with respect to the stress state.
          * @param[in] H Hardening modulus.
          * @param[in] Delta_epsilon_tilde_p Plastic strain increment.
-         * @return Vector of state variable increments.
+         * @return State
          */
         State compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, double H, Voigt Delta_epsilon_tilde_p=Voigt::Zero()) override;
 

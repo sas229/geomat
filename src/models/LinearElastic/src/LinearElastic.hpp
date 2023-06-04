@@ -29,7 +29,7 @@ class LinearElastic : public Elastic {
         /**
          * @brief Get the state variables vector.
          * 
-         * @return Vector of state variables.
+         * @return State
          */
         State get_state_variables(void);
         

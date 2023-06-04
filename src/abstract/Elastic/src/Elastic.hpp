@@ -38,7 +38,7 @@ class Elastic : public Model {
        * 
        * @param[in] K Bulk modulus.
        * @param[in] G Shear modulus.
-       * @returns Elastic constitutive matrix.
+       * @returns Constitutive
        */
        Constitutive compute_isotropic_linear_elastic_matrix(double K, double G);
 
@@ -47,15 +47,15 @@ class Elastic : public Model {
         * 
         * @param[in] D_e Elastic matrix.
         * @param[in] Delta_epsilon_tilde Strain increment. 
-        * @return Stress increment.
+        * @return Voigt
         */
        Voigt compute_elastic_stress_increment(Constitutive D_e, Voigt Delta_epsilon_tilde);
 
        /**
         * @brief Method to compute the elastic stress given a strain increment.
         * 
-        * @param sigma_prime Effective stress tensor.
-        * @param Delta_epsilon_tilde Strain increment.
+        * @param[in] sigma_prime Effective stress tensor.
+        * @param[in] Delta_epsilon_tilde Strain increment.
         * @return Cauchy 
         */
        Cauchy compute_elastic_stress(Cauchy sigma_prime, Voigt Delta_epsilon_tilde);
@@ -63,9 +63,9 @@ class Elastic : public Model {
        /**
          * @brief Pure virtual method to compute the elastic matrix.
          * 
-         * @param sigma_prime Effective stress tensor.
-         * @param state Stave variables.
-         * @param Delta_epsilon Strain increment.
+         * @param[in] sigma_prime Effective stress tensor.
+         * @param[in] state Stave variables.
+         * @param[in] Delta_epsilon Strain increment.
          * @return Constitutive
          */
         virtual Constitutive compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon=Cauchy::Zero()) = 0;

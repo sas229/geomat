@@ -27,7 +27,7 @@ class Model {
         /**
          * @brief Pure virtual method to get the state variables from the model implementation.
          * 
-         * @return Vector of state variables.
+         * @return State
          *  
          * @note Must be overriden by model implementations.
          */
@@ -36,7 +36,7 @@ class Model {
         /**
          * @brief Pure virtual method to set the state variables in the model implementation.
          * 
-         * @param new_state Vector of state variables.
+         * @param[in] new_state Vector of state variables.
          *  
          * @note Must be overriden by model implementations.
          */
@@ -61,14 +61,14 @@ class Model {
         /**
          * @brief Method to set name of model.
          * 
-         * @param name Name of model.
+         * @param[in] name Name of model.
          */
         void set_model_name(std::string name);
 
         /**
          * @brief Method to set the type of model.
          * 
-         * @param model_type Type of model.
+         * @param[in] model_type Type of model.
          */
         void set_model_type(std::string model_type);
         
@@ -182,9 +182,9 @@ class Model {
          * 
          * where \f$ s_{ii} \f$ are the deviatoric stress components, \f$ \tau_{ii} \f$ are the shear stresses and \f$ q \f$ is the deviatoric stress.
          * 
-         * @param sigma_prime Effective stress tensor.
-         * @param s Deviatoric stress tensor.
-         * @param q Deviatoric stress.
+         * @param[in] sigma_prime Effective stress tensor.
+         * @param[in] s Deviatoric stress tensor.
+         * @param[in] q Deviatoric stress.
          * @return Cauchy 
          */
         Cauchy compute_dq_dsigma_prime(Cauchy sigma_prime, Cauchy s, double q);
@@ -192,9 +192,9 @@ class Model {
         /**
          * @brief Method to compute the derivatives of the third deviatoric stress invariant with respect to the effective stress state.
          * 
-         * @param sigma_prime Effective stress tensor.
-         * @param s Deviatoric stress tensor.
-         * @param q Deviatoric stress.
+         * @param[in] sigma_prime Effective stress tensor.
+         * @param[in] s Deviatoric stress tensor.
+         * @param[in] q Deviatoric stress.
          * @return Cauchy 
          */
         Cauchy compute_dJ_3_dsigma_prime(Cauchy sigma_prime, Cauchy s, double q);
@@ -247,9 +247,9 @@ class Model {
          * 
          * @param[in] J_2 Second deviatoric stress invariant.
          * @param[in] J_3 Third deviatoric stress invariant.
-         * @param[out] theta_c Lode's angle using cosine definition.
-         * @param[out] theta_s Lode's angle using sine definition.
-         * @param[out] theta_s_bar Lode's angle using negative sine definition.
+         * @param[in,out] theta_c Lode's angle using cosine definition.
+         * @param[in,out] theta_s Lode's angle using sine definition.
+         * @param[in,out] theta_s_bar Lode's angle using negative sine definition.
          */
         void compute_lode(double J_2, double J_3, double &theta_c, double &theta_s, double &theta_s_bar);
 
@@ -305,11 +305,11 @@ class Model {
          * recover the cartesian stress state via compute_cartesian_stresses().
          * 
          * @param[in] sigma_prime Effective stress tensor.
-         * @param[out] sigma_1 Major principal stress.
-         * @param[out] sigma_2 Intermediate principal stress.
-         * @param[out] sigma_3 Minor principal stress.
-         * @param[out] R Principal stress direction tensor. 
-         * @param[out] S Principal stress tensor.
+         * @param[in,out] sigma_1 Major principal stress.
+         * @param[in,out] sigma_2 Intermediate principal stress.
+         * @param[in,out] sigma_3 Minor principal stress.
+         * @param[in,out] R Principal stress direction tensor. 
+         * @param[in,out] S Principal stress tensor.
          */
         void compute_principal_stresses(Cauchy sigma_prime, double &sigma_1, double &sigma_2, double &sigma_3, Cauchy &R, Cauchy &S);
 
@@ -354,7 +354,7 @@ class Model {
          *  
          * @param[in] sigma_prime Stress tensor.
          * @param[in] u Pore pressure.
-         * @return Total stress tensor.
+         * @return Cauchy
          */
         Cauchy compute_sigma(Cauchy sigma_prime, double u);
 
@@ -375,19 +375,19 @@ class Model {
          * where \f$ \mathbf{s} \f$ is the deviatoric stress tensor, which can be computed via compute_s().
          * 
          * @param[in] sigma Total stress tensor.
-         * @param[out] I_1 First stress invariant.
-         * @param[out] I_2 Second stress invariant.
-         * @param[out] I_3 Third stress invariant.
-         * @param[out] J_1 First deviatoric stress invariant.
-         * @param[out] J_2 Second deviatoric stress invariant.
-         * @param[out] J_3 Third deviatoric stress invariant.
+         * @param[in,out] I_1 First stress invariant.
+         * @param[in,out] I_2 Second stress invariant.
+         * @param[in,out] I_3 Third stress invariant.
+         * @param[in,out] J_1 First deviatoric stress invariant.
+         * @param[in,out] J_2 Second deviatoric stress invariant.
+         * @param[in,out] J_3 Third deviatoric stress invariant.
          */
         void compute_stress_invariants(Cauchy sigma, double &I_1, double &I_2, double &I_3, double &J_1, double &J_2, double &J_3);
 
         /**
          * @brief Convert Cauchy tensor into Voigt form.
          * 
-         * @param cauchy Cauchy tensor.
+         * @param[in] cauchy Cauchy tensor.
          * @return Voigt 
          */
         Voigt to_voigt(Cauchy cauchy);
@@ -395,7 +395,7 @@ class Model {
         /**
          * @brief Convert Voigt tensor into Cauchy form.
          * 
-         * @param voigt Voigt tensor.
+         * @param[in] voigt Voigt tensor.
          * @return Cauchy 
          */
         Cauchy to_cauchy(Voigt voigt);
