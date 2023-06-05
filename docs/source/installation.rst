@@ -8,7 +8,7 @@ To install and build this geotechnical constitutive model development library si
     git clone https://github.com/sas229/geomat.git
     cd geomat
     git submodule init src/external
-    git submodule update --recursive
+    git submodule update --init --recursive
     mkdir build && cd build
     cmake ..
     make

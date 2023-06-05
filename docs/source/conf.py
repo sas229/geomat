@@ -6,10 +6,6 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-def setup(app):
-    app.add_css_file('style.css')
-
-
 from sphinx.builders.html import StandaloneHTMLBuilder
 import subprocess
 

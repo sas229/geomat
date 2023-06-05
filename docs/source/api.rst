@@ -57,9 +57,6 @@ Linear Elastic
 
 The Linear Elastic model is implemented here. Theory to go here...
 
-.. doxygenfile:: LinearElastic_Definition.hpp
-    :project: geomat
-
 .. doxygenclass:: LinearElastic
     :project: geomat
     :members:
@@ -78,7 +75,7 @@ The Modified Cam Clay (MCC) model is implemented here. Theory to go here...
     :private-members:
 
 Soft Modified Cam Clay (SMCC)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The Soft Modified Cam Clay (SMCC) model is implemented here. Theory to go here...
 

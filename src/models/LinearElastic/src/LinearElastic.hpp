@@ -31,7 +31,7 @@ class LinearElastic : public Elastic {
          * 
          * @return State
          */
-        State get_state_variables(void);
+        State get_state_variables(void) override;
         
     protected:
 
@@ -40,7 +40,7 @@ class LinearElastic : public Elastic {
          * 
          * @param[in] new_state Vector of new state variables.
          */
-        void set_state_variables(State new_state);
+        void set_state_variables(State new_state) override;
 
         /**
          * @brief Overriden method to compute the elastic matrix.
@@ -61,7 +61,7 @@ class LinearElastic : public Elastic {
                      \end{array}\right] \f]
          * where \f$ K \f$ is the bulk modulus and \f$ G \f$ is the shear modulus.
          */
-        Constitutive compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon=Cauchy::Zero());
+        Constitutive compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon=Cauchy::Zero()) override;
 
         /** 
          * @brief Parameters. 

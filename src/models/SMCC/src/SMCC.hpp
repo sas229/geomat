@@ -31,7 +31,7 @@ class SMCC : public Elastoplastic {
          * 
          * @return State
          */
-        State get_state_variables(void);
+        State get_state_variables(void) override;
 
     protected:
 
@@ -40,8 +40,8 @@ class SMCC : public Elastoplastic {
          * 
          * @param[in] new_state Vector of new state variables.
          */
-        void set_state_variables(State new_state);
-
+        void set_state_variables(State new_state) override;
+ 
         /**
          * @brief Overriden method to compute the elastic constitutive matrix.
          * 
