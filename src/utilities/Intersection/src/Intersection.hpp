@@ -18,11 +18,11 @@ namespace Intersection {
     double compute_alpha(
         Cauchy sigma_prime, 
         State state, 
-        Voigt Delta_epsilon_tilde, 
-        std::function<double(Cauchy sigma_prime_f, State state_f)> compute_f, 
-        std::function<Cauchy(Cauchy sigma_prime_f, Voigt delta_epsilon_tilde_f)> compute_trial_stress,
-        std::function<Constitutive(Cauchy sigma_prime_f, Cauchy Delta_epsilon_f)> compute_D_e,
-        std::function<void(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &H)> compute_derivatives
+        Voigt Delta_epsilon_tilde,
+        YieldFunction compute_f,
+        TrialFunction compute_trial_stress,
+        ConstitutiveMatrixFunction compute_D_e,
+        DerivativeFunction compute_derivatives
         ); 
 
     // /**

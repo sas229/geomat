@@ -4,10 +4,10 @@ double Intersection::compute_alpha(
     Cauchy sigma_prime, 
     State state, 
     Voigt Delta_epsilon_tilde,
-    std::function<double(Cauchy sigma_prime_f, State state_f)> compute_f,
-    std::function<Cauchy(Cauchy sigma_prime_f, Voigt delta_epsilon_tilde)> compute_trial_stress,
-    std::function<Constitutive(Cauchy sigma_prime_f, Cauchy Delta_epsilon)> compute_D_e,
-    std::function<void(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &H)> compute_derivatives    
+    YieldFunction compute_f,
+    TrialFunction compute_trial_stress,
+    ConstitutiveMatrixFunction compute_D_e,
+    DerivativeFunction compute_derivatives
     ) {
     // Current stress state (i.e. alpha = 0.0).
     double f_0 = compute_f(sigma_prime, state);
@@ -15,6 +15,8 @@ double Intersection::compute_alpha(
     // Compute trial stress state with full strain increment.
     Cauchy sigma_prime_1 = compute_trial_stress(sigma_prime, 1.0*Delta_epsilon_tilde);
     double f_1 = compute_f(sigma_prime_1, state);
+
+    std::cout <<"Yes, we are in the right function!" << std::endl;
 
     // // Check increment type by finding alpha.
     // if (f_1 <= FTOL) {

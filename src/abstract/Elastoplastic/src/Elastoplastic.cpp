@@ -5,7 +5,7 @@ void Elastoplastic::solve(void) {
         State state = get_state_variables();
         double alpha = compute_alpha(sigma_prime, state);
 
-        // Define binds to functions for alpha computation.
+        // Define binds to class methods for alpha computation.
         auto compute_f_func = std::bind(&Elastoplastic::compute_f, this, std::placeholders::_1, std::placeholders::_2);
         auto compute_trial_stress_func = std::bind(&Elastoplastic::compute_elastic_stress, this, std::placeholders::_1, std::placeholders::_2);
         auto compute_D_e_func = std::bind(&Elastoplastic::compute_D_e, this, std::placeholders::_1, std::placeholders::_2);
