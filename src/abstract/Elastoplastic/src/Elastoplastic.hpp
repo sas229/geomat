@@ -6,6 +6,7 @@
 #include <Eigen/Eigen>
 #include "Types.hpp"
 #include "Elastic.hpp"
+#include "Intersection.hpp"
 
 /**
  * @brief Elastoplastic base class. Inherits Elastic class.
@@ -23,7 +24,7 @@ class Elastoplastic : public Elastic {
          *  @brief Elastoplastic model destructor. 
          */
         virtual ~Elastoplastic() {}
-        
+
         /**
          *  @brief Solve current strain increment using refined explicit approach of Sloan et al. (2001). 
          */

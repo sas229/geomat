@@ -4,6 +4,17 @@ void Elastoplastic::solve(void) {
     if (!solved) {
         State state = get_state_variables();
         double alpha = compute_alpha(sigma_prime, state);
+
+        // Define binds to functions for alpha computation.
+        auto compute_f_func = std::bind(&Elastoplastic::compute_f, this, std::placeholders::_1, std::placeholders::_2);
+        auto compute_trial_stress_func = std::bind(&Elastoplastic::compute_elastic_stress, this, std::placeholders::_1, std::placeholders::_2);
+        auto compute_D_e_func = std::bind(&Elastoplastic::compute_D_e, this, std::placeholders::_1, std::placeholders::_2);
+        auto compute_derivatives_func = std::bind(&Elastoplastic::compute_derivatives, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7);
+
+        // Compute alpha using bound functions.
+        double number = Intersection::compute_alpha(sigma_prime, state, Delta_epsilon_tilde, compute_f_func, compute_trial_stress_func, compute_D_e_func, compute_derivatives_func);
+        std::cout << "number = " << number << std::endl;
+        
         Voigt Delta_epsilon_tilde_e = alpha*Delta_epsilon_tilde;
         PLOG_DEBUG << "Strain increment, Delta_epsilon_tilde = \n" << Delta_epsilon_tilde;
         PLOG_DEBUG << "Initial stress state, sigma_prime = \n" << sigma_prime;
