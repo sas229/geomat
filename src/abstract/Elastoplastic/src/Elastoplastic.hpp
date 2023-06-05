@@ -3,9 +3,6 @@
 
 #include <iostream>
 #include <plog/Log.h>
-#include <cmath>
-#include <limits>
-#include <cassert>
 #include <Eigen/Eigen>
 #include "Types.hpp"
 #include "Elastic.hpp"
