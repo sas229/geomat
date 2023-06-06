@@ -384,22 +384,6 @@ class Model {
          */
         void compute_stress_invariants(Cauchy sigma, double &I_1, double &I_2, double &I_3, double &J_1, double &J_2, double &J_3);
 
-        /**
-         * @brief Convert Cauchy tensor into Voigt form.
-         * 
-         * @param[in] cauchy Cauchy tensor.
-         * @return Voigt 
-         */
-        Voigt to_voigt(Cauchy cauchy);
-
-        /**
-         * @brief Convert Voigt tensor into Cauchy form.
-         * 
-         * @param[in] voigt Voigt tensor.
-         * @return Cauchy 
-         */
-        Cauchy to_cauchy(Voigt voigt);
-
         // Members.
 
         /** 

@@ -35,12 +35,20 @@ typedef Eigen::VectorXd Parameters;
  */
 typedef Eigen::VectorXd State;
 
-typedef std::function<double(Cauchy sigma_prime_f, State state_f)> YieldFunction;
+/**
+ * @brief Convert Cauchy tensor into Voigt form.
+ * 
+ * @param[in] cauchy Cauchy tensor.
+ * @return Voigt 
+ */
+Voigt to_voigt(Cauchy cauchy);
 
-typedef std::function<Cauchy(Cauchy sigma_prime_f, Voigt delta_epsilon_tilde)> TrialFunction;
-
-typedef std::function<Constitutive(Cauchy sigma_prime_f, Cauchy Delta_epsilon)> ConstitutiveMatrixFunction;
-
-typedef std::function<void(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &H)> DerivativeFunction;
+/**
+ * @brief Convert Voigt tensor into Cauchy form.
+ * 
+ * @param[in] voigt Voigt tensor.
+ * @return Cauchy 
+ */
+Cauchy to_cauchy(Voigt voigt);
 
 #endif

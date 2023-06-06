@@ -61,28 +61,6 @@ Cauchy Model::compute_dq_dsigma_prime(Cauchy sigma_prime, Cauchy s, double q) {
     }
 }
 
-Voigt Model::to_voigt(Cauchy cauchy) {
-    Voigt voigt = Voigt::Zero();
-    voigt(0) = cauchy(0,0);
-    voigt(1) = cauchy(1,1);
-    voigt(2) = cauchy(2,2);
-    voigt(3) = cauchy(0,1);
-    voigt(4) = cauchy(0,2);
-    voigt(5) = cauchy(1,2);
-    return voigt;
-}
-
-Cauchy Model::to_cauchy(Voigt voigt) {
-    Cauchy cauchy = Cauchy::Zero();
-    cauchy(0,0) = voigt(0);
-    cauchy(1,1) = voigt(1);
-    cauchy(2,2) = voigt(2);
-    cauchy(0,1) = cauchy(1,0) = voigt(3);
-    cauchy(0,2) = cauchy(2,0) = voigt(4);
-    cauchy(1,2) = cauchy(2,1) = voigt(5);
-    return cauchy;
-}
-
 void Model::set_sigma_prime_tilde(Voigt sigma_prime_tilde) {
     // Stress in Voigt notation form - using compression positive soil mechanics convention.
     this->sigma_prime_tilde = sigma_prime_tilde;
@@ -105,7 +83,7 @@ void Model::set_sigma_prime_tilde(Voigt sigma_prime_tilde) {
 void Model::set_Delta_epsilon_tilde(Voigt Delta_epsilon_tilde) {
     // Strain increment in Voigt notation form - change sign to use compression positive soil mechanics convention.
     this->Delta_epsilon_tilde = Delta_epsilon_tilde;
-    this->Delta_epsilon = this->to_cauchy(Delta_epsilon_tilde);
+    this->Delta_epsilon = to_cauchy(Delta_epsilon_tilde);
     solved = false;   
 }
 
