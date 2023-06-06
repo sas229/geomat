@@ -2,11 +2,12 @@
 #define INTERSECTION_H
 
 #include <plog/Log.h>
-
 #include <functional>
 #include <string>
-
 #include "Types.hpp"
+
+
+namespace Intersection {
 
 /**
  * @brief Yield function binding.
@@ -28,10 +29,9 @@ typedef std::function<Constitutive(Cauchy sigma_prime_f, Cauchy Delta_epsilon)> 
  */
 typedef std::function<void(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &H)> DerivativeFunction;
 
-namespace Intersection {
 
 /**
- * @brief Method to compute the elastic fraction of the current strain increment following Sloan et al. (2001).
+ * @brief 
  *
  * @param[in] sigma_prime Current stress state.
  * @param[in] state Current state variables.

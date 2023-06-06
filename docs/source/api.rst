@@ -88,16 +88,52 @@ The Soft Modified Cam Clay (SMCC) model is implemented here. Theory to go here..
 Utilities
 ---------
 
-The following typdefs and classes contain types used by the constitutive model development framework. 
+The following modules, typedefs and classes contain types used by the constitutive model development framework. 
+
+Checks
+^^^^^^
+
+.. doxygennamespace:: Checks
+    :project: geomat
+    :members:
+
+Logging
+^^^^^^^
+
+.. doxygennamespace:: Logging
+    :project: geomat
+    :members:
+
+Intersection
+^^^^^^^^^^^^
+
+.. doxygennamespace:: Intersection
+    :project: geomat
+    :members:
 
 Types
 ^^^^^
 
 .. doxygentypedef:: Voigt
-   :project: geomat
+    :project: geomat
 
 .. doxygentypedef:: Cauchy
-   :project: geomat
+    :project: geomat
 
 .. doxygentypedef:: Constitutive
-   :project: geomat
+    :project: geomat
+
+.. doxygentypedef:: Jacobian
+    :project: geomat
+
+.. doxygentypedef:: Parameters
+    :project: geomat
+
+.. doxygentypedef:: State
+    :project: geomat
+
+.. doxygenfunction:: to_cauchy
+    :project: geomat
+
+.. doxygenfunction:: to_voigt
+    :project: geomat
