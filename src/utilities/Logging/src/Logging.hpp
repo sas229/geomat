@@ -9,9 +9,11 @@
 
 namespace Logging {
     /**
-     * @brief Function to initialise a console log using plog.
+     * @brief Function to initialise a console log using plog. 
+     * Possible options include \"verbose\", \"debug\", \"info\", \"warning\",
+     * \"error\", \"fatal\", or \"none\". Defaults to \"error\"."
      * 
-     * @param level Log level to use. Possible options include \"verbose\", \"debug\", \"info\", \"warning\", \"error\", \"fatal\", or \"none\". Defaults to \"error\"."
+     * @param level Log level to use. 
      */
     void initialise_log(std::string level);
 }

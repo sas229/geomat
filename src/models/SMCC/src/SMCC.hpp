@@ -88,7 +88,7 @@ class SMCC : public Elastoplastic {
          * 
          * Yield surface function definition for the SMCC model:
          * 
-         * \f[ f = q^2 + M^2 p^{\prime}\left( p^{\prime}-p_c*s_ep \right)\f]
+         * \f[ f = q^2 + M^2 p^{\prime}\left( p^{\prime}-p_c s_{ep} \right)\f]
          * 
          * where \f$ q \f$ is the deviatoric stress, \f$ p^{\prime} \f$ is the mean effective stress, 
          * \f$ M\f$ is the frictional constant and \f$ p_c \f$ is the preconsolidation pressure.

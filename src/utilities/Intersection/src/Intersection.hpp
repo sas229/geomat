@@ -88,8 +88,8 @@ bool check_unload_reload(
  * @param[in] state Current state variables.
  * @param[in] Delta_epsilon_tilde Current strain increment.
  * @param[in] FTOL Yield surface tolerance.
- * @param[in] MAXITS_YSI Maximum number of yield surface intersection iterations.
- * @param[in] NSUB Maximum number of subincrements.
+ * @param[in] MAXITS_YSI Maximum number of iterations for the yield surface intersection algorithm.
+ * @param[in] NSUB Maximum number of subincrements for the yield surface intersection algorithm.
  * @param[in] compute_f Yield function binding.
  * @param[in] compute_D_e Constitutive matrix function binding.
  * @param[in] compute_trial_stress Trial stress function binding.
@@ -120,7 +120,7 @@ void compute_alpha_bounds(
  * @param[in] f_0 Initial value of objective function with lower bound alpha.
  * @param[in] f_1 Initial value of objective function with upper bound alpha.
  * @param[in] FTOL Yield surface tolerance.
- * @param[in] MAXITS_YSI Maximum number of yield surface intersection iterations.
+ * @param[in] MAXITS_YSI Maximum number of iterations for the yield surface intersection algorithm.
  * @param[in] compute_f Yield function binding.
  * @param[in] compute_trial_stress Trial stress function binding.
  * @return double
