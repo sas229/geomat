@@ -12,7 +12,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 message("Compiler flags:" ${CMAKE_CXX_FLAGS})
 
 # Add subdirectories of documentation and source code.
-# add_subdirectory(${PROJECT_SOURCE_DIR}/docs)
+add_subdirectory(${PROJECT_SOURCE_DIR}/docs)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src)
 
 # # Create test executable.
