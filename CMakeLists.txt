@@ -26,8 +26,9 @@ target_include_directories(umat_library PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/u
 target_link_libraries(umat_library PUBLIC Model LinearElastic MCC SMCC)
 
 # Create Python module.
-pybind11_add_module(models src/PythonAPI.cpp)
+pybind11_add_module(models src/geomat/models.cpp)
 target_link_libraries(models PUBLIC Types Model Elastic Elastoplastic LinearElastic MCC SMCC Eigen3::Eigen)
+install(TARGETS models DESTINATION ./)
 
 # Tests.
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

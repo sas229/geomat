@@ -15,6 +15,14 @@
 namespace py = pybind11;
 
 PYBIND11_MODULE(models, m) {
+    // // Docs.
+    // m.doc() = "Constitutive model library.";
+
+    // // Standalone module definition.
+    // auto package = pybind11::module::import("package");
+    // auto module =  package.attr("module");
+    // m.add_object("module", module);
+
     // Abstract base classes.
     py::class_<Model>(m, "Model");
     py::class_<Elastic, Model>(m, "Elastic");

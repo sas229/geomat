@@ -6,9 +6,18 @@ name = "pypi"
 [packages]
 matplotlib = "*"
 numpy = "*"
-cmake = "*"
+geomat = {path = "."}
 
 [dev-packages]
+sphinxcontrib-bibtex = "*"
+sphinx-autoapi = "*"
+sphinx-copybutton = "*"
+scikit-build = "*"
+sphinx-rtd-theme = "*"
+sphinx = "*"
 
 [requires]
-python_version = "3"
+python_version = "3.10"
+
+[pipenv]
+allow_prereleases = true

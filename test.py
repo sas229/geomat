@@ -1,5 +1,5 @@
 import numpy as np
-from build.models import LinearElastic, MCC, SMCC    # Note that this import statement is importing the current build directly from the build folder!
+from geomat.models import LinearElastic, MCC, SMCC, Elastoplastic
 from matplotlib import pyplot as plt
 
 # LinearElastic test.
@@ -108,4 +108,18 @@ while i<increments-1:
 plt.plot(axial_strain, q)
 plt.xlabel(r"$\epsilon_{a}$ (-)")
 plt.ylabel("q (kPa)")
+plt.show()
+
+delta = 0.25
+xrange = np.arange(0, 100+delta, delta)
+yrange = np.arange(0, 100+delta, delta)
+p, q = np.meshgrid(xrange,yrange)
+
+M = 1
+p0 = 100
+ 
+f = q**2+M**2*p*(p-p0)
+
+print(np.shape(f))
+plt.contour(f, [0])
 plt.show()
