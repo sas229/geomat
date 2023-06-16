@@ -22,7 +22,7 @@ jobs:
         with:
           platforms: all
 
-      - name: Build Doxygen
+      - name: Install Doxygen
         uses: ssciwr/doxygen-install@v1
         # uses: mattnotmitt/doxygen-action@v1.9.5
         # with:
