@@ -24,7 +24,7 @@ jobs:
 
       - name: Build Doxygen
         uses: ssciwr/doxygen-install@v1
-        uses: mattnotmitt/doxygen-action@v1.9.5
+        # uses: mattnotmitt/doxygen-action@v1.9.5
         # with:
         #   doxyfile-path: 'docs/source/Doxyfile.in'
 
