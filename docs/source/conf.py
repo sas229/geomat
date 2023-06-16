@@ -6,11 +6,11 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-from sphinx.builders.html import StandaloneHTMLBuilder
-import subprocess
+# from sphinx.builders.html import StandaloneHTMLBuilder
+# import subprocess
 
-# Generate xml using oxygen.
-subprocess.call('doxygen Doxyfile.in', shell=True)
+# # Generate xml using oxygen.
+# subprocess.call('doxygen Doxyfile.in', shell=True)
 
 project = 'geomat'
 copyright = '2022, Sam Stanier'
