@@ -22,15 +22,15 @@ jobs:
         with:
           platforms: all
 
-      - name: Create build directory
-        run:  |
-          mkdir build && cd build && mkdir docs && cd ..
+      # - name: Create build directory
+      #   run:  |
+      #     mkdir build && cd build && mkdir docs && cd ..
 
-      - name: Install Doxygen
-        # uses: ssciwr/doxygen-install@v1
-        uses: mattnotmitt/doxygen-action@v1.9.5
-        with:
-          doxyfile-path: 'docs/source/Doxyfile.in'
+      # - name: Install Doxygen
+      #   # uses: ssciwr/doxygen-install@v1
+      #   uses: mattnotmitt/doxygen-action@v1.9.5
+      #   with:
+      #     doxyfile-path: 'docs/source/Doxyfile.in'
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.12.0
