@@ -5,7 +5,8 @@ requires = [
     "scikit-build",
     "cmake",
     "ninja",
-    "sphinx"
+    "sphinx",
+    "breathe"
 ]
 build-backend = "setuptools.build_meta"
 
