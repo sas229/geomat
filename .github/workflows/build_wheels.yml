@@ -24,7 +24,7 @@ jobs:
 
       - name: Create build directory
         run:  |
-          mkdir build/docs
+          mkdir build && cd build && mkdir docs && cd ..
 
       - name: Install Doxygen
         # uses: ssciwr/doxygen-install@v1
