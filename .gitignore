@@ -133,4 +133,4 @@ dmypy.json
 .vscode/
 
 # Cache folder.
-/.cache
+.cache/
