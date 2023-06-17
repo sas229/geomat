@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "692eb6ffc0b72296b19086a4be547c5a2ca68cc8c158195b3865eba0a4940152"
+            "sha256": "4495945fc7635d3802bd44dfa2f6babbe6ebaf184d712d3211e07fa00b3c0184"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -110,8 +110,11 @@
             "version": "==4.40.0"
         },
         "geomat": {
-            "path": ".",
-            "version": "==0.0.1"
+            "hashes": [
+                "sha256:37947c213023e46f6465b2c1c39056a83101f8eab7d5cdbb618584f02d5f4031"
+            ],
+            "index": "pypi",
+            "version": "==0.0.2"
         },
         "kiwisolver": {
             "hashes": [
