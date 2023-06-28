@@ -7,6 +7,10 @@ build:
   apt_packages:
     - cmake
     - doxygen
+  jobs:
+    pre_create_environment:
+      - mkdir build && cd build
+      - cmake -DBUILD_DOCS=1 ..
 
 # Build from the docs/ directory with Sphinx
 sphinx:
