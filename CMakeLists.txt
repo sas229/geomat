@@ -11,7 +11,7 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 # Add subdirectories of documentation and source code.
-# add_subdirectory(${PROJECT_SOURCE_DIR}/docs)
+add_subdirectory(${PROJECT_SOURCE_DIR}/docs)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src)
 
 # Create test executable.
