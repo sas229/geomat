@@ -15,9 +15,9 @@ void Elastoplastic::solve(void) {
         double alpha = Intersection::compute_alpha(sigma_prime, state, Delta_epsilon_tilde, FTOL, LTOL, MAXITS_YSI, NSUB, compute_f_func, compute_trial_stress_func, compute_D_e_func, compute_derivatives_func);
         
         Voigt Delta_epsilon_tilde_e = alpha*Delta_epsilon_tilde;
-        PLOG_DEBUG << "Strain increment, Delta_epsilon_tilde = \n" << Delta_epsilon_tilde;
-        PLOG_DEBUG << "Initial stress state, sigma_prime = \n" << sigma_prime;
-        PLOG_DEBUG << "Initial state variables, state = \n" << state;
+        PLOG_DEBUG << "Strain increment, Delta_epsilon_tilde = " << Delta_epsilon_tilde;
+        PLOG_DEBUG << "Initial stress state, sigma_prime_tilde = " << to_voigt(sigma_prime);
+        PLOG_DEBUG << "Initial state variables, state = " << state;
         PLOG_INFO << "Plastic increment; alpha = " << alpha;
         Cauchy sigma_prime_e, sigma_prime_ep;
         State state_e, state_ep;
@@ -31,17 +31,17 @@ void Elastoplastic::solve(void) {
             sigma_prime_e = sigma_prime + to_cauchy(D_e*alpha*Delta_epsilon_tilde);
             state_e = compute_elastic_state_variable(Delta_epsilon_tilde_e);
         } 
-        PLOG_DEBUG << "Elastic strain increment, Delta_epsilon_e = \n" << Delta_epsilon_tilde_e;
-        PLOG_DEBUG << "Stress state after elastic increment, sigma_prime_e = \n" << sigma_prime_e;
-        PLOG_DEBUG << "State variables after elastic increment, state_e = \n" << state_e;
+        PLOG_DEBUG << "Elastic strain increment, Delta_epsilon_e = " << Delta_epsilon_tilde_e;
+        PLOG_DEBUG << "Stress state after elastic increment, sigma_prime_e_tilde = " << to_voigt(sigma_prime_e);
+        PLOG_DEBUG << "State variables after elastic increment, state_e = " << state_e;
         if (alpha < 1.0) {
             // Perform elastoplastic stress integration on plastic portion of strain increment.
             Voigt Delta_epsilon_tilde_p = (1.0-alpha)*Delta_epsilon_tilde;
             sigma_prime_ep = sigma_prime_e; 
             state_ep = state_e;
-            PLOG_DEBUG << "Plastic strain increment, Delta_epsilon_tilde_p = \n" << Delta_epsilon_tilde_p;
-            PLOG_DEBUG << "Initial elastoplastic stress state, sigma_prime_ep = \n" <<sigma_prime_ep;
-            PLOG_DEBUG << "Initial elastoplastic state variables, state_ep = \n" <<state_ep;
+            PLOG_DEBUG << "Plastic strain increment, Delta_epsilon_tilde_p = " << Delta_epsilon_tilde_p;
+            PLOG_DEBUG << "Initial elastoplastic stress state, sigma_prime_ep_tilde = " << to_voigt(sigma_prime_ep);
+            PLOG_DEBUG << "Initial elastoplastic state variables, state_ep = " <<state_ep;
             sloan_substepping(sigma_prime_ep, state_ep, Delta_epsilon_tilde_p);
         } else {
             // Fully elastic increment. Update stress and state variables.
@@ -49,8 +49,8 @@ void Elastoplastic::solve(void) {
             set_state_variables(state_e);
             PLOG_INFO << "Fully elastic stress increment integrated directly.";
         }
-        PLOG_DEBUG << "Final stress state, sigma_prime = \n" << sigma_prime;
-        PLOG_DEBUG << "Final state variables, state = \n" << state;
+        PLOG_DEBUG << "Final stress state, sigma_prime_tilde = " << to_voigt(sigma_prime);
+        PLOG_DEBUG << "Final state variables, state = " << state;
 
         // Compute final stress invariants.
         p_prime = compute_p_prime(sigma_prime);
@@ -67,7 +67,7 @@ void Elastoplastic::sloan_substepping(Cauchy sigma_prime_ep, State state_ep, Voi
     double dT = 1.0;
     double T = 0.0;
     while (T < 1.0) {
-        PLOG_DEBUG << "Plastic increment, dT = " << dT;
+        // PLOG_DEBUG << "Plastic increment, dT = " << dT;
         Voigt Delta_epsilon_tilde_p_dT = Delta_epsilon_tilde_p*dT;
         double Delta_epsilon_vol_p_dT = to_cauchy(Delta_epsilon_tilde_p_dT).trace();
 
@@ -78,14 +78,14 @@ void Elastoplastic::sloan_substepping(Cauchy sigma_prime_ep, State state_ep, Voi
         Cauchy sigma_prime_1 = sigma_prime_ep + to_cauchy(Delta_sigma_prime_1);
         State state_1 = state_ep + delta_state_1;
         compute_plastic_increment(sigma_prime_1, state_ep, Delta_epsilon_tilde_p_dT, Delta_sigma_prime_2, delta_state_2);
-        PLOG_DEBUG << "State variable increment 1, delta_state_1 = \n" << delta_state_1;
-        PLOG_DEBUG << "State variable increment 2, delta_state_2 = \n" << delta_state_2;
+        PLOG_DEBUG << "State variable increment 1, delta_state_1 = " << delta_state_1;
+        PLOG_DEBUG << "State variable increment 2, delta_state_2 = " << delta_state_2;
 
         // Calculate modified Euler stresses and state variables.
         Cauchy sigma_prime_ini = sigma_prime_ep + to_cauchy(1.0/2.0*(Delta_sigma_prime_1 + Delta_sigma_prime_2));
         State state_ini = state_ep + 1.0/2.0*(delta_state_1+delta_state_2);
-        PLOG_DEBUG << "Initial stress estimate, sigma_prime_ini = \n" << sigma_prime_ini;
-        PLOG_DEBUG << "State variable estimate, state_ini = \n" << state_ini;
+        PLOG_DEBUG << "Initial stress estimate, sigma_prime_ini_tilde = " << to_voigt(sigma_prime_ini);
+        PLOG_DEBUG << "State variable estimate, state_ini = " << state_ini;
 
         // Compute error estimate.
         bool accepted = false;
@@ -155,7 +155,7 @@ void Elastoplastic::sloan_substepping(Cauchy sigma_prime_ep, State state_ep, Voi
 
 double Elastoplastic::compute_new_substep_size(bool accepted, double dT, double T, double R_n) {
     if (dT == DT_MIN) {
-        PLOG_FATAL << "Minimum step size DT_MIN = " << DT_MIN << " failed to generated an accepted increment.";
+        // PLOG_FATAL << "Minimum step size DT_MIN = " << DT_MIN << " failed to generated an accepted increment.";
         assert(false);
     }
     double q_step;
@@ -217,7 +217,7 @@ void Elastoplastic::compute_plastic_increment(Cauchy sigma_prime, State state, V
 }
 
 double Elastoplastic::compute_error_estimate(Cauchy sigma_prime_ini, State state_ini, Voigt Delta_sigma_prime_1, Voigt Delta_sigma_prime_2, State delta_state_1, State delta_state_2) {
-    int size_state = get_state_variables().size();
+    int size_state = (int)get_state_variables().size();
     State error(size_state);
     error[0] = (to_cauchy(Delta_sigma_prime_2 - Delta_sigma_prime_1)).norm()/sigma_prime_ini.norm();
     for (int i=1; i<size_state; i++) {

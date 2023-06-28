@@ -8,7 +8,7 @@ MCC::MCC(Parameters parameters, State state, std::string log_severity) : paramet
     Logging::initialise_log(log_severity);
 
     // Check inputs.
-    Checks::check_inputs(name, parameters.size(), state.size(), parameters_required, state_required);
+    Checks::check_inputs(name, (int)parameters.size(), (int)state.size(), parameters_required, state_required);
 }
 
 State MCC::get_state_variables(void) {
