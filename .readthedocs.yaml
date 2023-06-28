@@ -5,7 +5,8 @@ build:
   tools:
     python: "3.11"
   apt_packages:
-    doxygen
+    - cmake
+    - doxygen
 
 # Build from the docs/ directory with Sphinx
 sphinx:
