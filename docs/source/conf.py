@@ -7,9 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 # Generate xml using doxygen if building on readthedocs.
-import subprocess, os
-read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
-# if read_the_docs_build:
+import subprocess
 subprocess.call('doxygen Doxyfile.in', shell=True)
 
 project = 'geomat'
