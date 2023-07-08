@@ -134,3 +134,6 @@ dmypy.json
 
 # Cache folder.
 .cache/
+
+# docs build folder.
+docs/build

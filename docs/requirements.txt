@@ -1,0 +1,4 @@
+sphinxcontrib-bibtex==2.5.0
+sphinx-copybutton==0.5.1
+sphinx-autoapi==2.0.1
+breathe==4.35.0
