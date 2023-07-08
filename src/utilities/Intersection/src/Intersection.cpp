@@ -29,7 +29,7 @@ double Intersection::compute_alpha(
             // // Compute bounds on alpha.
             double alpha_0 = 0.0;
             double alpha_1 = 1.0;
-            Intersection::compute_alpha_bounds(sigma_prime, state, Delta_epsilon_tilde, FTOL, MAXITS_YSI, NSUB, compute_f, compute_D_e, compute_trial_stress, alpha_0, alpha_1);
+            Intersection::compute_alpha_bounds(sigma_prime, state, Delta_epsilon_tilde, FTOL, NSUB, compute_f, compute_D_e, compute_trial_stress, alpha_0, alpha_1);
 
             // Trial stress state for alpha_0.
             Cauchy sigma_prime_0 = compute_trial_stress(sigma_prime, alpha_0 * Delta_epsilon_tilde);
@@ -65,10 +65,10 @@ bool Intersection::check_unload_reload(
     ConstitutiveMatrixFunction compute_D_e,
     DerivativeFunction compute_derivatives) {
     // Compute required derivatives for the given stress state.
-    Cauchy df_dsigma_prime_check, dg_dsigma_prime_check;
-    Voigt a_check, b_check;
-    double H_check;
-    compute_derivatives(sigma_prime, state, df_dsigma_prime_check, a_check, dg_dsigma_prime_check, b_check, H_check);
+    Cauchy df_dsigma_prime_c, dg_dsigma_prime_c;
+    Voigt a_c, b_c;
+    double H_c;
+    compute_derivatives(sigma_prime, state, df_dsigma_prime_c, a_c, dg_dsigma_prime_c, b_c, H_c);
 
     // Compute the elastic matrix using tangent moduli.
     Constitutive D_e_tan = compute_D_e(sigma_prime, Cauchy::Zero());
@@ -77,7 +77,7 @@ bool Intersection::check_unload_reload(
     Voigt Delta_sigma_e = D_e_tan * Delta_epsilon_tilde;
 
     // Check unloading-reloading criterion.
-    double cos_theta = (double)(a_check.transpose() * Delta_sigma_e) / (double)(a_check.squaredNorm() * Delta_sigma_e.squaredNorm());
+    double cos_theta = (double)(a_c.transpose() * Delta_sigma_e) / (double)(a_c.squaredNorm() * Delta_sigma_e.squaredNorm());
 
     // Check against tolerance.
     if (cos_theta >= -LTOL) {
@@ -92,7 +92,6 @@ void Intersection::compute_alpha_bounds(
     State state,
     Voigt Delta_epsilon_tilde,
     double FTOL,
-    int MAXITS_YSI,
     int NSUB,
     YieldFunction compute_f,
     ConstitutiveMatrixFunction compute_D_e,
@@ -102,35 +101,34 @@ void Intersection::compute_alpha_bounds(
     double alpha_n, d_alpha;
     int i = 0;
     int j = 0;
-    while (i < MAXITS_YSI) {
+    while (alpha_n <= alpha_1) {
         d_alpha = (alpha_1 - alpha_0) / NSUB;
         alpha_n = alpha_0 + d_alpha;
         while (j < NSUB) {
             // Compute the elastic matrix.
             Cauchy Delta_epsilon = to_cauchy(Delta_epsilon_tilde);
-            Constitutive D_e_trial = compute_D_e(sigma_prime, alpha_n * Delta_epsilon);
+            Constitutive D_e_n = compute_D_e(sigma_prime, alpha_n * Delta_epsilon);
 
             // Compute elastic stress increment.
-            Cauchy sigma_prime_trial = compute_trial_stress(sigma_prime, alpha_n * Delta_epsilon_tilde);
+            Cauchy sigma_prime_n = compute_trial_stress(sigma_prime, alpha_n * Delta_epsilon_tilde);
 
             // Check yield function.
-            double f_trial = compute_f(sigma_prime_trial, state);
+            double f_n = compute_f(sigma_prime_n, state);
 
             // Check criterion.
-            if (f_trial > FTOL) {
+            if (f_n > FTOL) {
                 // Break from loops.
                 alpha_1 = alpha_n;
                 return;
             } else {
                 // Continue iterating.
                 alpha_0 = alpha_n;
-                alpha_n = alpha_n + d_alpha;
+                alpha_n += d_alpha;
                 j += 1;
             }
         }
-        i += 1;
     }
-    PLOG_FATAL << "Maximum number of iterations MAXITS_YSI = " << MAXITS_YSI << " therefore failed to compute valid bounds on alpha.";
+    PLOG_FATAL << "Transition not found therefore failed to compute valid bounds on alpha.";
     assert(false);
 }
 

@@ -6,15 +6,8 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-<<<<<<< HEAD
-# from sphinx.builders.html import StandaloneHTMLBuilder
-import subprocess
-
-# Generate xml using oxygen.
-=======
 # Generate xml using doxygen if building on readthedocs.
 import subprocess
->>>>>>> 7386b7e2a71e66dabd097fe98f05f8ff33a160f4
 subprocess.call('doxygen Doxyfile.in', shell=True)
 
 project = 'geomat'
