@@ -20,6 +20,8 @@ class Model {
         /**
          * @brief Method to solve stress increment given the current strain increment.
          * 
+         * @param[in] method Method to use to solve the strain increment.
+         * 
          * @note Must be overriden by constitutive behaviour classes (e.g. Elastic, Elastoplastic).
          */
         virtual void solve(void) {};

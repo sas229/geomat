@@ -2,11 +2,13 @@
 #define ELASTOPLASTIC_H
 
 #include <iostream>
+#include <string>
 #include <plog/Log.h>
 #include <Eigen/Eigen>
 #include "Types.hpp"
 #include "Elastic.hpp"
 #include "Intersection.hpp"
+#include "Sloan.hpp"
 
 /**
  * @brief Elastoplastic base class. Inherits Elastic class.
@@ -223,6 +225,11 @@ class Elastoplastic : public Elastic {
          * @brief Double precision tolerance.
          */
         double EPS = 1e-16;
+
+        /**
+         * @brief Solution method to use for plastic strain integration. Defaults to Sloan's explicit stress integration approach.
+         */
+        std::string method = "Sloan";
 
 };
 
