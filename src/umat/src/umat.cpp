@@ -72,6 +72,8 @@ void umat(
         PLOG_INFO << "Attempting to instantiate " << cmname << " model.";
         if (strcmp(cmname, "LinearElastic") == 0) {
             model.reset(new LinearElastic(parameters, state, "verbose"));    
+        } else if (strcmp(cmname, "C2MC") == 0) {
+            model.reset(new C2MC(parameters, state, "verbose"));   
         } else if (strcmp(cmname, "MCC") == 0) {
             model.reset(new MCC(parameters, state, "verbose"));   
         } else if (strcmp(cmname, "SMCC") == 0) {

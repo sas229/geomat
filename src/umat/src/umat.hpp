@@ -13,6 +13,7 @@
 #include "Types.hpp"
 #include "Model.hpp"
 #include "LinearElastic.hpp"
+#include "C2MC.hpp"
 #include "MCC.hpp"
 #include "SMCC.hpp"
 

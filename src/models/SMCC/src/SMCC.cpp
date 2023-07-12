@@ -81,7 +81,6 @@ void SMCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     double df_dtheta = 0;
     /* USER DEFINED CODE ENDS HERE */
 
-    double pi = 2*std::acos(0.0);
     Cauchy one = Cauchy::Constant(1.0); 
     if (q > 0.0 && df_dtheta != 0.0) {
         df_dsigma_prime = (df_dp_prime*dp_dsigma_prime) + ((df_dq - df_dtheta*tan(3*theta_s)/q)*dq_dsigma_prime) 

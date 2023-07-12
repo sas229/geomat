@@ -105,8 +105,7 @@ void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     double df_dq = var_alpha_f*k_theta;
     double df_dtheta = dk_dtheta_f;
     /* USER DEFINED CODE ENDS HERE */
-    double psi_r = psi*pi/180.0;
-    double pi = 2.0*std::acos(0.0);
+    double psi_r = to_radians(psi);
     Cauchy one = Cauchy::Constant(1.0); 
     if (q > 0.0 && df_dtheta != 0.0) {
         df_dsigma_prime = (df_dp_prime*dp_dsigma_prime) + ((df_dq - df_dtheta*tan(3.0*theta_s))*dq_dsigma_prime) 

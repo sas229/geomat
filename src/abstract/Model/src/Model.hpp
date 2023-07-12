@@ -580,11 +580,6 @@ class Model {
         double max_shear;  
 
         /** 
-         * @brief Constant \f$ \pi \f$. 
-         */
-        double pi = 2*std::acos(0.0);
-
-        /** 
          * @brief Lode angle from cosine definition. 
          */
         double theta_c;

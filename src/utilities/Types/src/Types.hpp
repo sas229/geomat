@@ -5,10 +5,10 @@
 #include <Eigen/Core>
 #include <iostream>
 
-/**
- * @brief The angle pi.
+/** 
+ * @brief Constant \f$ \pi \f$. 
  */
-double pi = 2.0*std::acos(0.0);
+const double pi = 2*std::acos(0.0);
 
 /** 
  * @brief Eigen vector with six indices for storing the Voigt tensor. 
