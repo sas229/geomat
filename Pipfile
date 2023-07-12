@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 matplotlib = "*"
 numpy = "*"
-geomat = "*"
+geomat = {path = "."}
 
 [dev-packages]
 sphinxcontrib-bibtex = "*"

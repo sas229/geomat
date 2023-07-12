@@ -21,3 +21,7 @@ Cauchy to_cauchy(Voigt voigt) {
     cauchy(1,2) = cauchy(2,1) = voigt(5);
     return cauchy;
 }
+
+double to_radians(double angle) {
+    return angle*pi/180.0
+}

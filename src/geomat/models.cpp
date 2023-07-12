@@ -8,6 +8,7 @@
 #include "Elastic.hpp"
 #include "Elastoplastic.hpp"
 
+#include "C2MC.hpp"
 #include "LinearElastic.hpp"
 #include "MCC.hpp"
 #include "SMCC.hpp"
@@ -29,6 +30,30 @@ PYBIND11_MODULE(models, m) {
     py::class_<Elastoplastic, Elastic>(m, "Elastoplastic");
 
     // Models.
+
+    // C2 Continuous Mohr Coulomb (C2MC).
+    py::class_<C2MC, Elastoplastic>(m, "C2MC")
+        .def(py::init<Parameters, State>(), py::kw_only(), py::arg("parameters"), py::arg("state")) // Constructor.
+        .def(py::init<Parameters, State, std::string>(), py::kw_only(), py::arg("parameters"), py::arg("state"), py::arg("log_severity")) // Overloaded constructor.
+        .def("set_sigma_prime_tilde", &C2MC::set_sigma_prime_tilde)
+        .def("get_sigma_prime_tilde", &C2MC::get_sigma_prime_tilde)
+        .def("set_Delta_epsilon_tilde", &C2MC::set_Delta_epsilon_tilde)
+        .def("get_state", &C2MC::get_state_variables)
+        .def("get_p_prime", &C2MC::get_p_prime)
+        .def("get_q", &C2MC::get_q)
+        .def_property_readonly("name", &C2MC::get_model_name)
+        .def_property_readonly("type", &C2MC::get_model_type)
+        .def_property_readonly("p_prime", &C2MC::get_p_prime)
+        .def_property_readonly("q", &C2MC::get_q)
+        .def_property_readonly("sigma_prime_tilde", &C2MC::get_sigma_prime_tilde)
+        .def_property_readonly("state", &C2MC::get_state_variables)
+        .def_property_readonly("I_1", &C2MC::get_I_1)
+        .def_property_readonly("I_2", &C2MC::get_I_2)
+        .def_property_readonly("I_3", &C2MC::get_I_3)
+        .def_property_readonly("J_1", &C2MC::get_J_1)
+        .def_property_readonly("J_2", &C2MC::get_J_2)
+        .def_property_readonly("J_3", &C2MC::get_J_3)
+        .def("solve", &C2MC::solve);
 
     // Linear isotropic elasticity (LinearElastic).
     py::class_<LinearElastic, Elastic>(m, "LinearElastic")
@@ -101,4 +126,5 @@ PYBIND11_MODULE(models, m) {
         .def_property_readonly("J_2", &SMCC::get_J_2)
         .def_property_readonly("J_3", &SMCC::get_J_3)
         .def("solve", &SMCC::solve);
+
 }

@@ -4,7 +4,12 @@
 
 #include <Eigen/Core>
 #include <iostream>
- 
+
+/**
+ * @brief The angle pi.
+ */
+double pi = 2.0*std::acos(0.0);
+
 /** 
  * @brief Eigen vector with six indices for storing the Voigt tensor. 
  */
@@ -124,5 +129,13 @@ Voigt to_voigt(Cauchy cauchy);
  * @return Cauchy 
  */
 Cauchy to_cauchy(Voigt voigt);
+
+/**
+ * @brief Function to convert degrees to radians.
+ * 
+ * @param angle 
+ * @return double 
+ */
+double to_radians(double angle);
 
 #endif
