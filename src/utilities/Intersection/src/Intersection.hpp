@@ -44,28 +44,16 @@ namespace Intersection {
      * @param[in] sigma_prime Current stress state.
      * @param[in] state Current state variables.
      * @param[in] Delta_epsilon_tilde Current strain increment.
-     * @param[in] FTOL Yield surface tolerance.
-     * @param[in] LTOL Unload-reload tolerance.
-     * @param[in] MAXITS_YSI Maximum number of iterations for the yield surface intersection algorithm.
-     * @param[in] NSUB Maximum number of subincrements for the yield surface intersection algorithm.
-     * @param[in] compute_f Yield function binding.
-     * @param[in] compute_trial_stress Trial stress function binding.
-     * @param[in] compute_D_e Constitutive matrix function binding.
-     * @param[in] compute_derivatives Derivative computation function binding.
+     * @param[in] settings Stress integrations settings.
+     * @param[in] f Struct containing model specific function bindings.
      * @return double
      */
     double compute_alpha(
         Cauchy sigma_prime,
         State state,
         Voigt Delta_epsilon_tilde,
-        double FTOL,
-        double LTOL,
-        int MAXITS_YSI,
-        int NSUB,
-        YieldFunction compute_f,
-        TrialFunction compute_trial_stress,
-        ConstitutiveMatrixFunction compute_D_e,
-        DerivativeFunction compute_derivatives);
+        Settings settings,
+        ModelFunctions mf);
 
     /**
      * @brief Function to determine if an increment is an unload-reload increment.
@@ -85,10 +73,8 @@ namespace Intersection {
      * @param[in] sigma_prime Current stress state.
      * @param[in] state Current state variables.
      * @param[in] Delta_epsilon_tilde Current strain increment.
-     * @param[in] LTOL Unload-reload tolerance.
-     * @param[in] compute_f Yield function binding.
-     * @param[in] compute_D_e Constitutive matrix function binding.
-     * @param[in] compute_derivatives Derivative computation function binding.
+     * @param[in] settings Stress integrations settings.
+     * @param[in] f Struct containing model specific function bindings.
      * @return true
      * @return false
      */
@@ -96,10 +82,8 @@ namespace Intersection {
         Cauchy sigma_prime,
         State state,
         Voigt Delta_epsilon_tilde,
-        double LTOL,
-        YieldFunction compute_f,
-        ConstitutiveMatrixFunction compute_D_e,
-        DerivativeFunction compute_derivatives);
+        Settings settings,
+        ModelFunctions mf);
 
     /**
      * @brief Function to compute bounds for alpha for elastoplastic unloading-reloading increment.
@@ -127,11 +111,8 @@ namespace Intersection {
      * @param[in] sigma_prime Current stress state.
      * @param[in] state Current state variables.
      * @param[in] Delta_epsilon_tilde Current strain increment.
-     * @param[in] FTOL Yield surface tolerance.
-     * @param[in] NSUB Maximum number of subincrements for the yield surface intersection algorithm.
-     * @param[in] compute_f Yield function binding.
-     * @param[in] compute_D_e Constitutive matrix function binding.
-     * @param[in] compute_trial_stress Trial stress function binding.
+     * @param[in] settings Stress integrations settings.
+     * @param[in] f Struct containing model specific function bindings.
      * @param[in,out] alpha_0 Lower bound for alpha.
      * @param[in,out] alpha_1 Upper bound for alpha.
      */
@@ -139,11 +120,8 @@ namespace Intersection {
         Cauchy sigma_prime,
         State state,
         Voigt Delta_epsilon_tilde,
-        double FTOL,
-        int NSUB,
-        YieldFunction compute_f,
-        ConstitutiveMatrixFunction compute_D_e,
-        TrialFunction compute_trial_stress,
+        Settings settings,
+        ModelFunctions mf,
         double &alpha_0,
         double &alpha_1);
 
@@ -182,10 +160,8 @@ namespace Intersection {
      * @param[in] alpha_1 Upper bound on alpha.
      * @param[in] f_0 Initial value of objective function with lower bound alpha.
      * @param[in] f_1 Initial value of objective function with upper bound alpha.
-     * @param[in] FTOL Yield surface tolerance.
-     * @param[in] MAXITS_YSI Maximum number of iterations for the yield surface intersection algorithm.
-     * @param[in] compute_f Yield function binding.
-     * @param[in] compute_trial_stress Trial stress function binding.
+     * @param[in] settings Stress integrations settings.
+     * @param[in] f Struct containing model specific function bindings.
      * @return double
      */
     double pegasus_regula_falsi(
@@ -196,10 +172,8 @@ namespace Intersection {
         double alpha_1,
         double f_0,
         double f_1,
-        double FTOL,
-        int MAXITS_YSI,
-        YieldFunction compute_f,
-        TrialFunction compute_trial_stress);
+        Settings settings,
+        ModelFunctions mf);
 
 }  // namespace Intersection
 

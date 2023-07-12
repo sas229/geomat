@@ -83,6 +83,33 @@ typedef std::function<void(Cauchy sigma_prime, State state, Cauchy &df_dsigma_pr
 typedef std::function<State(double delta_lambda, Cauchy df_dsigma_prime, double H, Voigt Delta_epsilon_tilde_p_dT)> StateIncrementFunction;
 
 /**
+ * @brief Object containing functions to be bound to model specific implementation.
+ */
+struct ModelFunctions {
+    YieldFunction compute_f;
+    TrialFunction compute_trial_stress;
+    ConstitutiveMatrixFunction compute_D_e;
+    DerivativeFunction compute_derivatives;
+    StateIncrementFunction compute_plastic_state_variable_increment;
+};
+
+/**
+ * @brief Stress integration settings with defaults.
+ */
+struct Settings{
+    std::string solver = "Explicit";
+    std::string method = "ForwardEuler";
+    double FTOL = 1e-8;
+    double LTOL = 1e-6;
+    double STOL = 1e-4;
+    double EPS = 1e-16;
+    double DT_MIN = 1e-6;
+    int MAXITS_YSI = 10;
+    int MAXITS_YSC = 30;
+    int NSUB = 10;
+};
+
+/**
  * @brief Convert Cauchy tensor into Voigt form.
  * 
  * @param[in] cauchy Cauchy tensor.

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <plog/Log.h>
 #include <Eigen/Eigen>
 #include "Types.hpp"
@@ -225,11 +226,16 @@ class Elastoplastic : public Elastic {
          * @brief Double precision tolerance.
          */
         double EPS = 1e-16;
-
+        
         /**
-         * @brief Solution method to use for plastic strain integration. Defaults to Sloan's explicit stress integration approach.
+         * @brief Object containing model specific function bindings.
          */
-        std::string method = "Sloan";
+        ModelFunctions mf;
+
+        /** 
+         * @brief Stress integration settings.
+        */
+        Settings settings;
 
 };
 

@@ -1,5 +1,5 @@
-#ifndef SLOAN_H
-#define SLOAN_H
+#ifndef EXPLICIT_H
+#define EXPLICIT_H
 
 #include <plog/Log.h>
 #include <functional>
@@ -7,21 +7,14 @@
 #include "Types.hpp"
 
 
-namespace Sloan {
+namespace Explicit {
 
     void solve(
         Cauchy &sigma_prime_ep, 
         State &state_ep, 
         Voigt Delta_epsilon_tilde_p, 
-        double FTOL,
-        double STOL,
-        double DT_MIN,
-        double EPS,
-        int MAXITS_YSC,
-        YieldFunction compute_f,
-        ConstitutiveMatrixFunction compute_D_e,
-        DerivativeFunction compute_derivatives,
-        StateIncrementFunction compute_plastic_state_variable_increment
+        Settings settings,
+        ModelFunctions mf
     );
 
     double compute_new_substep_size(
@@ -29,8 +22,7 @@ namespace Sloan {
         double dT, 
         double T, 
         double R_n, 
-        double DT_MIN, 
-        double STOL
+        Settings settings
     );
 
     void compute_yield_surface_correction(
@@ -43,7 +35,7 @@ namespace Sloan {
         Constitutive D_e_u, 
         Cauchy &sigma_prime_c, 
         State &state_c, 
-        StateIncrementFunction compute_plastic_state_variable_increment
+        ModelFunctions mf
     );
 
     void compute_normal_yield_surface_correction(
@@ -61,9 +53,7 @@ namespace Sloan {
         Voigt Delta_epsilon_tilde_p_dT, 
         Voigt &Delta_sigma_prime, 
         State &delta_state, 
-        ConstitutiveMatrixFunction compute_D_e, 
-        DerivativeFunction compute_derivatives, 
-        StateIncrementFunction compute_plastic_state_variable_increment
+        ModelFunctions mf
     );
 
     double compute_error_estimate(
@@ -73,9 +63,9 @@ namespace Sloan {
         Voigt Delta_sigma_prime_2, 
         State delta_state_1, 
         State delta_state_2, 
-        double EPS
+        Settings settings
     );
 
-}  // namespace Sloan
+}  // namespace Explicit
 
 #endif
