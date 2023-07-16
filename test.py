@@ -12,7 +12,7 @@ ea_increment = ea_max/increments
 Delta_epsilon_tilde = np.array([ea_increment, -ea_increment/2, -ea_increment/2, 0.0, 0.0, 0.0])
 axial_strain = np.arange(0, increments*ea_increment, ea_increment)
 
-model = LinearElastic(parameters=parameters, state=state, log_severity="none")
+model = LinearElastic(parameters=parameters, state=state, log_severity="verbose")
 print("Model name: {}".format(model.name))
 print("Model type: {}".format(model.type))
 model.set_sigma_prime_tilde(stress)
