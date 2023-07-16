@@ -37,8 +37,7 @@ double C2MC::compute_f(Cauchy sigma_prime, State state) {
     double p_prime = compute_p_prime(sigma_prime);
 
     // State variables.
-    //double psi = state[0]; if we consider Bolton's dilation related formulation
-
+    // No state variables for this model.
 
     /* USER DEFINED CODE STARTS HERE */
     double J_2, J_3, sign_theta, k_theta;
@@ -75,13 +74,10 @@ double C2MC::compute_f(Cauchy sigma_prime, State state) {
 
 void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &H) {
     // State variables.
-    //double e = state[0];
-    //double p_c = state[1];
-    //double s_ep = state[2];
+    // No state variables for this model.
 
     // Compute mean effective stress, deviatoric stress tensor and derivatives of the stress state for current stress state.
     double q, p_prime, I_1, I_2, I_3, J_1, J_2, J_3, theta_c, theta_s, theta_s_bar;
-    double k_theta, coeff_A, coeff_B, coeff_C, theta_r, theta_tr, phi_r, dk_dtheta_f, dk_dtheta_g;
     Cauchy s, dq_dsigma_prime, dJ_3_dsigma_prime, sigma;
     q = compute_q(sigma_prime);
     p_prime = compute_p_prime(sigma_prime);
@@ -93,19 +89,19 @@ void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     compute_lode(J_2, J_3, theta_c, theta_s, theta_s_bar);
     
     /* USER DEFINED CODE STARTS HERE */
+    double k_theta, coeff_A, coeff_B, coeff_C, theta_r, theta_tr, phi_r, dk_dtheta_f, dk_dtheta_g;
     double var_alpha_f = (q*k_theta)/sqrt(std::pow((q*k_theta),2.0)+std::pow((a_h*sin(phi_r)),2.0));
-
     if (std::abs(theta_r) > theta_tr) {
         dk_dtheta_f = 3.0*coeff_B*std::cos(3.0*theta_r)+3.0*coeff_C*std::sin(6.0*theta_r);
     } else { 
         dk_dtheta_f = -std::sin(theta_r)-(1.0/std::sqrt(3.0))*std::sin(phi_r)*std::cos(theta_r);
     }
-
     double df_dp_prime = std::sin(phi_r);
     double df_dq = var_alpha_f*k_theta;
     double df_dtheta = dk_dtheta_f;
-    /* USER DEFINED CODE ENDS HERE */
     double psi_r = to_radians(psi);
+    /* USER DEFINED CODE ENDS HERE */
+
     Cauchy one = Cauchy::Constant(1.0); 
     if (q > 0.0 && df_dtheta != 0.0) {
         df_dsigma_prime = (df_dp_prime*dp_dsigma_prime) + ((df_dq - df_dtheta*tan(3.0*theta_s))*dq_dsigma_prime) 
@@ -116,7 +112,6 @@ void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     
     /* USER DEFINED CODE STARTS HERE */
     double var_alpha_g = (q*k_theta)/sqrt(std::pow((q*k_theta),2.0)+std::pow((a_h*sin(psi_r)),2.0));
-
     if (std::abs(theta_r) > theta_tr) {
         dk_dtheta_g = 3.0*coeff_B*std::cos(3.0*theta_r)+3.0*coeff_C*std::sin(6.0*theta_r);
     } else { 
@@ -137,9 +132,6 @@ void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     b = to_voigt(dg_dsigma_prime);
 
     /* USER DEFINED CODE STARTS HERE */
-    // double H_p_c = (std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*s_ep*df_dsigma_prime.trace();
-    // double H_s_ep = (std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*-k*(s_ep-1.0)*std::sqrt((1-A)*std::pow(df_dsigma_prime.trace(),2)
-    //     + (A*2.0/3.0*(df_dsigma_prime*(df_dsigma_prime.transpose())).trace()));
     H = 0.0;
     /* USER DEFINED CODE ENDS HERE */
 
