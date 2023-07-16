@@ -1,6 +1,6 @@
 #include "C2MC.hpp"
 
-C2MC::C2MC(Parameters parameters, State state, std::string log_severity) : parameters(parameters), state(state) {   
+C2MC::C2MC(Parameters parameters, State state, std::string log_severity) : parameters(parameters), state(state), Elastoplastic::Elastoplastic() {   
     set_model_name("C2MC");
     set_model_type("Elastoplastic");
 
@@ -9,9 +9,6 @@ C2MC::C2MC(Parameters parameters, State state, std::string log_severity) : param
 
     // Check inputs.
     Checks::check_inputs(name, (int)parameters.size(), (int)state.size(), parameters_required, state_required);
-
-    // Bind model functions and apply settings.
-    bind_model_functions_and_settings();
 }
 
 State C2MC::get_state_variables(void) {

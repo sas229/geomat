@@ -21,7 +21,7 @@ class Elastoplastic : public Elastic {
         /** 
          * @brief Elastoplastic model constructor.
          */
-        explicit Elastoplastic() {}
+        explicit Elastoplastic();
 
         /**
          *  @brief Elastoplastic model destructor. 

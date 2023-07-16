@@ -64,42 +64,12 @@ int main() {
     // int kstep;
     // int kinc;
 
-    // int ndi = 3;
-    // int nshr = 3;
-    // int ntens = 6;
-    // double stress[6] = {-10, -10, -10, 0, 0, 0};
-    // int nstatv = 3;
-    // double statev[3] = {1.7477796692480023, 10, 3.0};
-    // double ddsdde[36] = {0};
-    // double sse, spd, scd, rpl;
-    // double ddsddt[6], drplde[6];
-    // double drpldt;
-    // double stran[6] = {0};
-    // double dstran[6] = {-0.0005, 0.00025, 0.00025, 0.0, 0.0, 0.0};
-    // double time[2];
-    // double dtime, temp, dtemp;
-    // double predef, dpred;
-    // char cmname[] = "SMCC";
-    // int nprops = 8;
-    // double props[8] = {0.92, 0.2, 1.195, 0.08, 0.02, 3.0, 0.2, 0.5};
-    // double coords[3] = {0.0, 0.0, 0.0};
-    // double drot;
-    // double pnewdt, celent;
-    // double dfgrd0;
-    // double dfgrd1;
-    // int noel = 1;
-    // int npt = 1;
-    // int layer;
-    // int kspt;
-    // int kstep;
-    // int kinc;
-
     int ndi = 3;
     int nshr = 3;
     int ntens = 6;
     double stress[6] = {-10, -10, -10, 0, 0, 0};
-    int nstatv = 0;
-    double statev[0] = {};
+    int nstatv = 3;
+    double statev[3] = {1.7477796692480023, 10, 3.0};
     double ddsdde[36] = {0};
     double sse, spd, scd, rpl;
     double ddsddt[6], drplde[6];
@@ -109,9 +79,9 @@ int main() {
     double time[2];
     double dtime, temp, dtemp;
     double predef, dpred;
-    char cmname[] = "C2MC";
-    int nprops = 7;
-    double props[7] = {500.0, 0.2, 1.0, 25.0, 29.0, 1.1, 0.1};
+    char cmname[] = "SMCC";
+    int nprops = 8;
+    double props[8] = {0.92, 0.2, 1.195, 0.08, 0.02, 3.0, 0.2, 0.5};
     double coords[3] = {0.0, 0.0, 0.0};
     double drot;
     double pnewdt, celent;
@@ -123,6 +93,36 @@ int main() {
     int kspt;
     int kstep;
     int kinc;
+
+    // int ndi = 3;
+    // int nshr = 3;
+    // int ntens = 6;
+    // double stress[6] = {-10, -10, -10, 0, 0, 0};
+    // int nstatv = 0;
+    // double statev[0] = {};
+    // double ddsdde[36] = {0};
+    // double sse, spd, scd, rpl;
+    // double ddsddt[6], drplde[6];
+    // double drpldt;
+    // double stran[6] = {0};
+    // double dstran[6] = {-0.0005, 0.00025, 0.00025, 0.0, 0.0, 0.0};
+    // double time[2];
+    // double dtime, temp, dtemp;
+    // double predef, dpred;
+    // char cmname[] = "C2MC";
+    // int nprops = 7;
+    // double props[7] = {500.0, 0.2, 1.0, 25.0, 29.0, 1.1, 0.1};
+    // double coords[3] = {0.0, 0.0, 0.0};
+    // double drot;
+    // double pnewdt, celent;
+    // double dfgrd0;
+    // double dfgrd1;
+    // int noel = 1;
+    // int npt = 1;
+    // int layer;
+    // int kspt;
+    // int kstep;
+    // int kinc;
 
     // Try ten increments.
     for (int i=0; i < 100; ++i) {

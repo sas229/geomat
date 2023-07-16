@@ -9,7 +9,7 @@
 
 class Intersection {
 
-    public: 
+    public:
 
         /**
          * @brief Intersection class constructor. 
@@ -24,6 +24,12 @@ class Intersection {
          */
         virtual ~Intersection() {}
 
+        /**
+         * @brief Initialise Intersection instance by setting model function bindings and stress integration settings.
+         * 
+         * @param settings Stress integration settings.
+         * @param mf Model specific function bindings.
+         */
         void initialise(Settings settings, ModelFunctions mf);
 
         /**
@@ -53,7 +59,7 @@ class Intersection {
          * In this instance, a check is made for unloading-reloading via @ref check_unload_reload. If this check is true, then the
          * unloading-reloading occurs and the "Pegasus" algorithm is used to compute \f$ \alpha \f$ with bounds on \f$ \alpha \f$ 
          * of \f$ 0.0 \f$ and \f$ 1.0 \f$ via @ref pegasus_regula_falsi. Otherwise, if unloading-reloading does not occur closer bounds on 
-         * \f$ \alpha \f$ are computed via @ref compute_alpha_bounds prior to calling via @ref pegasus_regula_falsi. If the algorithm fails 
+         * \f$ \alpha \f$ are computed via @ref refine_alpha_bounds prior to calling via @ref pegasus_regula_falsi. If the algorithm fails 
          * to converge within a user-defined MAXITS_YSI iterations, typically taken as 10, then the algorithm raises a false assertion and
          * accompanying log message. The technique is model agnostic and can be used with any model because of the use of various function
          * bindings rather than hard-coded functions.
@@ -113,14 +119,8 @@ class Intersection {
      * If \f$ f_{n} \gt \text{FTOL} \f$ then the current subincrement contains the transition and bounds on 
      * \f$ \alpha \f$ of \f$ \alpha_{n} \pm 1.0/\text{NSUB}\f$ are returned. Otherwise the process continues 
      * with \f$ \alpha_{n} = \alpha_{n} + 1.0/\text{NSUB} \f$ recursively until \f$ f_{n} > \text{FTOL} \f$.
-     *
-     * @param[in,out] alpha_0 Lower bound for alpha.
-     * @param[in,out] alpha_1 Upper bound for alpha.
      */
-    void compute_alpha_bounds(
-        double &alpha_0,
-        double &alpha_1
-    );
+    void refine_alpha_bounds(void);
 
     /**
      * @brief Pegasus regula falsi algorithm to find root of general non-linear system of equations.
@@ -150,30 +150,51 @@ class Intersection {
      * Updated estimates for \f$ \alpha \f$ are computed until the yield function value is less than the user-defined
      * tolerance FTOL or until the number of iterations equals the user-defined maximum number of iterations MAXITS_YSI.
      * 
-     * @param[in] alpha_0 Lower bound on alpha.
-     * @param[in] alpha_1 Upper bound on alpha.
-     * @param[in] f_0 Initial value of objective function with lower bound alpha.
-     * @param[in] f_1 Initial value of objective function with upper bound alpha.
      * @return double
      */
-    double pegasus_regula_falsi(
-        double alpha_0,
-        double alpha_1,
-        double f_0,
-        double f_1
-    );
+    double pegasus_regula_falsi(void);
 
+    /**
+     * @brief Lower bound on alpha.
+     */
+    double alpha_0 = 0.0;
+
+    /**
+     * @brief Upper bound on alpha.
+     */
+    double alpha_1 = 1.0;
+
+    /**
+     * @brief Fraction of strain increment applied at point of intersection.
+     */
+    double alpha = 0.0;
+
+    /**
+     * @brief Initial effective stress state to solve for surface intersection.
+     * 
+     */
     Cauchy sigma_prime;
 
+    /**
+     * @brief Initial state variables to solve for surface intersection.
+     */
     State state;
 
+    /**
+     * @brief Strain increment to solve for surface intersection.
+     * 
+     */
     Voigt Delta_epsilon_tilde;
 
+    /**
+     * @brief Stress integration settings.
+     */
     Settings settings;
 
+    /**
+     * @brief Model specfic function bindings.
+     */
     ModelFunctions mf;
-
-    bool initialised = false;
 
 };
 
