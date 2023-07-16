@@ -7,53 +7,69 @@
 #include "Types.hpp"
 
 
-namespace Intersection {
+class Intersection {
 
-    /**
-     * @brief Function to compute the fraction \f$ \alpha \f$ of the step that is elastic.
-     * 
-     * The approach uses the "Pegasus" algorithm of Dowell and Jarret (1972) via @ref pegasus_regula_falsi. 
-     * Due to the specific nature of the problem the algorithm is preconditioned for various cases to ensure
-     * unconditional convergence. Taking the effective stress state and state variables at the start of the 
-     * current increment, the current yield function value is computed as:
-     * 
-     * \f[ f_{0} = f\left(\sigma^{\prime}_{0}, H_{0}\right)\f]
-     *  
-     * where \f$ \sigma^{\prime}_{0} \f$ is the initial effective stress state and \f$ H_{0} \f$ 
-     * is the initial vector of state variables. The trial stress state is then computed using an 
-     * elastic predictor and the full strain increment (i.e. \f$ \alpha = 1.0 \f$):
-     * 
-     * \f[ \sigma^{\prime}_{1} = \sigma^{\prime}_{0} + \mathbf{D}_{e} \alpha \Delta \epsilon = \sigma^{\prime}_{0} + \mathbf{D}_{e} \Delta \epsilon \f]
-     * 
-     * The value of the yield function at this trial stress is then computed:
-     * 
-     * \f[ f_{1} = f\left(\sigma^{\prime}_{1}, H_{0}\right)\f]
-     *
-     * If \f$ f_{1} < \text{FTOL} \f$, which is a user-defined tolerance typically taken as \f$ 1 \cdot 10^{-8} \f$,
-     * then the increment is fully elastic and \f$ \alpha = 1.0 \f$ is returned. 
-     * 
-     * Otherwise, if \f$ \lvert f_{0} \rvert \leq \text{FTOL} \f$ and \f$ f_{1} \gt \text{FTOL} \f$ then the increment is partially plastic.
-     * In this instance, a check is made for unloading-reloading via @ref check_unload_reload. If this check is true, then the
-     * unloading-reloading occurs and the "Pegasus" algorithm is used to compute \f$ \alpha \f$ with bounds on \f$ \alpha \f$ 
-     * of \f$ 0.0 \f$ and \f$ 1.0 \f$ via @ref pegasus_regula_falsi. Otherwise, if unloading-reloading does not occur closer bounds on 
-     * \f$ \alpha \f$ are computed via @ref compute_alpha_bounds prior to calling via @ref pegasus_regula_falsi. If the algorithm fails 
-     * to converge within a user-defined MAXITS_YSI iterations, typically taken as 10, then the algorithm raises a false assertion and
-     * accompanying log message. The technique is model agnostic and can be used with any model because of the use of various function
-     * bindings rather than hard-coded functions.
-     * 
-     * @param[in] sigma_prime Current stress state.
-     * @param[in] state Current state variables.
-     * @param[in] Delta_epsilon_tilde Current strain increment.
-     * @param[in] settings Stress integrations settings.
-     * @param[in] f Struct containing model specific function bindings.
-     * @return double
-     */
-    double compute_alpha(
-        Cauchy sigma_prime,
-        State state,
-        Voigt Delta_epsilon_tilde,
-        Settings settings,
-        ModelFunctions mf);
+    public: 
+
+        /**
+         * @brief Intersection class constructor. 
+         * 
+         * @param[in] settings Stress integrations settings.
+         * @param[in] mf Struct containing model specific function bindings.
+         */
+        Intersection() {}
+
+        /** 
+         * @brief C2MC model destructor. 
+         */
+        virtual ~Intersection() {}
+
+        void initialise(Settings settings, ModelFunctions mf);
+
+        /**
+         * @brief Function to compute the fraction \f$ \alpha \f$ of the step that is elastic.
+         * 
+         * The approach uses the "Pegasus" algorithm of Dowell and Jarret (1972) via @ref pegasus_regula_falsi. 
+         * Due to the specific nature of the problem the algorithm is preconditioned for various cases to ensure
+         * unconditional convergence. Taking the effective stress state and state variables at the start of the 
+         * current increment, the current yield function value is computed as:
+         * 
+         * \f[ f_{0} = f\left(\sigma^{\prime}_{0}, H_{0}\right)\f]
+         *  
+         * where \f$ \sigma^{\prime}_{0} \f$ is the initial effective stress state and \f$ H_{0} \f$ 
+         * is the initial vector of state variables. The trial stress state is then computed using an 
+         * elastic predictor and the full strain increment (i.e. \f$ \alpha = 1.0 \f$):
+         * 
+         * \f[ \sigma^{\prime}_{1} = \sigma^{\prime}_{0} + \mathbf{D}_{e} \alpha \Delta \epsilon = \sigma^{\prime}_{0} + \mathbf{D}_{e} \Delta \epsilon \f]
+         * 
+         * The value of the yield function at this trial stress is then computed:
+         * 
+         * \f[ f_{1} = f\left(\sigma^{\prime}_{1}, H_{0}\right)\f]
+         *
+         * If \f$ f_{1} < \text{FTOL} \f$, which is a user-defined tolerance typically taken as \f$ 1 \cdot 10^{-8} \f$,
+         * then the increment is fully elastic and \f$ \alpha = 1.0 \f$ is returned. 
+         * 
+         * Otherwise, if \f$ \lvert f_{0} \rvert \leq \text{FTOL} \f$ and \f$ f_{1} \gt \text{FTOL} \f$ then the increment is partially plastic.
+         * In this instance, a check is made for unloading-reloading via @ref check_unload_reload. If this check is true, then the
+         * unloading-reloading occurs and the "Pegasus" algorithm is used to compute \f$ \alpha \f$ with bounds on \f$ \alpha \f$ 
+         * of \f$ 0.0 \f$ and \f$ 1.0 \f$ via @ref pegasus_regula_falsi. Otherwise, if unloading-reloading does not occur closer bounds on 
+         * \f$ \alpha \f$ are computed via @ref compute_alpha_bounds prior to calling via @ref pegasus_regula_falsi. If the algorithm fails 
+         * to converge within a user-defined MAXITS_YSI iterations, typically taken as 10, then the algorithm raises a false assertion and
+         * accompanying log message. The technique is model agnostic and can be used with any model because of the use of various function
+         * bindings rather than hard-coded functions.
+         * 
+         * @param[in] sigma_prime Current stress state.
+         * @param[in] state Current state variables.
+         * @param[in] Delta_epsilon_tilde Current strain increment.
+         * @return double
+         */
+        double solve(
+            Cauchy sigma_prime,
+            State state,
+            Voigt Delta_epsilon_tilde
+        );
+
+    protected:
 
     /**
      * @brief Function to determine if an increment is an unload-reload increment.
@@ -70,20 +86,10 @@ namespace Intersection {
      * state assuming the increment is fully elastic and LTOL is a user-defined tolerance typically taken as
      * \f$ 1 \cdot 10^{-6} \f$. Returns true if the above criteria is met and false otherwise.
      * 
-     * @param[in] sigma_prime Current stress state.
-     * @param[in] state Current state variables.
-     * @param[in] Delta_epsilon_tilde Current strain increment.
-     * @param[in] settings Stress integrations settings.
-     * @param[in] f Struct containing model specific function bindings.
      * @return true
      * @return false
      */
-    bool check_unload_reload(
-        Cauchy sigma_prime,
-        State state,
-        Voigt Delta_epsilon_tilde,
-        Settings settings,
-        ModelFunctions mf);
+    bool check_unload_reload(void);
 
     /**
      * @brief Function to compute bounds for alpha for elastoplastic unloading-reloading increment.
@@ -108,22 +114,13 @@ namespace Intersection {
      * \f$ \alpha \f$ of \f$ \alpha_{n} \pm 1.0/\text{NSUB}\f$ are returned. Otherwise the process continues 
      * with \f$ \alpha_{n} = \alpha_{n} + 1.0/\text{NSUB} \f$ recursively until \f$ f_{n} > \text{FTOL} \f$.
      *
-     * @param[in] sigma_prime Current stress state.
-     * @param[in] state Current state variables.
-     * @param[in] Delta_epsilon_tilde Current strain increment.
-     * @param[in] settings Stress integrations settings.
-     * @param[in] f Struct containing model specific function bindings.
      * @param[in,out] alpha_0 Lower bound for alpha.
      * @param[in,out] alpha_1 Upper bound for alpha.
      */
     void compute_alpha_bounds(
-        Cauchy sigma_prime,
-        State state,
-        Voigt Delta_epsilon_tilde,
-        Settings settings,
-        ModelFunctions mf,
         double &alpha_0,
-        double &alpha_1);
+        double &alpha_1
+    );
 
     /**
      * @brief Pegasus regula falsi algorithm to find root of general non-linear system of equations.
@@ -153,28 +150,31 @@ namespace Intersection {
      * Updated estimates for \f$ \alpha \f$ are computed until the yield function value is less than the user-defined
      * tolerance FTOL or until the number of iterations equals the user-defined maximum number of iterations MAXITS_YSI.
      * 
-     * @param[in] sigma_prime Current stress state.
-     * @param[in] state Current state variables.
-     * @param[in] Delta_epsilon_tilde Current strain increment.
      * @param[in] alpha_0 Lower bound on alpha.
      * @param[in] alpha_1 Upper bound on alpha.
      * @param[in] f_0 Initial value of objective function with lower bound alpha.
      * @param[in] f_1 Initial value of objective function with upper bound alpha.
-     * @param[in] settings Stress integrations settings.
-     * @param[in] f Struct containing model specific function bindings.
      * @return double
      */
     double pegasus_regula_falsi(
-        Cauchy sigma_prime,
-        State state,
-        Voigt Delta_epsilon_tilde,
         double alpha_0,
         double alpha_1,
         double f_0,
-        double f_1,
-        Settings settings,
-        ModelFunctions mf);
+        double f_1
+    );
 
-}  // namespace Intersection
+    Cauchy sigma_prime;
+
+    State state;
+
+    Voigt Delta_epsilon_tilde;
+
+    Settings settings;
+
+    ModelFunctions mf;
+
+    bool initialised = false;
+
+};
 
 #endif

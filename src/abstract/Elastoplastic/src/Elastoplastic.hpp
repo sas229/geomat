@@ -21,7 +21,7 @@ class Elastoplastic : public Elastic {
         /** 
          * @brief Elastoplastic model constructor.
          */
-        Elastoplastic() {}
+        explicit Elastoplastic() {}
 
         /**
          *  @brief Elastoplastic model destructor. 
@@ -32,6 +32,8 @@ class Elastoplastic : public Elastic {
          *  @brief Solve current strain increment using refined explicit approach of Sloan et al. (2001). 
          */
         void solve(void);
+
+        void bind_model_functions_and_settings(void);
 
         /**
          * @brief Pure virtual method to compute the yield surface value given the parameters, current state variables and stress state.
@@ -236,6 +238,8 @@ class Elastoplastic : public Elastic {
          * @brief Stress integration settings.
         */
         Settings settings;
+
+        Intersection intersection;
 
 };
 
