@@ -8,3 +8,4 @@ target_include_directories(Explicit INTERFACE
 target_link_libraries(Explicit INTERFACE plog Types)
 
 add_subdirectory(ModifiedEuler)
+add_subdirectory(RKDP)
