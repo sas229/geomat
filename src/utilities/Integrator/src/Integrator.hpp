@@ -23,9 +23,9 @@ class Integrator {
         virtual ~Integrator() {}
 
         void solve(
-            Cauchy &sigma_prime_ep, 
-            State &state_ep, 
-            Voigt Delta_epsilon_tilde_p
+            Cauchy &sigma_prime, 
+            State &state, 
+            Voigt Delta_epsilon_tilde
         );
 
     private:
