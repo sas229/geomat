@@ -1,6 +1,6 @@
 #include "Elastoplastic.hpp"
 
-Elastoplastic::Elastoplastic() {
+Elastoplastic::Elastoplastic() : integrator(&settings, &mf) {
     // Define binds to model functions.
     using namespace std::placeholders;
     mf.compute_f = std::bind(&Elastoplastic::compute_f, this, _1, _2);
@@ -50,13 +50,7 @@ void Elastoplastic::solve(void) {
             PLOG_DEBUG << "Plastic strain increment, Delta_epsilon_tilde_p = " << Delta_epsilon_tilde_p;
             PLOG_DEBUG << "Initial elastoplastic stress state, sigma_prime_ep_tilde = " << to_voigt(sigma_prime_ep);
             PLOG_DEBUG << "Initial elastoplastic state variables, state_ep = " <<state_ep;
-            if (settings.solver == "Explicit") {
-                // Perform elastoplastic stress integration using Sloan's method.
-                Explicit::solve(sigma_prime_ep, state_ep, Delta_epsilon_tilde_p, settings, mf);
-            } else {
-                PLOG_FATAL << "Invalid elastoplastic integration method.";
-                assert(false);
-            }
+            integrator.solve(sigma_prime_ep, state_ep, Delta_epsilon_tilde_p);
             sigma_prime = sigma_prime_ep;
             set_state_variables(state_ep);
         } else {

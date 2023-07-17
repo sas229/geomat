@@ -244,6 +244,8 @@ class Elastoplastic : public Elastic {
          */
         Intersection intersection{settings, mf};
 
+        Integrator integrator;
+
 };
 
 #endif
