@@ -1,6 +1,6 @@
 #include "Integrator.hpp"
 
-Integrator::Integrator(Settings *settings, ModelFunctions *mf) : me(settings, mf) {
+Integrator::Integrator(Settings *settings, ModelFunctions *mf) : me(settings, mf), rkdp(settings, mf) {
     this->settings = settings;
     this->mf = mf;
 }
@@ -13,6 +13,8 @@ void Integrator::solve(
     if (settings->solver == "Explicit") {
         if (settings->method == "ModifiedEuler") {
             me.solve(sigma_prime, state, Delta_epsilon_tilde);
+        } else if (settings->method == "RKDP") {
+            rkdp.solve(sigma_prime, state, Delta_epsilon_tilde);
         }
     } else {
         PLOG_FATAL << "Invalid solver defined. This option is not yet implemented.";

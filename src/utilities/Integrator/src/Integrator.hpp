@@ -4,6 +4,7 @@
 #include <plog/Log.h>
 #include "Types.hpp"
 #include "ModifiedEuler.hpp"
+#include "RKDP.hpp"
 
 class Integrator {
 
@@ -44,6 +45,12 @@ class Integrator {
          * @brief Modified Euler stress integration solver instance.
          */
         ModifiedEuler me;
+
+        /**
+         * @brief Runge-Kutta-Dormand-Prince integration solver instance.
+         * 
+         */
+        RKDP rkdp;
         
 };
 
