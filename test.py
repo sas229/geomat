@@ -1,5 +1,5 @@
 import numpy as np
-from geomat.models import LinearElastic, MCC, SMCC, C2MC, Elastoplastic
+from models import LinearElastic, MCC, SMCC, C2MC, Elastoplastic
 from matplotlib import pyplot as plt
 
 # LinearElastic test.

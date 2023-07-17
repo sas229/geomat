@@ -1,6 +1,6 @@
 #include "MCC.hpp"
 
-MCC::MCC(Parameters parameters, State state, std::string log_severity) : parameters(parameters), state(state) {   
+MCC::MCC(Parameters parameters, State state, std::string log_severity) : parameters(parameters), state(state), Elastoplastic::Elastoplastic() {   
     set_model_name("MCC");
     set_model_type("Elastoplastic");
 

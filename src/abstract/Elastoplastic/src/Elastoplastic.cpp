@@ -1,35 +1,34 @@
 #include "Elastoplastic.hpp"
 
+Elastoplastic::Elastoplastic() {
+    // Define binds to model functions.
+    using namespace std::placeholders;
+    mf.compute_f = std::bind(&Elastoplastic::compute_f, this, _1, _2);
+    mf.compute_trial_stress = std::bind(&Elastoplastic::compute_elastic_stress, this, _1, _2);
+    mf.compute_D_e = std::bind(&Elastoplastic::compute_D_e, this, _1, _2);
+    mf.compute_derivatives = std::bind(&Elastoplastic::compute_derivatives, this, _1, _2, _3, _4, _5, _6, _7);
+    mf.compute_plastic_state_variable_increment = std::bind(&Elastoplastic::compute_plastic_state_variable_increment, this, _1, _2, _3, _4);
+
+    // Apply settings and bind model functions.
+    intersection.initialise(settings, mf);
+}
+
 void Elastoplastic::solve(void) {
     if (!solved) {
         // Get the current state variables.
         State state = get_state_variables();
-
-        // Define binds to class methods.
-        using namespace std::placeholders;
-        auto compute_f_func = std::bind(&Elastoplastic::compute_f, this, _1, _2);
-        auto compute_trial_stress_func = std::bind(&Elastoplastic::compute_elastic_stress, this, _1, _2);
-        auto compute_D_e_func = std::bind(&Elastoplastic::compute_D_e, this, _1, _2);
-        auto compute_derivatives_func = std::bind(&Elastoplastic::compute_derivatives, this, _1, _2, _3, _4, _5, _6, _7);
-        auto compute_state_func = std::bind(&Elastoplastic::compute_plastic_state_variable_increment, this, _1, _2, _3, _4);
-
-        // Pack bound functions into ModelFunctions object.
-        mf.compute_f = compute_f_func;
-        mf.compute_trial_stress = compute_trial_stress_func;
-        mf.compute_D_e = compute_D_e_func;
-        mf.compute_derivatives = compute_derivatives_func;
-        mf.compute_plastic_state_variable_increment = compute_state_func;
-
-        // Compute alpha using bound functions.
-        double alpha = Intersection::compute_alpha(sigma_prime, state, Delta_epsilon_tilde, settings, mf);
         
-        Voigt Delta_epsilon_tilde_e = alpha*Delta_epsilon_tilde;
+        // Initial conditions.
         PLOG_DEBUG << "Strain increment, Delta_epsilon_tilde = " << Delta_epsilon_tilde;
         PLOG_DEBUG << "Initial stress state, sigma_prime_tilde = " << to_voigt(sigma_prime);
         PLOG_DEBUG << "Initial state variables, state = " << state;
+        
+        // Compute alpha using bound functions.
+        double alpha = intersection.solve(sigma_prime, state, Delta_epsilon_tilde);
         PLOG_INFO << "Plastic increment; alpha = " << alpha;
         Cauchy sigma_prime_e, sigma_prime_ep;
         State state_e, state_ep;
+        Voigt Delta_epsilon_tilde_e = alpha*Delta_epsilon_tilde;
         if (alpha == 0.0) {
             // Fully plastic increment. Update stress and state variables.
             sigma_prime_e = sigma_prime;

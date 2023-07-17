@@ -1,17 +1,26 @@
 #include "Intersection.hpp"
 
-double Intersection::compute_alpha(
-    Cauchy sigma_prime,
-    State state,
-    Voigt Delta_epsilon_tilde,
-    Settings settings,
-    ModelFunctions mf) {
-    // Current stress state (i.e. alpha = 0.0).
-    double f_0 = mf.compute_f(sigma_prime, state);
+void Intersection::initialise(Settings settings, ModelFunctions mf) {
+    this->settings = settings;
+    this->mf = mf;
+};
+
+double Intersection::solve(Cauchy sigma_prime, State state, Voigt Delta_epsilon_tilde) {
+    // Store current model state.
+    this->sigma_prime = sigma_prime;
+    this->state = state;
+    this->Delta_epsilon_tilde = Delta_epsilon_tilde;
+
+    // Reset bounds on alpha.
+    alpha_0 = 0.0;
+    alpha_1 = 1.0;
+
+    // Yield function value for current stress state (i.e. alpha = 0.0).
+    f_0 = mf.compute_f(sigma_prime, state);
 
     // Compute trial stress state with full strain increment.
     Cauchy sigma_prime_1 = mf.compute_trial_stress(sigma_prime, 1.0 * Delta_epsilon_tilde);
-    double f_1 = mf.compute_f(sigma_prime_1, state);
+    f_1 = mf.compute_f(sigma_prime_1, state);
 
     // Check increment type by finding alpha.
     if (f_1 <= settings.FTOL) {
@@ -19,30 +28,20 @@ double Intersection::compute_alpha(
         return 1.0;
     } else if (std::abs(f_0) <= settings.FTOL && f_1 > settings.FTOL) {
         PLOG_INFO << "Check potential for elastoplastic unloading-reloading.";
-        if (!Intersection::check_unload_reload(sigma_prime, state, Delta_epsilon_tilde, settings, mf)) {
-            // // Compute bounds on alpha.
-            double alpha_0 = 0.0;
-            double alpha_1 = 1.0;
-            Intersection::compute_alpha_bounds(sigma_prime, state, Delta_epsilon_tilde, settings, mf, alpha_0, alpha_1);
-
-            // Trial stress state for alpha_0.
-            Cauchy sigma_prime_0 = mf.compute_trial_stress(sigma_prime, alpha_0 * Delta_epsilon_tilde);
-            double f_0 = mf.compute_f(sigma_prime_0, state);
-
-            // Trial stress state for alpha_1.
-            Cauchy sigma_prime_1 = mf.compute_trial_stress(sigma_prime, alpha_1 * Delta_epsilon_tilde);
-            double f_1 = mf.compute_f(sigma_prime_1, state);
+        if (!check_unload_reload()) {
+            // Refine bounds on alpha.
+            refine_alpha_bounds();
 
             // Perform Pegasus intersection within the bounds of alpha_0 and alpha_1.
             PLOG_INFO << "Plastic increment: finding alpha via the Pegasus algorithm using alpha_0 = " << alpha_0 << " and alpha_1 = " << alpha_1 << ".";
-            return Intersection::pegasus_regula_falsi(sigma_prime, state, Delta_epsilon_tilde, alpha_0, alpha_1, f_0, f_1, settings, mf);
+            return pegasus_regula_falsi();
         } else {
             PLOG_INFO << "Fully plastic increment; alpha = 0.0.";
             return 0.0;
         }
     } else if (f_0 < -settings.FTOL && f_1 > settings.FTOL) {
         PLOG_INFO << "Plastic increment: finding alpha via the Pegasus algorithm using alpha_0 = 0.0 and alpha_1 = 1.0.";
-        return Intersection::pegasus_regula_falsi(sigma_prime, state, Delta_epsilon_tilde, 0.0, 1.0, f_0, f_1, settings, mf);
+        return pegasus_regula_falsi();
     } else {
         PLOG_FATAL << "Illegal stress state.";
         assert(false);
@@ -50,12 +49,7 @@ double Intersection::compute_alpha(
     return 0.0;
 }
 
-bool Intersection::check_unload_reload(
-    Cauchy sigma_prime,
-    State state,
-    Voigt Delta_epsilon_tilde,
-    Settings settings,
-    ModelFunctions mf) {
+bool Intersection::check_unload_reload(void) {
     // Compute required derivatives for the given stress state.
     Cauchy df_dsigma_prime_c, dg_dsigma_prime_c;
     Voigt a_c, b_c;
@@ -79,14 +73,7 @@ bool Intersection::check_unload_reload(
     }
 }
 
-void Intersection::compute_alpha_bounds(
-    Cauchy sigma_prime,
-    State state,
-    Voigt Delta_epsilon_tilde,
-    Settings settings,
-    ModelFunctions mf,
-    double &alpha_0,
-    double &alpha_1) {
+void Intersection::refine_alpha_bounds(void) {
     double alpha_n, d_alpha;
     int i = 0;
     int j = 0;
@@ -106,8 +93,18 @@ void Intersection::compute_alpha_bounds(
 
             // Check criterion.
             if (f_n > settings.FTOL) {
-                // Break from loops.
+                // Intersection found.
                 alpha_1 = alpha_n;
+                
+                // Update yield function value for current lower bound stress state (i.e. alpha = alpha_0).
+                Cauchy sigma_prime_0 = mf.compute_trial_stress(sigma_prime, alpha_0 * Delta_epsilon_tilde);
+                f_0 = mf.compute_f(sigma_prime, state);
+
+                // Update yield function value for current upper bound stress state (i.e. alpha = alpha_1).
+                Cauchy sigma_prime_1 = mf.compute_trial_stress(sigma_prime, alpha_1 * Delta_epsilon_tilde);
+                f_1 = mf.compute_f(sigma_prime_1, state);
+                
+                // Break from loops.
                 return;
             } else {
                 // Continue iterating.
@@ -121,18 +118,9 @@ void Intersection::compute_alpha_bounds(
     assert(false);
 }
 
-double Intersection::pegasus_regula_falsi(
-    Cauchy sigma_prime,
-    State state,
-    Voigt Delta_epsilon_tilde,
-    double alpha_0,
-    double alpha_1,
-    double f_0,
-    double f_1,
-    Settings settings,
-    ModelFunctions mf) {
+double Intersection::pegasus_regula_falsi(void) {
     // Pegasus algorithm.
-    double alpha, alpha_n;
+    double alpha_n;
     double f_n = settings.FTOL;
     Cauchy sigma_prime_n = sigma_prime;
     State state_n = state;

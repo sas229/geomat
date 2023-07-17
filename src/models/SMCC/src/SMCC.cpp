@@ -1,6 +1,6 @@
 #include "SMCC.hpp"
 
-SMCC::SMCC(Parameters parameters, State state, std::string log_severity) : parameters(parameters), state(state) {   
+SMCC::SMCC(Parameters parameters, State state, std::string log_severity) : parameters(parameters), state(state), Elastoplastic::Elastoplastic() {   
     set_model_name("SMCC");
     set_model_type("Elastoplastic");
 
