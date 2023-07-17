@@ -7,7 +7,8 @@ Elastoplastic::Elastoplastic() : intersection(&settings, &mf), integrator(&setti
     mf.compute_trial_stress = std::bind(&Elastoplastic::compute_elastic_stress, this, _1, _2);
     mf.compute_D_e = std::bind(&Elastoplastic::compute_D_e, this, _1, _2);
     mf.compute_derivatives = std::bind(&Elastoplastic::compute_derivatives, this, _1, _2, _3, _4, _5, _6, _7);
-    mf.compute_plastic_state_variable_increment = std::bind(&Elastoplastic::compute_plastic_state_variable_increment, this, _1, _2, _3, _4);
+    mf.compute_state_increment = std::bind(&Elastoplastic::compute_plastic_state_variable_increment, this, _1, _2, _3, _4);
+    mf.compute_plastic_increment = std::bind(&Elastoplastic::compute_plastic_increment, this, _1, _2, _3, _4, _5);
 }
 
 void Elastoplastic::solve(void) {
@@ -66,4 +67,29 @@ void Elastoplastic::solve(void) {
         sigma_prime_tilde = to_voigt(sigma_prime);
         solved = true;
     }
+}
+
+void Elastoplastic::compute_plastic_increment(
+    Cauchy sigma_prime, 
+    State state, 
+    Voigt Delta_epsilon_tilde_p_dT, 
+    Voigt &Delta_sigma_prime, 
+    State &delta_state
+    ) {   
+    // Calculate elastic constitutive matrix using tangent moduli and elastic stress increment.
+    Constitutive D_e = compute_D_e(sigma_prime, Cauchy::Zero());
+
+    // Compute elastoplastic constitutive matrix and elastoplastic multiplier. 
+    Cauchy df_dsigma_prime, dg_dsigma_prime;
+    Voigt a, b;
+    double H;
+    compute_derivatives(sigma_prime, state, df_dsigma_prime, a, dg_dsigma_prime, b, H);
+    Constitutive D_ep = D_e-(D_e*b*a.transpose()*D_e)/(H+a.transpose()*D_e*b);
+    Voigt Delta_sigma_prime_e = D_e*Delta_epsilon_tilde_p_dT;
+    double delta_lambda = (double)(a.transpose()*Delta_sigma_prime_e)/(double)(H + a.transpose()*D_e*b);
+    PLOG_DEBUG << "Plastic multiplier, delta_lambda = " << delta_lambda;
+
+    // Update stress and state variable increment by reference.
+    Delta_sigma_prime = D_ep*Delta_epsilon_tilde_p_dT;
+    delta_state = compute_plastic_state_variable_increment(delta_lambda, df_dsigma_prime, H, Delta_epsilon_tilde_p_dT);
 }

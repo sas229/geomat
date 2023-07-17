@@ -88,6 +88,17 @@ typedef std::function<void(Cauchy sigma_prime, State state, Cauchy &df_dsigma_pr
 typedef std::function<State(double delta_lambda, Cauchy df_dsigma_prime, double H, Voigt Delta_epsilon_tilde_p_dT)> StateIncrementFunction;
 
 /**
+ * @brief Plastic increment function binding.
+ * 
+ * @tparam sigma_prime_f Effective stress tensor in Cauchy form.
+ * @tparam state_f State variables.
+ * @tparam Delta_epsilon_tilde_p_dT Plastic strain increment in Voigt form.
+ * @tparam Delta_sigma_prime Increment in the effective stress state in Voigt form.
+ * @tparam Delta_state Increment in the state variables.
+ */
+typedef std::function<void(Cauchy sigma_prime, State state, Voigt Delta_epsilon_p_dT, Voigt &Delta_sigma_prime, State &Delta_state)> PlasticIncrementFunction;
+
+/**
  * @brief Object containing functions to be bound to model specific implementation.
  */
 struct ModelFunctions {
@@ -95,7 +106,8 @@ struct ModelFunctions {
     TrialFunction compute_trial_stress;
     ConstitutiveMatrixFunction compute_D_e;
     DerivativeFunction compute_derivatives;
-    StateIncrementFunction compute_plastic_state_variable_increment;
+    StateIncrementFunction compute_state_increment;
+    PlasticIncrementFunction compute_plastic_increment;
 };
 
 /**
@@ -103,7 +115,7 @@ struct ModelFunctions {
  */
 struct Settings{
     std::string solver = "Explicit";
-    std::string method = "ForwardEuler";
+    std::string method = "ModifiedEuler";
     double FTOL = 1e-8;
     double LTOL = 1e-6;
     double STOL = 1e-4;

@@ -3,7 +3,7 @@
 
 #include <plog/Log.h>
 #include "Types.hpp"
-#include "Explicit.hpp"
+#include "ModifiedEuler.hpp"
 
 class Integrator {
 
@@ -39,6 +39,11 @@ class Integrator {
          * @brief Model specfic function bindings.
          */
         ModelFunctions *mf;
+
+        /**
+         * @brief Modified Euler stress integration solver instance.
+         */
+        ModifiedEuler me;
         
 };
 

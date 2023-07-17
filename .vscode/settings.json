@@ -83,7 +83,8 @@
         "charconv": "cpp",
         "format": "cpp",
         "span": "cpp",
-        "stdfloat": "cpp"
+        "stdfloat": "cpp",
+        "nnls": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceFolder}",
     // "editor.formatOnSave": true,
