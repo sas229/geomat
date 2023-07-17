@@ -14,7 +14,7 @@ class Intersection {
          * @param settings Stress integration settings.
          * @param mf Model specific function bindings. 
          */
-        Intersection(Settings settings, ModelFunctions mf);
+        Intersection(Settings *settings, ModelFunctions *mf);
 
         /** 
          * @brief Intersection class destructor. 
@@ -188,12 +188,12 @@ class Intersection {
         /**
          * @brief Stress integration settings.
          */
-        Settings settings;
+        Settings *settings;
 
         /**
          * @brief Model specfic function bindings.
          */
-        ModelFunctions mf;
+        ModelFunctions *mf;
 
 };
 

@@ -1,6 +1,6 @@
 #include "Elastoplastic.hpp"
 
-Elastoplastic::Elastoplastic() {
+Elastoplastic::Elastoplastic() : intersection(&settings, &mf) {
     // Define binds to model functions.
     using namespace std::placeholders;
     mf.compute_f = std::bind(&Elastoplastic::compute_f, this, _1, _2);
@@ -8,9 +8,6 @@ Elastoplastic::Elastoplastic() {
     mf.compute_D_e = std::bind(&Elastoplastic::compute_D_e, this, _1, _2);
     mf.compute_derivatives = std::bind(&Elastoplastic::compute_derivatives, this, _1, _2, _3, _4, _5, _6, _7);
     mf.compute_plastic_state_variable_increment = std::bind(&Elastoplastic::compute_plastic_state_variable_increment, this, _1, _2, _3, _4);
-
-    // Apply settings and bind model functions.
-    intersection = Intersection(settings, mf);
 }
 
 void Elastoplastic::solve(void) {
