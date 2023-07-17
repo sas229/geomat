@@ -9,7 +9,7 @@
 #include "Types.hpp"
 #include "Elastic.hpp"
 #include "Intersection.hpp"
-#include "Integrators.hpp"
+#include "Integrator.hpp"
 
 /**
  * @brief Elastoplastic base class. Inherits Elastic class.
