@@ -9,7 +9,7 @@
 #include "Types.hpp"
 #include "Elastic.hpp"
 #include "Intersection.hpp"
-#include "Integrators.hpp"
+#include "Integrator.hpp"
 
 /**
  * @brief Elastoplastic base class. Inherits Elastic class.
@@ -243,6 +243,8 @@ class Elastoplastic : public Elastic {
          * @brief Intersection class instance.
          */
         Intersection intersection;
+
+        Integrator integrator;
 
 };
 
