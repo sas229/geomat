@@ -5,7 +5,7 @@ Intersection::Intersection(Settings *settings, ModelFunctions *mf) {
     this->mf = mf;
 }
 
-double Intersection::solve(Cauchy sigma_prime, State state, Voigt Delta_epsilon_tilde) {
+double Intersection::solve(Cauchy sigma_prime, State state, Voigt Delta_epsilon_tilde) {  
     // Store current model state.
     this->sigma_prime = sigma_prime;
     this->state = state;
