@@ -9,25 +9,17 @@ class Intersection {
     public:
 
         /**
-         * @brief Intersection class constructor. 
-         * 
-         * @param[in] settings Stress integrations settings.
-         * @param[in] mf Struct containing model specific function bindings.
-         */
-        Intersection() {}
-
-        /** 
-         * @brief Intersection model destructor. 
-         */
-        virtual ~Intersection() {}
-
-        /**
-         * @brief Initialise Intersection instance by setting model function bindings and stress integration settings.
+         * @brief Intersection class constructor.
          * 
          * @param settings Stress integration settings.
-         * @param mf Model specific function bindings.
+         * @param mf Model specific function bindings. 
          */
-        void initialise(Settings settings, ModelFunctions mf);
+        Intersection(Settings settings, ModelFunctions mf);
+
+        /** 
+         * @brief Intersection class destructor. 
+         */
+        virtual ~Intersection() {}
 
         /**
          * @brief Method to compute the fraction \f$ \alpha \f$ of the step that is elastic.

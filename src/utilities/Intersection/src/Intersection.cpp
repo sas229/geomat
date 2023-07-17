@@ -1,9 +1,9 @@
 #include "Intersection.hpp"
 
-void Intersection::initialise(Settings settings, ModelFunctions mf) {
+Intersection::Intersection(Settings settings, ModelFunctions mf) {
     this->settings = settings;
     this->mf = mf;
-};
+}
 
 double Intersection::solve(Cauchy sigma_prime, State state, Voigt Delta_epsilon_tilde) {
     // Store current model state.

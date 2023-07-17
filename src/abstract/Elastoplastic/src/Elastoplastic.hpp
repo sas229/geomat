@@ -239,7 +239,10 @@ class Elastoplastic : public Elastic {
         */
         Settings settings;
 
-        Intersection intersection;
+        /**
+         * @brief Intersection class instance.
+         */
+        Intersection intersection{settings, mf};
 
 };
 

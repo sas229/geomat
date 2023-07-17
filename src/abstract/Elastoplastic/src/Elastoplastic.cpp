@@ -10,7 +10,7 @@ Elastoplastic::Elastoplastic() {
     mf.compute_plastic_state_variable_increment = std::bind(&Elastoplastic::compute_plastic_state_variable_increment, this, _1, _2, _3, _4);
 
     // Apply settings and bind model functions.
-    intersection.initialise(settings, mf);
+    intersection = Intersection(settings, mf);
 }
 
 void Elastoplastic::solve(void) {
