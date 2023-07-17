@@ -1,11 +1,6 @@
-#include "ModifiedEuler.hpp"
+#include "Explicit.hpp"
 
-ModifiedEuler::ModifiedEuler(Settings *settings, ModelFunctions *mf) {
-    this->settings = settings;
-    this->mf = mf;
-}
-
-void ModifiedEuler::solve(
+void Explicit::solve(
     Cauchy &sigma_prime, 
     State &state, 
     Voigt Delta_epsilon_tilde 
@@ -65,44 +60,7 @@ void ModifiedEuler::solve(
     state = state_ep;
 }
 
-void ModifiedEuler::compute_initial_estimate(void) {
-    // Calculate estimate of increment.
-    Voigt Delta_sigma_prime_1, Delta_sigma_prime_2;
-    State Delta_state_1, Delta_state_2;
-    mf->compute_plastic_increment(sigma_prime_ep, state_ep, Delta_epsilon_tilde_dT, Delta_sigma_prime_1, Delta_state_1);
-    Cauchy sigma_prime_1 = sigma_prime_ep + to_cauchy(Delta_sigma_prime_1);
-    State state_1 = state_ep + Delta_state_1;
-    mf->compute_plastic_increment(sigma_prime_1, state_ep, Delta_epsilon_tilde_dT, Delta_sigma_prime_2, Delta_state_2);
-    PLOG_DEBUG << "State variable increment 1, Delta_state1 = " << Delta_state_1;
-    PLOG_DEBUG << "State variable increment 2, Delta_state2 = " << Delta_state_2;
-
-    // Calculate modified Euler stresses and state variables.
-    sigma_prime_ini = sigma_prime_ep + to_cauchy(1.0/2.0*(Delta_sigma_prime_1 + Delta_sigma_prime_2));
-    state_ini = state_ep + 1.0/2.0*(Delta_state_1+Delta_state_2);
-    PLOG_DEBUG << "Initial stress estimate, sigma_prime_ini_tilde = " << to_voigt(sigma_prime_ini);
-    PLOG_DEBUG << "State variable estimate, state_ini = " << state_ini;
-
-    // Compute error estimate.
-    int size_state = state_ini.size();
-    State error(size_state);
-    error[0] = (to_cauchy(Delta_sigma_prime_2 - Delta_sigma_prime_1)).norm()/(2.0*sigma_prime_ini.norm());
-    for (int i=1; i<size_state; i++) {
-        error[i] = std::abs((Delta_state_2[i] - Delta_state_1[i]))/(2.0*state_ini[i]);
-    }
-    R_n = error.maxCoeff();
-
-    // Check error estimate against machine tolerance.
-    R_n = std::max(R_n, settings->EPS);
-
-    // Check acceptance of estimate.
-    if (R_n < settings->STOL) {
-        accepted = true;
-    } else {
-        accepted = false;
-    }
-}
-
-void ModifiedEuler::compute_yield_surface_correction(void) {
+void Explicit::compute_yield_surface_correction(void) {
     // Calculate uncorrected elastic constitutive matrix using tangent moduli and elastic stress increment.
     Constitutive D_e_u = mf->compute_D_e(sigma_prime_u, Cauchy::Zero());
 
@@ -135,7 +93,7 @@ void ModifiedEuler::compute_yield_surface_correction(void) {
     }
 }
 
-double ModifiedEuler::compute_new_substep_size(void) {
+double Explicit::compute_new_substep_size(void) {
     if (dT == settings->DT_MIN) {
         PLOG_FATAL << "Minimum step size DT_MIN = " << settings->DT_MIN << " failed to generated an accepted increment.";
         assert(false);

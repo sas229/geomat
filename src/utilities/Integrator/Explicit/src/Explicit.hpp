@@ -1,32 +1,48 @@
-#ifndef MODIFIEDEULER_H
-#define MODIFIEDEULER_H
+#ifndef EXPLICIT_H
+#define EXPLICIT_H
 
 #include <plog/Log.h>
-#include <vector>
-#include <string>
 #include "Types.hpp"
 
-
-class ModifiedEuler {
+class Explicit {
 
     public:
 
-        ModifiedEuler(Settings *settings, ModelFunctions *mf);
+        /** @brief Virtual destructor for Explicit integrator base class. */
+        virtual ~Explicit() {}
 
-        ~ModifiedEuler() {}
-
+        /**
+         * @brief Method to solve the current incremement.
+         * 
+         * @param[in,out] sigma_prime Effective stress state in Cauchy form.
+         * @param[in,out] state State variables.
+         * @param[in] Delta_epsilon_tilde Strain increment in Voigt form.
+         */
         void solve(
             Cauchy &sigma_prime, 
             State &state, 
             Voigt Delta_epsilon_tilde
         );
 
-    private:
+    protected:
 
-        void compute_initial_estimate(void);
+        /**
+         * @brief Pure virtual method to compute an initial estimate for the current increment.
+         *
+         * @note Must be overriden by the solver classes that inherit from it (e.g. ModifiedEuler).
+         */
+        virtual void compute_initial_estimate(void) = 0;
 
+        /**
+         * @brief Method to compute the yield surface correction.
+         */
         void compute_yield_surface_correction(void);
 
+        /**
+         * @brief Method to compute the new substep size for the next increment.
+         * 
+         * @return double 
+         */
         double compute_new_substep_size(void);
 
         /**
@@ -42,7 +58,7 @@ class ModifiedEuler {
         /**
          * @brief Order of integration method.
          */
-        const double order = 2.0;
+        double order;
 
         /**
          * @brief Effective stress state in Cauchy form.
