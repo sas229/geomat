@@ -134,7 +134,7 @@ plt.show()
 # Delta_epsilon_tilde = np.array([ea_increment, -ea_increment/2, -ea_increment/2, 0.0, 0.0, 0.0])
 # axial_strain = np.arange(0, increments*ea_increment, ea_increment)
 
-# model = C2MC(log_severity="verbose", parameters=parameters, state=state)
+# model = C2MC(log_severity="none", parameters=parameters, state=state)
 # print("Model name: {}".format(model.name))
 # print("Model type: {}".format(model.type))
 # model.set_sigma_prime_tilde(stress)

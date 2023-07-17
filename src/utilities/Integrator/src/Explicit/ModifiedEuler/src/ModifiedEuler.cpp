@@ -6,49 +6,30 @@ ModifiedEuler::ModifiedEuler(Settings *settings, ModelFunctions *mf) {
 }
 
 void ModifiedEuler::solve(
-    Cauchy &sigma_prime_ep, 
-    State &state_ep, 
-    Voigt Delta_epsilon_tilde_p 
-    ) {
+    Cauchy &sigma_prime, 
+    State &state, 
+    Voigt Delta_epsilon_tilde 
+) { 
+    // Store effective stress and state variables locally.
+    sigma_prime_ep  = sigma_prime;
+    state_ep = state;
+    
     // Sloan et al. (2001) substepping with automatic error control.
     int substeps = 0;
     int corrections = 0;
-    double dT = 1.0;
-    double T = 0.0;
+    dT = 1.0;
+    T = 0.0;
     while (T < 1.0) {
+        // Compute initial estimate and error estimate.
         PLOG_DEBUG << "Plastic increment, dT = " << dT;
-        Voigt Delta_epsilon_tilde_p_dT = Delta_epsilon_tilde_p*dT;
-        double Delta_epsilon_vol_p_dT = to_cauchy(Delta_epsilon_tilde_p_dT).trace();
-
-        // Compute stress and state variable increment estimates.
-        Voigt Delta_sigma_prime_1, Delta_sigma_prime_2;
-        State delta_state_1, delta_state_2;
-        mf->compute_plastic_increment(sigma_prime_ep, state_ep, Delta_epsilon_tilde_p_dT, Delta_sigma_prime_1, delta_state_1);
-        Cauchy sigma_prime_1 = sigma_prime_ep + to_cauchy(Delta_sigma_prime_1);
-        State state_1 = state_ep + delta_state_1;
-        mf->compute_plastic_increment(sigma_prime_1, state_ep, Delta_epsilon_tilde_p_dT, Delta_sigma_prime_2, delta_state_2);
-        PLOG_DEBUG << "State variable increment 1, delta_state_1 = " << delta_state_1;
-        PLOG_DEBUG << "State variable increment 2, delta_state_2 = " << delta_state_2;
-
-        // Calculate modified Euler stresses and state variables.
-        Cauchy sigma_prime_ini = sigma_prime_ep + to_cauchy(1.0/2.0*(Delta_sigma_prime_1 + Delta_sigma_prime_2));
-        State state_ini = state_ep + 1.0/2.0*(delta_state_1+delta_state_2);
-        PLOG_DEBUG << "Initial stress estimate, sigma_prime_ini_tilde = " << to_voigt(sigma_prime_ini);
-        PLOG_DEBUG << "State variable estimate, state_ini = " << state_ini;
-
-        // Compute error estimate.
-        bool accepted = false;
-        double R_n = ModifiedEuler::compute_error_estimate(sigma_prime_ini, state_ini, Delta_sigma_prime_1, Delta_sigma_prime_2, delta_state_1, delta_state_2);
-        if (R_n < settings->STOL) {
-            // Accept increment and correct stresses and state variables back to yield surface.
-            accepted = true;
-            Cauchy sigma_prime_u, sigma_prime_c;
+        Delta_epsilon_tilde_dT = Delta_epsilon_tilde*dT;
+        compute_initial_estimate();
+        if (accepted) {
+            // Correct stresses and state variables back to yield surface.
             sigma_prime_u = sigma_prime_c = sigma_prime_ini;
-            State state_u, state_c;
             state_u = state_c = state_ini;
 
             // Correct stresses and state variables back to yield surface. 
-            double f_u, f_c;
             f_u = f_c = mf->compute_f(sigma_prime_u, state_u);
             int ITS_YSC = 0;
             while (ITS_YSC < settings->MAXITS_YSC && std::abs(f_c) > settings->FTOL) {
@@ -58,25 +39,8 @@ void ModifiedEuler::solve(
                     assert(false);
                 } 
 
-                // Calculate uncorrected elastic constitutive matrix using tangent moduli and elastic stress increment.
-                Constitutive D_e_u = mf->compute_D_e(sigma_prime_u, Cauchy::Zero());
-
-                // Calculate uncorrected derivatives.
-                Cauchy df_dsigma_prime_u, dg_dsigma_prime_u;
-                Voigt a_u, b_u;
-                double H_u;
-                mf->compute_derivatives(sigma_prime_u, state_u, df_dsigma_prime_u, a_u, dg_dsigma_prime_u, b_u, H_u);
-
                 // Compute consistent correction to yield surface.
-                compute_yield_surface_correction(sigma_prime_u, state_u, f_u, H_u, a_u, b_u, D_e_u, sigma_prime_c, state_c);
-
-                // Check yield surface function.
-                f_c = mf->compute_f(sigma_prime_c, state_c);
-                f_u = mf->compute_f(sigma_prime_u, state_u);
-                if (std::abs(f_c) > std::abs(f_u)) {
-                    // Apply normal correction instead.
-                    compute_normal_yield_surface_correction(sigma_prime_u, state_u, f_u, a_u, sigma_prime_c, state_c);
-                }
+                compute_yield_surface_correction();
 
                 // Correct stress and state variables.
                 sigma_prime_u = sigma_prime_c;
@@ -93,18 +57,85 @@ void ModifiedEuler::solve(
             substeps += 1;
             T += dT;
         }
-        dT = compute_new_substep_size(accepted, dT, T, R_n);
+        dT = compute_new_substep_size();
     }
     // Strain increment solved.
     PLOG_INFO << "Elastoplastic stress increment integrated to within a tolerance FTOL = " << settings->FTOL << " via " << substeps << " substeps and " << corrections << " drift corrections.";
+    sigma_prime = sigma_prime_ep;
+    state = state_ep;
 }
 
-double ModifiedEuler::compute_new_substep_size(
-    bool accepted, 
-    double dT, 
-    double T, 
-    double R_n
-    ) {
+void ModifiedEuler::compute_initial_estimate(void) {
+    // Calculate estimate of increment.
+    Voigt Delta_sigma_prime_1, Delta_sigma_prime_2;
+    State Delta_state_1, Delta_state_2;
+    mf->compute_plastic_increment(sigma_prime_ep, state_ep, Delta_epsilon_tilde_dT, Delta_sigma_prime_1, Delta_state_1);
+    Cauchy sigma_prime_1 = sigma_prime_ep + to_cauchy(Delta_sigma_prime_1);
+    State state_1 = state_ep + Delta_state_1;
+    mf->compute_plastic_increment(sigma_prime_1, state_ep, Delta_epsilon_tilde_dT, Delta_sigma_prime_2, Delta_state_2);
+    PLOG_DEBUG << "State variable increment 1, Delta_state1 = " << Delta_state_1;
+    PLOG_DEBUG << "State variable increment 2, Delta_state2 = " << Delta_state_2;
+
+    // Calculate modified Euler stresses and state variables.
+    sigma_prime_ini = sigma_prime_ep + to_cauchy(1.0/2.0*(Delta_sigma_prime_1 + Delta_sigma_prime_2));
+    state_ini = state_ep + 1.0/2.0*(Delta_state_1+Delta_state_2);
+    PLOG_DEBUG << "Initial stress estimate, sigma_prime_ini_tilde = " << to_voigt(sigma_prime_ini);
+    PLOG_DEBUG << "State variable estimate, state_ini = " << state_ini;
+
+    // Compute error estimate.
+    int size_state = state_ini.size();
+    State error(size_state);
+    error[0] = (to_cauchy(Delta_sigma_prime_2 - Delta_sigma_prime_1)).norm()/(2.0*sigma_prime_ini.norm());
+    for (int i=1; i<size_state; i++) {
+        error[i] = std::abs((Delta_state_2[i] - Delta_state_1[i]))/(2.0*state_ini[i]);
+    }
+    R_n = error.maxCoeff();
+
+    // Check error estimate against machine tolerance.
+    R_n = std::max(R_n, settings->EPS);
+
+    // Check acceptance of estimate.
+    if (R_n < settings->STOL) {
+        accepted = true;
+    } else {
+        accepted = false;
+    }
+}
+
+void ModifiedEuler::compute_yield_surface_correction(void) {
+    // Calculate uncorrected elastic constitutive matrix using tangent moduli and elastic stress increment.
+    Constitutive D_e_u = mf->compute_D_e(sigma_prime_u, Cauchy::Zero());
+
+    // Calculate uncorrected derivatives.
+    Cauchy df_dsigma_prime_u, dg_dsigma_prime_u;
+    Voigt a_u, b_u;
+    double H_u;
+    mf->compute_derivatives(sigma_prime_u, state_u, df_dsigma_prime_u, a_u, dg_dsigma_prime_u, b_u, H_u);
+
+    // Compute correction factor.
+    double delta_lambda_c = f_u/(H_u + a_u.transpose()*D_e_u*b_u);
+
+    // Update stress and state variables using corrections.
+    Voigt Delta_sigma_prime_c = -delta_lambda_c*D_e_u*b_u;
+    State Delta_state_c = mf->compute_state_increment(delta_lambda_c, df_dsigma_prime_u, H_u, Voigt::Zero());
+    sigma_prime_c = sigma_prime_u + to_cauchy(Delta_sigma_prime_c);
+    state_c = state_u + Delta_state_c;
+
+    // Check yield surface function value.
+    double f_c = mf->compute_f(sigma_prime_c, state_c);
+    f_u = mf->compute_f(sigma_prime_u, state_u);
+    if (std::abs(f_c) > std::abs(f_u)) {
+        // Apply normal correction instead.
+        double delta_lambda_c = f_u/(a_u.transpose()*a_u);
+        
+        //Update stress and state variables using correction.
+        Voigt Delta_sigma_prime_c = -delta_lambda_c*a_u;
+        sigma_prime_c = sigma_prime_u + to_cauchy(Delta_sigma_prime_c);
+        state_c = state_u; /* i.e. no correction to state variables. */
+    }
+}
+
+double ModifiedEuler::compute_new_substep_size(void) {
     if (dT == settings->DT_MIN) {
         PLOG_FATAL << "Minimum step size DT_MIN = " << settings->DT_MIN << " failed to generated an accepted increment.";
         assert(false);
@@ -112,10 +143,10 @@ double ModifiedEuler::compute_new_substep_size(
     double q_step;
     if (accepted) {
         // Step size accepted: allow substep size to grow.
-        q_step = std::min(0.9*std::sqrt(settings->STOL/R_n),1.1);
+        q_step = std::min(0.9*std::pow(settings->STOL/R_n, 1.0/order), 1.1);
     } else {
         // Step size rejected: calculate reduced substep size factor and limit substep size growth factor.
-        q_step = std::max(0.9*std::sqrt(settings->STOL/R_n),0.1);
+        q_step = std::max(0.9*std::pow(settings->STOL/R_n, 1.0/order), 0.1);
         q_step = std::min(q_step, 1.0);
     }
     dT *= q_step;
@@ -124,63 +155,4 @@ double ModifiedEuler::compute_new_substep_size(
     dT = std::max(dT, settings->DT_MIN);
     dT = std::min(dT, 1.0-T);
     return dT;
-}
-
-void ModifiedEuler::compute_yield_surface_correction(
-    Cauchy sigma_prime_u, 
-    State state_u, 
-    double f_u, 
-    double H_u, 
-    Voigt a_u, 
-    Voigt b_u, 
-    Constitutive D_e_u, 
-    Cauchy &sigma_prime_c, 
-    State &state_c
-    ) {
-    // Compute correction factor.
-    double delta_lambda_c = f_u/(H_u + a_u.transpose()*D_e_u*b_u);
-
-    // Update stress and state variables using corrections.
-    Voigt Delta_sigma_prime_c = -delta_lambda_c*D_e_u*b_u;
-    Cauchy df_dsigma_prime_u = to_cauchy(a_u);
-    State delta_state_c = mf->compute_state_increment(delta_lambda_c, df_dsigma_prime_u, H_u, Voigt::Zero());
-    sigma_prime_c = sigma_prime_u + to_cauchy(Delta_sigma_prime_c);
-    state_c = state_u + delta_state_c;
-}
-
-void ModifiedEuler::compute_normal_yield_surface_correction(
-    Cauchy sigma_prime_u, 
-    State state_u, 
-    double f_u, 
-    Voigt a_u, 
-    Cauchy &sigma_prime_c, 
-    State &state_c) {
-    // Compute corretion factor.
-    double delta_lambda_c = f_u/(a_u.transpose()*a_u);
-    
-    //Update stress and state variables using correction.
-    Voigt Delta_sigma_prime_c = -delta_lambda_c*a_u;
-    sigma_prime_c = sigma_prime_u + to_cauchy(Delta_sigma_prime_c);
-    state_c = state_u; /* i.e. no correction to state variables. */
-}
-
-double ModifiedEuler::compute_error_estimate(
-    Cauchy sigma_prime_ini, 
-    State state_ini, 
-    Voigt Delta_sigma_prime_1, 
-    Voigt Delta_sigma_prime_2, 
-    State delta_state_1, 
-    State delta_state_2
-    ) {
-    int size_state = state_ini.size();
-    State error(size_state);
-    error[0] = (to_cauchy(Delta_sigma_prime_2 - Delta_sigma_prime_1)).norm()/sigma_prime_ini.norm();
-    for (int i=1; i<size_state; i++) {
-        error[i] = std::abs((delta_state_2[i] - delta_state_1[i]))/state_ini[i];
-    }
-    double R_n = 1.0/2.0*error.maxCoeff();
-
-    // Check against machine tolerance.
-    R_n = std::max(R_n, settings->EPS);
-    return R_n;
 }

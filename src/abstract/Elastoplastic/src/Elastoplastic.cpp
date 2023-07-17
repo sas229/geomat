@@ -34,6 +34,9 @@ void Elastoplastic::solve(void) {
         }
         if (alpha > 0.0) {
             // Update stress and state variables based on elastic portion of strain increment.
+            Voigt Delta_epsilon_tilde_e = alpha*Delta_epsilon_tilde;
+            Cauchy Delta_epsilon_e = to_cauchy(Delta_epsilon_tilde_e);
+            D_e = compute_D_e(sigma_prime, Delta_epsilon_e);
             sigma_prime_e = sigma_prime + to_cauchy(D_e*alpha*Delta_epsilon_tilde);
             state_e = compute_elastic_state_variable(Delta_epsilon_tilde_e);
         } 

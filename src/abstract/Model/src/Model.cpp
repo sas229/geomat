@@ -116,7 +116,14 @@ double Model::compute_Delta_epsilon_vol(Cauchy Delta_epsilon) {
 }
 
 void Model::compute_lode(double J_2, double J_3, double &theta_c, double &theta_s, double &theta_s_bar) {
-    theta_c = 1.0/3.0*std::acos(J_3/2.0*std::pow((3.0/J_2), 3.0/2.0));
+    if (J_2 != 0) {
+        double angle = J_3/2.0*std::pow((3.0/J_2), 3.0/2.0);
+        angle = std::min(angle, 1.0);
+        angle = std::max(angle, -1.0);
+        theta_c = 1.0/3.0*std::acos(angle);
+    } else {
+        theta_c = 0;
+    }
     theta_s = pi/6.0 - theta_c;
     theta_s_bar = -theta_s;
 }
