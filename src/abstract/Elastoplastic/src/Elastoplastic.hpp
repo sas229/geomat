@@ -244,6 +244,9 @@ class Elastoplastic : public Elastic {
          */
         Intersection intersection;
 
+        /**
+         * @brief Integrator class instance.
+         */
         Integrator integrator;
 
 };
