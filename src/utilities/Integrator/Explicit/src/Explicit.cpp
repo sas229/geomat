@@ -28,7 +28,7 @@ void Explicit::solve(
             // Correct stresses and state variables back to yield surface. 
             f_u = f_c = mf->compute_f(sigma_prime_u, state_u);
             int ITS_YSC = 0;
-            while (ITS_YSC < settings->MAXITS_YSC && std::abs(f_c) > settings->FTOL) {
+            while (std::abs(f_c) > settings->FTOL) {
                 // If yield surface drift correction unsuccessful, log fault.
                 if (ITS_YSC >= settings->MAXITS_YSC && std::abs(f_c) > settings->FTOL) {
                     PLOG_FATAL << "Maximum number of yield surface correction iterations performed and f = " << f_c << " > FTOL = " << settings->FTOL << ".";
@@ -37,6 +37,7 @@ void Explicit::solve(
 
                 // Compute consistent correction to yield surface.
                 compute_yield_surface_correction();
+                PLOG_DEBUG << "f_c = " << f_c;
 
                 // Correct stress and state variables.
                 sigma_prime_u = sigma_prime_c;
@@ -81,7 +82,7 @@ void Explicit::compute_yield_surface_correction(void) {
     state_c = state_u + Delta_state_c;
 
     // Check yield surface function value.
-    double f_c = mf->compute_f(sigma_prime_c, state_c);
+    f_c = mf->compute_f(sigma_prime_c, state_c);
     f_u = mf->compute_f(sigma_prime_u, state_u);
     if (std::abs(f_c) > std::abs(f_u)) {
         // Apply normal correction instead.
@@ -91,7 +92,10 @@ void Explicit::compute_yield_surface_correction(void) {
         Voigt Delta_sigma_prime_c = -delta_lambda_c*a_u;
         sigma_prime_c = sigma_prime_u + to_cauchy(Delta_sigma_prime_c);
         state_c = state_u; /* i.e. no correction to state variables. */
-    }
+
+        // Check yield surface function value.
+        f_c = mf->compute_f(sigma_prime_c, state_c);
+    }    
 }
 
 double Explicit::compute_new_substep_size(void) {
