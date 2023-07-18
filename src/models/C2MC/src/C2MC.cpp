@@ -22,7 +22,7 @@ void C2MC::set_state_variables(State new_state) {
 Constitutive C2MC::compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) {
 
     /* USER DEFINED CODE STARTS HERE */
-    double K = E/(3.0*(1-2.0*nu));
+    double K = E/(3.0*(1.0-2.0*nu));
     double G = E/(2.0*(1.0+nu));
     Constitutive D_e = compute_isotropic_linear_elastic_matrix(K, G);
     /* USER DEFINED CODE ENDS HERE */
@@ -40,33 +40,14 @@ double C2MC::compute_f(Cauchy sigma_prime, State state) {
     // No state variables for this model.
 
     /* USER DEFINED CODE STARTS HERE */
-    double J_2, J_3, sign_theta, k_theta;
-    double theta_r = 1.0/3.0*(std::asin(-3.0*std::sqrt(3.0)/2.0*J_3/(std::pow(J_2,3.0/2.0))));
-    if (theta_r >= 0) {
-        sign_theta = 1.0;
-    } else { 
-        sign_theta = -1.0;
+    double f, J_2, J_3, theta_c, theta_s, theta_s_bar;
+    double A, B, C, theta_tr, k_theta, phi_r;
+    {   
+        compute_lode(J_2, J_3, theta_c, theta_s, theta_s_bar);
+        compute_coefficients(phi, theta_s, A, B, C, k_theta); 
+        phi_r = to_radians(phi);  
+        f = -p_prime*sin(phi_r) + sqrt(pow((q*k_theta),2.0) + pow(a_h*sin(phi_r),2.0)) - cohs*cos(phi_r);
     }
-    double theta_tr = to_radians(theta_t);
-    double phi_r = to_radians(phi);
-    double psi_r = to_radians(psi);
-
-    double coeff_B = (-std::cos(3.0*theta_tr)*(std::cos(theta_tr)-(1.0/std::sqrt(3.0))*std::sin(phi_r)*(sign_theta)*std::sin(theta_tr))
-        -3.0*(sign_theta)*std::sin(3.0*theta_tr)*((sign_theta)*std::sin(theta_tr)+1.0/std::sqrt(3.0)*std::sin(phi_r)*std::cos(theta_tr)))/
-        (18.0*(std::pow(std::cos(3.0*theta_tr),3.0)));
-    double coeff_C = ((sign_theta)*std::sin(6.0*theta_tr)*(std::cos(theta_tr)-(1.0/std::sqrt(3.0))*std::sin(phi_r)*(sign_theta)*std::sin(theta_tr))
-        -6.0*std::cos(6.0*theta_tr)*((sign_theta)*std::sin(theta_tr)+1.0/std::sqrt(3.0)*std::sin(phi_r)*std::cos(theta_tr)))/
-        (18.0*(std::pow(std::cos(3.0*theta_tr),3.0)));
-    double coeff_A = -(1.0/std::sqrt(3.0))*std::sin(phi_r)*(sign_theta)*std::sin(theta_tr)-coeff_B*(sign_theta)*std::sin(3.0*theta_tr)
-        -coeff_C*std::pow(std::sin(3.0*theta_tr),2.0)+std::cos(theta_tr);
-    
-    if (std::abs(theta_r) > theta_tr) {
-        k_theta = coeff_A+coeff_B*std::sin(3.0*theta_r)+coeff_B*(std::pow(std::sin(3.0*theta_r),2));
-    } else { 
-        k_theta = std::cos(theta_r)-(1.0/std::sqrt(3.0))*std::sin(phi_r)*std::sin(theta_r);
-    }   
-     
-    double f = p_prime*std::sin(phi_r)+std::sqrt(std::pow((q*k_theta),2.0)+std::pow(a_h*std::sin(phi_r),2.0))-cohs*std::cos(phi_r);
     /* USER DEFINED CODE ENDS HERE */
 
     return f;
@@ -89,17 +70,25 @@ void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     compute_lode(J_2, J_3, theta_c, theta_s, theta_s_bar);
     
     /* USER DEFINED CODE STARTS HERE */
-    double k_theta, coeff_A, coeff_B, coeff_C, theta_r, theta_tr, phi_r, dk_dtheta_f, dk_dtheta_g;
-    double var_alpha_f = (q*k_theta)/sqrt(std::pow((q*k_theta),2.0)+std::pow((a_h*sin(phi_r)),2.0));
-    if (std::abs(theta_r) > theta_tr) {
-        dk_dtheta_f = 3.0*coeff_B*std::cos(3.0*theta_r)+3.0*coeff_C*std::sin(6.0*theta_r);
-    } else { 
-        dk_dtheta_f = -std::sin(theta_r)-(1.0/std::sqrt(3.0))*std::sin(phi_r)*std::cos(theta_r);
-    }
-    double df_dp_prime = std::sin(phi_r);
-    double df_dq = var_alpha_f*k_theta;
-    double df_dtheta = dk_dtheta_f;
+    double theta_tr = to_radians(theta_t);
+    double phi_r = to_radians(phi);
     double psi_r = to_radians(psi);
+
+    double df_dp_prime, df_dq, df_dtheta;
+    {
+        using namespace std;
+        double A, B, C, k_theta, dk_dtheta_f;
+        compute_coefficients(phi, theta_s, A, B, C, k_theta);
+        double alpha_f = (q*k_theta)/sqrt(pow((q*k_theta),2.0) + pow((a_h*sin(phi_r)),2.0));
+        if (abs(theta_s) > theta_tr) {
+            dk_dtheta_f = 3.0*B*cos(3.0*theta_s) + 3.0*C*sin(6.0*theta_s);
+        } else { 
+            dk_dtheta_f = -sin(theta_s)-(1.0/sqrt(3.0))*sin(phi_r)*cos(theta_s);
+        }
+        df_dp_prime = -sin(phi_r);
+        df_dq = alpha_f*k_theta;
+        df_dtheta = dk_dtheta_f;
+    }
     /* USER DEFINED CODE ENDS HERE */
 
     Cauchy one = Cauchy::Constant(1.0); 
@@ -111,15 +100,21 @@ void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     }
     
     /* USER DEFINED CODE STARTS HERE */
-    double var_alpha_g = (q*k_theta)/sqrt(std::pow((q*k_theta),2.0)+std::pow((a_h*sin(psi_r)),2.0));
-    if (std::abs(theta_r) > theta_tr) {
-        dk_dtheta_g = 3.0*coeff_B*std::cos(3.0*theta_r)+3.0*coeff_C*std::sin(6.0*theta_r);
-    } else { 
-        dk_dtheta_g = -std::sin(theta_r)-(1.0/std::sqrt(3.0))*std::sin(psi_r)*std::cos(theta_r);
+    double dg_dp_prime, dg_dq, dg_dtheta;
+    {
+        using namespace std;
+        double A, B, C, k_theta, dk_dtheta_g;
+        compute_coefficients(psi, theta_s, A, B, C, k_theta);
+        double alpha_g = (q*k_theta)/sqrt(pow((q*k_theta),2.0)+pow((a_h*sin(psi_r)),2.0));
+        if (abs(theta_s) > theta_tr) {
+            dk_dtheta_g = 3.0*B*cos(3.0*theta_s)+3.0*C*sin(6.0*theta_s);
+        } else { 
+            dk_dtheta_g = -sin(theta_s)-(1.0/sqrt(3.0))*sin(psi_r)*cos(theta_s);
+        }
+        dg_dp_prime = -sin(psi_r);
+        dg_dq = alpha_g*k_theta;
+        dg_dtheta = dk_dtheta_g;
     }
-    double dg_dp_prime = std::sin(psi_r);
-    double dg_dq = var_alpha_f*k_theta;
-    double dg_dtheta = dk_dtheta_g;
     /* USER DEFINED CODE ENDS HERE */
 
     if (q > 0.0 && dg_dtheta != 0.0) {
@@ -145,4 +140,34 @@ State C2MC::compute_elastic_state_variable(Voigt Delta_epsilon_tilde_e) {
 State C2MC::compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, double H, Voigt Delta_epsilon_tilde_p) {
     State delta_state(state.size());
     return delta_state;
+}
+
+void C2MC::compute_coefficients(double angle, double theta_s, double &A, double &B, double &C, double &k_theta) {
+    using namespace std;
+    double A_1, B_1, C_1, A_2, B_2, C_2, theta_tr, theta_r, angle_r, sign_theta;
+    theta_tr = to_radians(theta_t);
+    angle_r = to_radians(angle);
+    sign_theta = (theta_s >= 0.0) ? 1.0 : -1.0;
+
+    // Coefficient C.
+    C_1 = (-cos(3.0*theta_tr)*cos(theta_tr) - 3.0*sin(3.0*theta_tr)*sin(theta_tr))/(18.0*pow(cos(3*theta_tr), 3.0));
+    C_2 = (1.0/sqrt(3.0))*((cos(3*theta_tr)*sin(theta_tr)-3.0*sin(3.0*theta_tr)*cos(theta_tr))/(18.0*pow(cos(3.0*theta_tr),3.0)));
+    C = C_1 + C_2*sign_theta*theta_s*sin(angle_r);
+
+    // Coefficient B.
+    B_1 = (cos(theta_tr)*sin(6.0*theta_tr) - 6.0*cos(6.0*theta_tr)*sin(theta_tr))/(18.0*pow(cos(3.0*theta_tr),3.0));
+    B_2 = -(sin(theta_tr)*sin(6.0*theta_tr) + 6.0*cos(6.0*theta_tr)*cos(theta_tr))/(18.0*sqrt(3.0)*pow(cos(3.0*theta_tr),3.0));
+    B = B_1*sign_theta*theta_s + B_2*sin(angle_r);
+
+    // Coefficient A.
+    A_1 = cos(3.0*theta_tr) - B_1*sin(3.0*theta_tr) - C_1*pow(sin(3.0*theta_tr),2.0);
+    A_2 = (-1.0/sqrt(3.0))*sin(3.0*theta_tr) - B_2*sin(3*theta_tr) - C_2*pow(sin(3.0*theta_tr),2.0);
+    A = A_1 + A_2*sign_theta*sin(angle_r);    
+
+    // Coefficient k_theta.
+    if (abs(theta_s) > theta_tr) {
+        k_theta = A + B*sin(3.0*theta_s) + C*(pow(sin(3.0*theta_s),2));
+    } else { 
+        k_theta = cos(theta_s)-(1.0/sqrt(3.0))*sin(angle_r)*sin(theta_s);
+    } 
 }

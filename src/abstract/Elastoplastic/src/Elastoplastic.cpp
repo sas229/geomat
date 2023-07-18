@@ -9,8 +9,6 @@ Elastoplastic::Elastoplastic() : intersection(&settings, &mf), integrator(&setti
     mf.compute_derivatives = std::bind(&Elastoplastic::compute_derivatives, this, _1, _2, _3, _4, _5, _6, _7);
     mf.compute_state_increment = std::bind(&Elastoplastic::compute_plastic_state_variable_increment, this, _1, _2, _3, _4);
     mf.compute_plastic_increment = std::bind(&Elastoplastic::compute_plastic_increment, this, _1, _2, _3, _4, _5);
-
-    settings.method = "RKDP";
 }
 
 void Elastoplastic::solve(void) {

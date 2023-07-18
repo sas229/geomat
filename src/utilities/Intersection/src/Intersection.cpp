@@ -17,10 +17,12 @@ double Intersection::solve(Cauchy sigma_prime, State state, Voigt Delta_epsilon_
 
     // Yield function value for current stress state (i.e. alpha = 0.0).
     f_0 = mf->compute_f(sigma_prime, state);
+    PLOG_DEBUG << "f_0 = " << f_0;
 
     // Compute trial stress state with full strain increment.
     Cauchy sigma_prime_1 = mf->compute_trial_stress(sigma_prime, 1.0 * Delta_epsilon_tilde);
     f_1 = mf->compute_f(sigma_prime_1, state);
+    PLOG_DEBUG << "f_1 = " << f_1;
 
     // Check increment type by finding alpha.
     if (f_1 <= settings->FTOL) {

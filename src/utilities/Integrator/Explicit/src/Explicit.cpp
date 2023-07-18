@@ -21,6 +21,7 @@ void Explicit::solve(
         compute_initial_estimate();
         if (accepted) {
             // Correct stresses and state variables back to yield surface.
+            PLOG_DEBUG << "Increment accepted. Checking for yield surface drift.";
             sigma_prime_u = sigma_prime_c = sigma_prime_ini;
             state_u = state_c = state_ini;
 

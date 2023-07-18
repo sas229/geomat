@@ -182,6 +182,18 @@ class C2MC : public Elastoplastic {
          */
         State compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, double H, Voigt Delta_epsilon_tilde_p=Voigt::Zero()) override;
 
+        /**
+         * @brief Method to compute C2MC specific coefficients.
+         * 
+         * @param angle Friction or dilation angle in degrees.
+         * @param theta_s Lode angle defined by sine convention.
+         * @param A Coeffient A after Abbo et al. (2011).
+         * @param B Coeffient B after Abbo et al. (2011).
+         * @param C Coeffient C after Abbo et al. (2011).
+         * @param k_theta Coeffient k_theta after Abbo et al. (2011).
+         */
+        void compute_coefficients(double angle, double theta_s, double &A, double &B, double &C, double &k_theta);
+
        /** 
          * @brief Parameters. 
          */
@@ -226,6 +238,8 @@ class C2MC : public Elastoplastic {
          * @brief Parameter: dilation angle. 
          */
         const double &psi = parameters[6];
+
+        // const double phi_r = to_radians(parameters[3]);
 
         // /** 
         //  * @brief Parameter: deformation balance parameter. 
