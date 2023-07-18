@@ -76,8 +76,7 @@ void RKDP::compute_initial_estimate(void) {
 
     // Compute error estimate.
     int size_error = 1 + state_ini.size();
-    Eigen::VectorXd error;
-    error.resize(size_error);
+    Eigen::VectorXd error(size_error);
     error[0] = (to_cauchy(
         (11.0/360.0)*Delta_sigma_prime_1 - 
         (10.0/63.0)*Delta_sigma_prime_3 +

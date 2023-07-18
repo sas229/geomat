@@ -27,8 +27,8 @@ void ModifiedEuler::compute_initial_estimate(void) {
 
     // Compute error estimate.
     int size_error = 1 + state_ini.size();
-    Eigen::VectorXd error;
-    error.resize(size_error);
+    Eigen::VectorXd error(size_error);
+    // error.resize(size_error);
     error[0] = (to_cauchy(Delta_sigma_prime_2 - Delta_sigma_prime_1)).norm()/(2.0*sigma_prime_ini.norm());
     for (int i=1; i<size_error; ++i) {
         error[i] = std::abs((Delta_state_2[i-1] - Delta_state_1[i-1]))/(2.0*state_ini[i-1]);
