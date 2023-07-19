@@ -26,7 +26,7 @@ double Intersection::solve(Cauchy sigma_prime, State state, Voigt Delta_epsilon_
 
     // Check increment type by finding alpha.
     if (f_1 <= settings->FTOL) {
-        PLOG_INFO << "Fully elastic increment; alpha = 1.0.";
+        PLOG_INFO << "Fully elastic increment; alpha = 1.0";
         return 1.0;
     } else if (std::abs(f_0) <= settings->FTOL && f_1 > settings->FTOL) {
         PLOG_INFO << "Check potential for elastoplastic unloading-reloading.";

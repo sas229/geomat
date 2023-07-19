@@ -51,18 +51,6 @@ double C2MC::compute_f(Cauchy sigma_prime, State state) {
         f = -p_prime*sin(phi_r) + sqrt(pow((q/sqrt(3.0)),2.0)*pow((k_theta),2.0) + pow(a_h,2.0)*pow(sin(phi_r),2.0)) - cohs*cos(phi_r);
         PLOG_DEBUG << "A = " << A << "; B = " << B << "; C = " << C << "; nk_theta = " << k_theta; 
     }
-    double theta_C2MC;
-    Cauchy s = compute_s(sigma_prime, p_prime);
-    double sigma_bar = sqrt((1.0/2.0)*(pow(s(0,0),2.0) + pow(s(1,1),2.0) + pow(s(2,2),2.0)) + pow(s(0,1),2.0) + pow(s(0,2),2.0) + pow(s(1,2),2.0));
-    if (sigma_bar != 0.0) {
-        double val = -(3.0*sqrt(3.0)/2.0)*(J_3/(pow(sigma_bar,3.0)));
-        val = max(val, -1.0);
-        val = min(val, 1.0);
-        theta_C2MC = (1.0/3.0)*asin(val);
-    } else {
-        theta_C2MC = 0.0;
-    }
-    double q_check = sqrt(3.0)*sigma_bar;
     /* USER DEFINED CODE ENDS HERE */
     return f;
 }
@@ -92,12 +80,12 @@ void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     {
         using namespace std;
         double A, B, C, k_theta, dk_dtheta_f;
-        compute_coefficients(phi, theta_s, A, B, C, k_theta);
-        double alpha_f = (q*k_theta)/sqrt(pow((q*k_theta),2.0) + pow((a_h*sin(phi_r)),2.0));
-        if (abs(theta_s) > theta_tr) {
-            dk_dtheta_f = 3.0*B*cos(3.0*theta_s) + 3.0*C*sin(6.0*theta_s);
+        compute_coefficients(phi, theta_s_bar, A, B, C, k_theta);
+        double alpha_f = ((q/sqrt(3.0))*k_theta)/sqrt(pow(((q/sqrt(3.0))*k_theta),2.0) + pow((a_h*sin(phi_r)),2.0));
+        if (abs(theta_s_bar) > theta_tr) {
+            dk_dtheta_f = 3.0*B*cos(3.0*theta_s_bar) + 3.0*C*sin(6.0*theta_s_bar);
         } else { 
-            dk_dtheta_f = -sin(theta_s)-(1.0/sqrt(3.0))*sin(phi_r)*cos(theta_s);
+            dk_dtheta_f = -sin(theta_s_bar)-(1.0/sqrt(3.0))*sin(phi_r)*cos(theta_s_bar);
         }
         df_dp_prime = -sin(phi_r);
         df_dq = alpha_f*k_theta;
@@ -107,8 +95,8 @@ void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
 
     Cauchy one = Cauchy::Constant(1.0); 
     if (q > 0.0 && df_dtheta != 0.0) {
-        df_dsigma_prime = (df_dp_prime*dp_dsigma_prime) + ((df_dq - df_dtheta*tan(3.0*theta_s))*dq_dsigma_prime) 
-            + (one*(sqrt(3.0)/(2.0*pow(q,2.0)*cos(3.0*theta_s)))*df_dtheta);
+        df_dsigma_prime = (df_dp_prime*dp_dsigma_prime) + ((df_dq - df_dtheta*tan(3.0*theta_s_bar)/(q/sqrt(3.0)))*dq_dsigma_prime) 
+            - (one*(sqrt(3.0)/(2.0*pow((q/sqrt(3.0)),3.0)*cos(3.0*theta_s_bar)))*df_dtheta);
     } else { 
         df_dsigma_prime = (df_dp_prime*dp_dsigma_prime) + (df_dq*dq_dsigma_prime);
     }
@@ -118,12 +106,12 @@ void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     {
         using namespace std;
         double A, B, C, k_theta, dk_dtheta_g;
-        compute_coefficients(psi, theta_s, A, B, C, k_theta);
-        double alpha_g = (q*k_theta)/sqrt(pow((q*k_theta),2.0)+pow((a_h*sin(psi_r)),2.0));
-        if (abs(theta_s) > theta_tr) {
-            dk_dtheta_g = 3.0*B*cos(3.0*theta_s)+3.0*C*sin(6.0*theta_s);
+        compute_coefficients(psi, theta_s_bar, A, B, C, k_theta);
+        double alpha_g = ((q/sqrt(3.0))*k_theta)/sqrt(pow(((q/sqrt(3.0))*k_theta),2.0)+pow((a_h*sin(psi_r)),2.0));
+        if (abs(theta_s_bar) > theta_tr) {
+            dk_dtheta_g = 3.0*B*cos(3.0*theta_s_bar)+3.0*C*sin(6.0*theta_s_bar);
         } else { 
-            dk_dtheta_g = -sin(theta_s)-(1.0/sqrt(3.0))*sin(psi_r)*cos(theta_s);
+            dk_dtheta_g = -sin(theta_s_bar)-(1.0/sqrt(3.0))*sin(psi_r)*cos(theta_s_bar);
         }
         dg_dp_prime = -sin(psi_r);
         dg_dq = alpha_g*k_theta;
@@ -132,8 +120,8 @@ void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     /* USER DEFINED CODE ENDS HERE */
 
     if (q > 0.0 && dg_dtheta != 0.0) {
-        dg_dsigma_prime = (dg_dp_prime*dp_dsigma_prime) + ((dg_dq - dg_dtheta*tan(3*theta_s)/q)*dq_dsigma_prime)
-            + (one*(sqrt(3)/(2.0*pow(q,3)*cos(3*theta_s)))*dg_dtheta);
+        dg_dsigma_prime = (dg_dp_prime*dp_dsigma_prime) + ((dg_dq - dg_dtheta*tan(3.0*theta_s_bar)/(q/sqrt(3.0)))*dq_dsigma_prime) 
+            - (one*(sqrt(3.0)/(2.0*pow((q/sqrt(3.0)),3.0)*cos(3.0*theta_s_bar)))*dg_dtheta);
     } else { 
         dg_dsigma_prime = (dg_dp_prime*dp_dsigma_prime) + (dg_dq*dq_dsigma_prime);
     }
@@ -143,7 +131,6 @@ void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     /* USER DEFINED CODE STARTS HERE */
     H = 0.0;
     /* USER DEFINED CODE ENDS HERE */
-
 }
 
 State C2MC::compute_elastic_state_variable(Voigt Delta_epsilon_tilde_e) {

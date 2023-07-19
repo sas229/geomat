@@ -23,7 +23,6 @@ void Elastoplastic::solve(void) {
         
         // Compute alpha using bound functions.
         double alpha = intersection.solve(sigma_prime, state, Delta_epsilon_tilde);
-        PLOG_INFO << "Plastic increment; alpha = " << alpha;
         Cauchy sigma_prime_e, sigma_prime_ep;
         State state_e, state_ep;
         Voigt Delta_epsilon_tilde_e = alpha*Delta_epsilon_tilde;
@@ -45,6 +44,7 @@ void Elastoplastic::solve(void) {
         PLOG_DEBUG << "State variables after elastic increment, state_e = " << state_e;
         if (alpha < 1.0) {
             // Perform elastoplastic stress integration on plastic portion of strain increment.
+            PLOG_INFO << "Plastic increment; alpha = " << alpha;
             Voigt Delta_epsilon_tilde_p = (1.0-alpha)*Delta_epsilon_tilde;
             sigma_prime_ep = sigma_prime_e; 
             state_ep = state_e;

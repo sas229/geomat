@@ -111,7 +111,7 @@ int main() {
     double predef, dpred;
     char cmname[] = "C2MC";
     int nprops = 7;
-    double props[7] = {500.0, 0.2, 1.0, 25.0, 29.0, 1.1, 25.0};
+    double props[7] = {500.0, 0.2, 1.0, 25.0, 25.0, 29.0, 1.1};
     double coords[3] = {0.0, 0.0, 0.0};
     double drot;
     double pnewdt, celent;
