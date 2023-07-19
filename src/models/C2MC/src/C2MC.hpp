@@ -239,28 +239,6 @@ class C2MC : public Elastoplastic {
          */
         const double &psi = parameters[6];
 
-        // const double phi_r = to_radians(parameters[3]);
-
-        // /** 
-        //  * @brief Parameter: deformation balance parameter. 
-        //  */
-        // const double &A = parameters[7];
-
-        // /** 
-        //  * @brief State variable: voids ratio. 
-        //  */
-        // double &e  = state[0];
-
-        // /** 
-        //  * @brief State variable: preconsolidation pressure. 
-        //  */
-        // double &p_c = state[1];
-
-        // /** 
-        //  * @brief State variable: current sensitivity. 
-        //  */
-        // double &s_ep = state[2];
-
         /**
          * @brief Number of required parameters.
          */

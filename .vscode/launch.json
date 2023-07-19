@@ -1,13 +1,13 @@
 {
     "configurations": [
         {
-            "name": "(gdb) Launch",
+            "name": "umat test",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/umat_test",
             "args": [],
-            "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",

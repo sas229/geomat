@@ -112,7 +112,7 @@ plt.show()
 
 # C2MC test.
 increments = 100
-parameters = np.array([500.0, 0.2, 1.0, 25.0, 29.0, 1.1, 0.1])
+parameters = np.array([500.0, 0.2, 1.0, 25.0, 29.0, 1.1, 25.0])
 state = np.array([])
 stress = np.array([50, 50, 50, 0, 0, 0])
 ea_max = 0.5
@@ -120,7 +120,7 @@ ea_increment = ea_max/increments
 Delta_epsilon_tilde = np.array([ea_increment, 0.0, 0.0, 0.0, 0.0, 0.0])
 axial_strain = np.arange(0, increments*ea_increment, ea_increment)
 
-model = C2MC(log_severity="fatal", parameters=parameters, state=state)
+model = C2MC(log_severity="verbose", parameters=parameters, state=state)
 print("Model name: {}".format(model.name))
 print("Model type: {}".format(model.type))
 model.set_sigma_prime_tilde(stress)
