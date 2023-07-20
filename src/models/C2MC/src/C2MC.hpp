@@ -95,14 +95,14 @@ class C2MC : public Elastoplastic {
         /**
          * @brief Method to compute C2MC specific coefficients.
          * 
-         * @param angle Friction or dilation angle in degrees.
-         * @param theta Lode's angle.
+         * @param angle Friction or dilation angle in radians.
+         * @param theta Lode's angle in radians.
          * @param A Coeffient A after Abbo et al. (2011).
          * @param B Coeffient B after Abbo et al. (2011).
          * @param C Coeffient C after Abbo et al. (2011).
          * @param k_theta Coeffient k_theta after Abbo et al. (2011).
          */
-        void compute_coefficients(double angle, double theta, double &A, double &B, double &C, double &k_theta);
+        void compute_coefficients(double angle_r, double theta, double &A, double &B, double &C, double &k_theta);
 
        /** 
          * @brief Parameters. 
@@ -158,6 +158,21 @@ class C2MC : public Elastoplastic {
          * @brief Number of required state variables.
          */
         int state_required = 0;
+
+        /**
+         * @brief Friction angle in radians.
+         */
+        const double phi_r = to_radians(phi);
+
+        /**
+         * @brief Dilation angle in radians.
+         */
+        const double psi_r = to_radians(psi);
+
+        /**
+         * @brief C2 rounding parameter in radians.
+         */
+        const double theta_tr = to_radians(theta_t);
 
 };
 

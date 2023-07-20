@@ -22,8 +22,25 @@ class Elastic : public Model {
         /** @brief Elastic model destructor. */
         virtual ~Elastic() {}
 
-       //  /** @brief Method to get the elastic matrix. */
-       //  Constitutive get_elastic_matrix(void);
+       /**
+        * @brief Method to compute the bulk modulus from elastic parameters:
+        * \f[ K = \frac{E}{(3(1-2\nu))} \f]
+        * 
+        * @param E Young's modulus.
+        * @param nu Poisson's ratio.
+        * @return double 
+        */
+       double compute_K(double E, double nu);
+
+       /**
+        * @brief Method to compute the shear modulus from elastic parameters:
+        * \f[ G = \frac{E}{(2(1+\nu))} \f]
+        * 
+        * @param E Young's modulus.
+        * @param nu Poisson's ratio.
+        * @return double 
+        */
+       double compute_G(double E, double nu);
 
        /** @brief Method to compute the isotropic linear elastic matrix:
         *  \f[ D_e = \left[\begin{array}{cccccc}

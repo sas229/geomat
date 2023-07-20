@@ -1,5 +1,13 @@
 #include "Elastic.hpp"
 
+double Elastic::compute_K(double E, double nu) {
+    return E/(3.0*(1.0-2.0*nu));
+}
+
+double Elastic::compute_G(double E, double nu) {
+    return E/(2.0*(1.0+nu));
+}
+
 Constitutive Elastic::compute_isotropic_linear_elastic_matrix(double K, double G) {
     // Check elastic paramaters are valid.
     Checks::check_elastic_parameters(K, G);
