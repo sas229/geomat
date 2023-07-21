@@ -105,13 +105,13 @@ int main() {
     double ddsddt[6], drplde[6];
     double drpldt;
     double stran[6] = {0};
-    double dstran[6] = {-0.01, 0.005, 0.005, 0.0, 0.0, 0.0};
+    double dstran[6] = {-0.005, 0.0025, 0.0025, 0.0, 0.0, 0.0};
     double time[2];
     double dtime, temp, dtemp;
     double predef, dpred;
     char cmname[] = "C2MC";
     int nprops = 7;
-    double props[7] = {500.0, 0.2, 1.0, 25.0, 25.0, 29.0, 1.1};
+    double props[7] = {500.0, 0.2, 1.0, 33.0, 15.0, 29.0, 1.1};
     double coords[3] = {0.0, 0.0, 0.0};
     double drot;
     double pnewdt, celent;
@@ -125,7 +125,7 @@ int main() {
     int kinc;
 
     // Try some increments.
-    for (int i=0; i < 50; ++i) {
+    for (int i=0; i < 100; ++i) {
         umat(
             stress,
             statev,

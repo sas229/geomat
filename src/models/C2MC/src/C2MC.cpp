@@ -9,6 +9,8 @@ C2MC::C2MC(Parameters parameters, State state, std::string log_severity) : param
 
     // Check inputs.
     Checks::check_inputs(name, (int)parameters.size(), (int)state.size(), parameters_required, state_required);
+
+    settings.MAXITS_YSC = 100;
 }
 
 State C2MC::get_state_variables(void) {
@@ -20,38 +22,33 @@ void C2MC::set_state_variables(State new_state) {
 }
 
 Constitutive C2MC::compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) {
-
-    /* USER DEFINED CODE STARTS HERE */
+    // Compute elastic constants.
     double K = compute_K(E, nu);
     double G = compute_G(E, nu);
-    Constitutive D_e = compute_isotropic_linear_elastic_matrix(K, G);
-    /* USER DEFINED CODE ENDS HERE */
 
+    // Compute elastic matrix.
+    Constitutive D_e = compute_isotropic_linear_elastic_matrix(K, G);
     return D_e;
 }
 
 double C2MC::compute_f(Cauchy sigma_prime, State state) {
 
     // Stress invariants.
-    double q = compute_q(sigma_prime);
     double p_prime = compute_p_prime(sigma_prime); // C2MC definition is tension positive.
     double sigma_bar = compute_sigma_bar(sigma_prime, p_prime);
 
     // State variables.
     // No state variables for this model.
 
-    /* USER DEFINED CODE STARTS HERE */
     using namespace std;
     double f, I_1, I_2, I_3, J_1, J_2, J_3, theta_c, theta_s, theta_s_bar;
     double A, B, C, K_theta;
     {   
         compute_stress_invariants(sigma_prime, I_1, I_2, I_3, J_1, J_2, J_3);
         compute_lode(J_2, J_3, theta_c, theta_s, theta_s_bar);
-        compute_coefficients(phi, theta_s_bar, A, B, C, K_theta);
+        compute_coefficients(phi_r, theta_s_bar, A, B, C, K_theta);
         f = -p_prime*sin(phi_r) + sqrt(pow(sigma_bar,2.0)*pow((K_theta),2.0) + pow(a_h,2.0)*pow(sin(phi_r),2.0)) - cohs*cos(phi_r); 
     }
-    /* USER DEFINED CODE ENDS HERE */
-
     return f;
 }
 
@@ -60,26 +57,22 @@ void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     // No state variables for this model.
 
     // Compute mean effective stress, deviatoric stress tensor and derivatives of the stress state for current stress state.
-    double q, p_prime, I_1, I_2, I_3, J_1, J_2, J_3, theta_c, theta_s, theta_s_bar, sigma_bar;
+    double p_prime, I_1, I_2, I_3, J_1, J_2, J_3, theta_c, theta_s, theta_s_bar, sigma_bar;
     Cauchy s, dq_dsigma_prime, dJ_3_dsigma_prime, sigma, dsigma_bar_dsigma_prime;
-    q = compute_q(sigma_prime);
     p_prime = compute_p_prime(sigma_prime);
     s = compute_s(sigma_prime, p_prime);
-    dq_dsigma_prime = compute_dq_dsigma_prime(sigma_prime, s, q);
-    dJ_3_dsigma_prime = compute_dJ_3_dsigma_prime(sigma_prime, s, q);
-    sigma = compute_sigma(sigma_prime, u);
-    compute_stress_invariants(sigma, I_1, I_2, I_3, J_1, J_2, J_3);
+    compute_stress_invariants(sigma_prime, I_1, I_2, I_3, J_1, J_2, J_3);
     compute_lode(J_2, J_3, theta_c, theta_s, theta_s_bar);
     sigma_bar = compute_sigma_bar(sigma_prime, p_prime);
     dsigma_bar_dsigma_prime = compute_dsigma_bar_dsigma_prime(sigma_prime, s, sigma_bar);
-    
-    /* USER DEFINED CODE STARTS HERE */
+    dJ_3_dsigma_prime = compute_dJ_3_dsigma_prime(sigma_prime, s, sigma_bar);
+
     double df_dp_prime, df_dsigma_bar, df_dtheta, dg_dp_prime, dg_dsigma_bar, dg_dtheta, C_1, C_2, C_3;
     {
         using namespace std;
         double A, B, C, K_theta, dK_dtheta;
-        compute_coefficients(phi, theta_s_bar, A, B, C, K_theta);
-        double alpha = (sigma_bar*K_theta)/sqrt(pow(sigma_bar,2.0)*pow(K_theta,2.0) + pow(a_h,2.0)*pow(sin(psi_r),2.0));
+        compute_coefficients(phi_r, theta_s_bar, A, B, C, K_theta);
+        double alpha = (sigma_bar*K_theta)/sqrt(pow(sigma_bar,2.0)*pow(K_theta,2.0) + pow(a_h,2.0)*pow(sin(phi_r),2.0));
         if (abs(theta_s_bar) > theta_tr) {
             dK_dtheta = 3.0*B*cos(3.0*theta_s_bar) + 3.0*C*sin(6.0*theta_s_bar);
         } else { 
@@ -94,14 +87,14 @@ void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
             C_3 = alpha*(-(sqrt(3.0)/(2.0*pow(sigma_bar,2)*cos(3.0*theta_s_bar)))*dK_dtheta);
         }
     }
-    df_dsigma_prime = (C_1*dp_prime_dsigma_prime) + (C_2*dsigma_bar_dsigma_prime) + (pow(sigma_bar,2.0)*C_3)*(1.0/(pow(sigma_bar,2.0))*dJ_3_dsigma_prime);
+    df_dsigma_prime = (C_1*dp_prime_dsigma_prime) + (C_2*dsigma_bar_dsigma_prime) + (pow(sigma_bar,2.0)*C_3)*((1.0/(pow(sigma_bar,2.0)))*dJ_3_dsigma_prime);
 
     // If non-associated flow, compute the gradient of the plastic potential function.
-    if (phi == psi) {
+    if (phi_r == psi_r) {
         {
             using namespace std;
             double A, B, C, K_theta, dK_dtheta;
-            compute_coefficients(psi, theta_s_bar, A, B, C, K_theta);
+            compute_coefficients(psi_r, theta_s_bar, A, B, C, K_theta);
             double alpha = (sigma_bar*K_theta)/sqrt(pow(sigma_bar,2.0)*pow(K_theta,2.0) + pow(a_h,2.0)*pow(sin(psi_r),2.0));
             if (abs(theta_s_bar) > theta_tr) {
                 dK_dtheta = 3.0*B*cos(3.0*theta_s_bar) + 3.0*C*sin(6.0*theta_s_bar);
@@ -117,7 +110,7 @@ void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
                 C_3 = alpha*(-(sqrt(3.0)/(2.0*pow(sigma_bar,2)*cos(3.0*theta_s_bar)))*dK_dtheta);
             }
         }
-        dg_dsigma_prime = (C_1*dp_prime_dsigma_prime) + (C_2*dsigma_bar_dsigma_prime) + (pow(sigma_bar,2.0)*C_3)*(1.0/(pow(sigma_bar,2.0))*dJ_3_dsigma_prime);
+        dg_dsigma_prime = (C_1*dp_prime_dsigma_prime) + (C_2*dsigma_bar_dsigma_prime) + (pow(sigma_bar,2.0)*C_3)*((1.0/(pow(sigma_bar,2.0)))*dJ_3_dsigma_prime);
     } else {
         dg_dsigma_prime = df_dsigma_prime;
     }
@@ -142,7 +135,7 @@ State C2MC::compute_plastic_state_variable_increment(double delta_lambda, Cauchy
 
 void C2MC::compute_coefficients(double angle_r, double theta_s_bar, double &A, double &B, double &C, double &K_theta) {
     using namespace std;
-    double A_1, B_1, C_1, A_2, B_2, C_2, theta_tr, theta_r, sign_theta;
+    double A_1, B_1, C_1, A_2, B_2, C_2, sign_theta;
 
     // Only calculate A, B and C if required.
     if (abs(theta_s_bar) > theta_tr) {
@@ -165,9 +158,9 @@ void C2MC::compute_coefficients(double angle_r, double theta_s_bar, double &A, d
 
         // Coefficient K_theta. 
         K_theta = A + B*sin(3.0*theta_s_bar) + C*(pow(sin(3.0*theta_s_bar),2.0));
-        PLOG_DEBUG << "A = " << A << "; B = " << B << "; C = " << C << "; K_theta = " << K_theta;
+        PLOG_DEBUG << "Coefficients: A = " << A << "; B = " << B << "; C = " << C << "; K_theta = " << K_theta;
     } else { 
         K_theta = cos(theta_s_bar)-(1.0/sqrt(3.0))*sin(angle_r)*sin(theta_s_bar);
-        PLOG_DEBUG << "K_theta = " << K_theta;
+        PLOG_DEBUG << "Coefficients: K_theta = " << K_theta;
     } 
 }

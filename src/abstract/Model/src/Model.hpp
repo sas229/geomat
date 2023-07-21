@@ -194,10 +194,10 @@ class Model {
          * 
          * @param[in] sigma_prime Effective stress tensor.
          * @param[in] s Deviatoric stress tensor.
-         * @param[in] q Deviatoric stress.
+         * @param[in] sigma_bar Stress invariant.
          * @return Cauchy 
          */
-        Cauchy compute_dJ_3_dsigma_prime(Cauchy sigma_prime, Cauchy s, double q);
+        Cauchy compute_dJ_3_dsigma_prime(Cauchy sigma_prime, Cauchy s, double sigma_bar);
 
         /**
          * @brief Method to compute the derivatives of the stress invariant \f$ \overbar{\sigma} \f$.
