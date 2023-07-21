@@ -88,7 +88,7 @@ void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     df_dsigma_prime = (C_1*dp_prime_dsigma_prime) + (C_2*dsigma_bar_dsigma_prime) + (pow(sigma_bar,2.0)*C_3)*((1.0/(pow(sigma_bar,2.0)))*dJ_3_dsigma_prime);
 
     // If non-associated flow, compute the gradient of the plastic potential function.
-    if (phi_r == psi_r) {
+    if (phi_r != psi_r) {
         {
             using namespace std;
             double A, B, C, K_theta, dK_dtheta;

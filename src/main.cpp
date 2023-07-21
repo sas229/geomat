@@ -97,7 +97,7 @@ int main() {
     int ndi = 3;
     int nshr = 3;
     int ntens = 6;
-    double stress[6] = {-49, -50, -50, 0, 0, 0};
+    double stress[6] = {-50, -50, -50, 0, 0, 0};
     int nstatv = 0;
     double statev[0] = {};
     double ddsdde[36] = {0};
@@ -111,7 +111,7 @@ int main() {
     double predef, dpred;
     char cmname[] = "C2MC";
     int nprops = 7;
-    double props[7] = {500.0, 0.2, 1.0, 33.0, 15.0, 29.0, 1.1};
+    double props[7] = {500.0, 0.2, 0.0, 33.0, 0.0, 29.0, 1.1};
     double coords[3] = {0.0, 0.0, 0.0};
     double drot;
     double pnewdt, celent;
