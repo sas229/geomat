@@ -97,7 +97,7 @@ int main() {
     int ndi = 3;
     int nshr = 3;
     int ntens = 6;
-    double stress[6] = {-49, -50, -50, 0, 0, 0};
+    double stress[6] = {-50, -50, -50, 0, 0, 0};
     int nstatv = 0;
     double statev[0] = {};
     double ddsdde[36] = {0};
@@ -105,7 +105,7 @@ int main() {
     double ddsddt[6], drplde[6];
     double drpldt;
     double stran[6] = {0};
-    double dstran[6] = {-0.005, 0.0, 0.0, 0.0, 0.0, 0.0};
+    double dstran[6] = {-0.01, 0.005, 0.005, 0.0, 0.0, 0.0};
     double time[2];
     double dtime, temp, dtemp;
     double predef, dpred;
@@ -124,8 +124,8 @@ int main() {
     int kstep;
     int kinc;
 
-    // Try ten increments.
-    for (int i=0; i < 100; ++i) {
+    // Try some increments.
+    for (int i=0; i < 50; ++i) {
         umat(
             stress,
             statev,

@@ -61,6 +61,25 @@ Cauchy Model::compute_dq_dsigma_prime(Cauchy sigma_prime, Cauchy s, double q) {
     }
 }
 
+Cauchy Model::compute_dsigma_bar_dsigma_prime(Cauchy sigma_prime, Cauchy s, double sigma_bar) {
+    if (sigma_bar == 0.0) {
+        return Cauchy::Zero();
+    } else {
+        Cauchy dsigma_bar_dsigma_prime;
+        dsigma_bar_dsigma_prime(0,0) = s(0,0);
+        dsigma_bar_dsigma_prime(1,1) = s(1,1);
+        dsigma_bar_dsigma_prime(1,1) = s(2,2);
+        dsigma_bar_dsigma_prime(0,1) = 2*sigma_prime(0,1);
+        dsigma_bar_dsigma_prime(1,0) = 2*sigma_prime(1,0);
+        dsigma_bar_dsigma_prime(0,2) = 2*sigma_prime(0,2);
+        dsigma_bar_dsigma_prime(2,0) = 2*sigma_prime(2,0);
+        dsigma_bar_dsigma_prime(1,2) = 2*sigma_prime(1,2);
+        dsigma_bar_dsigma_prime(2,1) = 2*sigma_prime(2,1);
+        dsigma_bar_dsigma_prime *= 1.0/(2.0*sigma_bar);
+        return dsigma_bar_dsigma_prime;
+    }
+}
+
 void Model::set_sigma_prime_tilde(Voigt sigma_prime_tilde) {
     // Stress in Voigt notation form - using compression positive soil mechanics convention.
     this->sigma_prime_tilde = sigma_prime_tilde;
@@ -197,6 +216,13 @@ void Model::compute_stress_invariants(Cauchy sigma, double &I_1, double &I_2, do
     J_1 = s.trace(); // Is always zero...
     J_2 = (std::pow(I_1,2)/3.0) - I_2;
     J_3 = s.determinant();
+}
+
+double Model::compute_sigma_bar(Cauchy sigma, double p) {
+    Cauchy s = compute_s(sigma, p);
+    Voigt s_tilde = to_voigt(s);
+    double sigma_bar = std::sqrt((1.0/2.0)*s_tilde.array().square().matrix().sum());
+    return sigma_bar;
 }
 
 Cauchy Model::compute_dJ_3_dsigma_prime(Cauchy sigma_prime, Cauchy s, double q) {

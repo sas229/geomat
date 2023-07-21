@@ -93,7 +93,7 @@ void RKDP::compute_initial_estimate(void) {
             (11.0/280.0)*Delta_state_6[i-1]
         )/state_ini[i-1];
     }
-    PLOG_DEBUG << "Error vector: " << error;
+    PLOG_DEBUG << "Initial estimate error vector: " << error;
     R_n = error.maxCoeff();
 
     // Check error estimate against machine tolerance.

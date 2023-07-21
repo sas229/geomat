@@ -83,10 +83,10 @@ void SMCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
 
     Cauchy one = Cauchy::Constant(1.0); 
     if (q > 0.0 && df_dtheta != 0.0) {
-        df_dsigma_prime = (df_dp_prime*dp_dsigma_prime) + ((df_dq - df_dtheta*tan(3*theta_s)/q)*dq_dsigma_prime) 
+        df_dsigma_prime = (df_dp_prime*dp_prime_dsigma_prime) + ((df_dq - df_dtheta*tan(3*theta_s)/q)*dq_dsigma_prime) 
             + (one*(sqrt(3)/(2.0*pow(q,3)*cos(3*theta_s)))*df_dtheta);
     } else { 
-        df_dsigma_prime = (df_dp_prime*dp_dsigma_prime) + (df_dq*dq_dsigma_prime);
+        df_dsigma_prime = (df_dp_prime*dp_prime_dsigma_prime) + (df_dq*dq_dsigma_prime);
     }
     
     /* USER DEFINED CODE STARTS HERE */
@@ -96,10 +96,10 @@ void SMCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     /* USER DEFINED CODE ENDS HERE */
 
     if (q > 0.0 && dg_dtheta != 0.0) {
-        dg_dsigma_prime = (dg_dp_prime*dp_dsigma_prime) + ((dg_dq - dg_dtheta*tan(3*theta_s)/q)*dq_dsigma_prime)
+        dg_dsigma_prime = (dg_dp_prime*dp_prime_dsigma_prime) + ((dg_dq - dg_dtheta*tan(3*theta_s)/q)*dq_dsigma_prime)
             + (one*(sqrt(3)/(2.0*pow(q,3)*cos(3*theta_s)))*dg_dtheta);
     } else { 
-        dg_dsigma_prime = (dg_dp_prime*dp_dsigma_prime) + (dg_dq*dq_dsigma_prime);
+        dg_dsigma_prime = (dg_dp_prime*dp_prime_dsigma_prime) + (dg_dq*dq_dsigma_prime);
     }
     a = to_voigt(df_dsigma_prime);
     b = to_voigt(dg_dsigma_prime);

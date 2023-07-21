@@ -18,6 +18,7 @@ void Explicit::solve(
         // Compute initial estimate and error estimate.
         PLOG_DEBUG << "Plastic increment, dT = " << dT;
         Delta_epsilon_tilde_dT = Delta_epsilon_tilde*dT;
+        PLOG_DEBUG << "Computing initial stress increment estimate.";
         compute_initial_estimate();
         if (accepted) {
             // Correct stresses and state variables back to yield surface.
@@ -31,7 +32,7 @@ void Explicit::solve(
             while (std::abs(f_c) > settings->FTOL) {
                 // If yield surface drift correction unsuccessful, log fault.
                 if (ITS_YSC >= settings->MAXITS_YSC && std::abs(f_c) > settings->FTOL) {
-                    PLOG_FATAL << "Maximum number of yield surface correction iterations performed and f = " << f_c << " > FTOL = " << settings->FTOL << ".";
+                    PLOG_FATAL << "Maximum number of yield surface correction iterations performed and |f| = " << std::abs(f_c) << " > FTOL = " << settings->FTOL << ".";
                     assert(false);
                 } 
 
