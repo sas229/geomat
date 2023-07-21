@@ -46,7 +46,7 @@ double C2MC::compute_f(Cauchy sigma_prime, State state) {
     {   
         compute_stress_invariants(sigma_prime, I_1, I_2, I_3, J_1, J_2, J_3);
         compute_lode(J_2, J_3, theta_c, theta_s, theta_s_bar);
-        compute_coefficients(phi, theta_s_bar, A, B, C, k_theta);
+        compute_coefficients(phi_r, theta_s_bar, A, B, C, k_theta);
         f = -p_prime*sin(phi_r) + sqrt(pow((q/sqrt(3.0)),2.0)*pow((k_theta),2.0) + pow(a_h,2.0)*pow(sin(phi_r),2.0)) - cohs*cos(phi_r); 
     }
     /* USER DEFINED CODE ENDS HERE */
@@ -74,7 +74,7 @@ void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     {
         using namespace std;
         double A, B, C, k_theta, dk_dtheta_f;
-        compute_coefficients(phi, theta_s_bar, A, B, C, k_theta);
+        compute_coefficients(phi_r, theta_s_bar, A, B, C, k_theta);
         double alpha_f = ((q/sqrt(3.0))*k_theta)/sqrt(pow(((q/sqrt(3.0))*k_theta),2.0) + pow((a_h*sin(phi_r)),2.0));
         if (abs(theta_s_bar) > theta_tr) {
             dk_dtheta_f = 3.0*B*cos(3.0*theta_s_bar) + 3.0*C*sin(6.0*theta_s_bar);
@@ -102,7 +102,7 @@ void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
         if (phi != psi) {
             using namespace std;
             double A, B, C, k_theta, dk_dtheta_g;
-            compute_coefficients(psi, theta_s_bar, A, B, C, k_theta);
+            compute_coefficients(psi_r, theta_s_bar, A, B, C, k_theta);
             double alpha_g = ((q/sqrt(3.0))*k_theta)/sqrt(pow(((q/sqrt(3.0))*k_theta),2.0)+pow((a_h*sin(psi_r)),2.0));
             if (abs(theta_s_bar) > theta_tr) {
                 dk_dtheta_g = 3.0*B*cos(3.0*theta_s_bar)+3.0*C*sin(6.0*theta_s_bar);

@@ -199,10 +199,10 @@ void Model::compute_stress_invariants(Cauchy sigma, double &I_1, double &I_2, do
     J_3 = s.determinant();
 }
 
-Cauchy Model::compute_dJ_3_dsigma_prime(Cauchy sigma_prime, Cauchy s, double q) {
-    dJ_3_dsigma_prime(0,0) = (s(1,1)*s(2,2) - std::pow(sigma_prime(1,2),2)) + (1.0*std::pow(q,2)/3.0);
-    dJ_3_dsigma_prime(1,1) = (s(0,0)*s(2,2) - std::pow(sigma_prime(0,2),2)) + (1.0*std::pow(q,2)/3.0);
-    dJ_3_dsigma_prime(1,1) = (s(0,0)*s(1,1) - std::pow(sigma_prime(0,1),2)) + (1.0*std::pow(q,2)/3.0);
+Cauchy Model::compute_dJ_3_dsigma_prime(Cauchy sigma_prime, Cauchy s, double sigma_bar) {
+    dJ_3_dsigma_prime(0,0) = (s(1,1)*s(2,2) - std::pow(sigma_prime(1,2),2)) + (1.0*std::pow(sigma_bar,2)/3.0);
+    dJ_3_dsigma_prime(1,1) = (s(0,0)*s(2,2) - std::pow(sigma_prime(0,2),2)) + (1.0*std::pow(sigma_bar,2)/3.0);
+    dJ_3_dsigma_prime(2,2) = (s(0,0)*s(1,1) - std::pow(sigma_prime(0,1),2)) + (1.0*std::pow(sigma_bar,2)/3.0);
     dJ_3_dsigma_prime(0,1) = 2.0*(sigma_prime(1,2)*sigma_prime(0,2) - s(2,2)*sigma_prime(0,1));
     dJ_3_dsigma_prime(0,2) = 2.0*(sigma_prime(0,2)*sigma_prime(0,1) - s(0,0)*sigma_prime(1,2));
     dJ_3_dsigma_prime(1,2) = 2.0*(sigma_prime(0,1)*sigma_prime(1,2) - s(1,1)*sigma_prime(0,2));
