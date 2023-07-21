@@ -220,7 +220,6 @@ void Model::compute_stress_invariants(Cauchy sigma, double &I_1, double &I_2, do
 
 double Model::compute_sigma_bar(Cauchy sigma, double p) {
     Cauchy s = compute_s(sigma, p);
-    Voigt s_tilde = to_voigt(s);
     double sigma_bar = std::sqrt((1.0/2.0)*(std::pow(s(0,0),2) + std::pow(s(1,1),2) + std::pow(s(2,2),2) + std::pow(sigma(0,1),2) + std::pow(sigma(1,2),2) + std::pow(sigma(0,2),2)));
     return sigma_bar;
 }
