@@ -194,13 +194,21 @@ class Model {
          * 
          * @param[in] sigma_prime Effective stress tensor.
          * @param[in] s Deviatoric stress tensor.
-         * @param[in] q Deviatoric stress.
+         * @param[in] sigma_bar Stress invariant.
          * @return Cauchy 
          */
-        Cauchy compute_dJ_3_dsigma_prime(Cauchy sigma_prime, Cauchy s, double q);
+        Cauchy compute_dJ_3_dsigma_prime(Cauchy sigma_prime, Cauchy s, double sigma_bar);
 
-        // Computers.
-
+        /**
+         * @brief Method to compute the derivatives of the stress invariant \f$ \overbar{\sigma} \f$.
+         * 
+         * @param sigma_prime Effective stress tensor.
+         * @param s Deviatoric stress tensor.
+         * @param sigma_bar Stress invariant.
+         * @return Cauchy 
+         */
+        Cauchy compute_dsigma_bar_dsigma_prime(Cauchy sigma_prime, Cauchy s, double sigma_bar);
+        
         /**
          * @brief Method to compute the cartesian stress tensor from principal stresses and directions as: 
          * 
@@ -383,6 +391,14 @@ class Model {
          * @param[in,out] J_3 Third deviatoric stress invariant.
          */
         void compute_stress_invariants(Cauchy sigma, double &I_1, double &I_2, double &I_3, double &J_1, double &J_2, double &J_3);
+
+        /**
+         * @brief Method to compute the stress invariant \f$ \overbar{\sigma} = \sqrt{J_{2} \f$.
+         * 
+         * @param J_2 Second deviatoric stress invariant.
+         * @return double 
+         */
+        double compute_sigma_bar(double J_2);
 
         // Members.
 
@@ -604,7 +620,7 @@ class Model {
          * 
          * where \f$ \boldsymbol{I} \f$ is the identity matrix. 
          */
-        Cauchy dp_dsigma_prime = 1.0/3.0*eye;
+        Cauchy dp_prime_dsigma_prime = 1.0/3.0*eye;
 
         /**
          * @brief Derivative of the deviatoric stress with respect to the effective stress state.
@@ -614,7 +630,7 @@ class Model {
         /**
          * @brief Derivatives of the thrid deviatoric stress invariant with respect to the effective stress state.
          */
-        Cauchy dJ_3_dsigma_prime;
+        Cauchy dJ_3_dsigma_prime = Cauchy::Zero();
 
         /**
          * @brief Model type.

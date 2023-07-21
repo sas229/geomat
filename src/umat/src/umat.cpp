@@ -83,25 +83,12 @@ void umat(
             assert(true);
         }
         first_call = false;
+        // Set initial stress state.
+        model->set_sigma_prime_tilde(-Eigen_sigma);
     } 
 
     // Set variables within model.    
-    model->set_sigma_prime_tilde(-Eigen_sigma);
     model->set_Delta_epsilon_tilde(-Eigen_dstran);
-
-    // model->update_stress_invariants();
-    // model->update_principal_stresses();
-    // double c, s, s_bar;
-    // model->compute_lode(850.0, 9000.0, c, s, s_bar);
-    // model->update_lode();
-
-    // Do some work with it... (i.e. stress integration).
-    // int i = 0;
-    // while (i<1000) {
-    //     model->solve();
-    //     model->set_Delta_epsilon_tilde(Eigen_dstran);
-    //     i += 1;
-    // }
     model->solve();
 
     // // Equate map to updated variable in order to map back to input variable.

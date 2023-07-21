@@ -32,7 +32,7 @@ void ModifiedEuler::compute_initial_estimate(void) {
     for (int i=1; i<size_error; ++i) {
         error[i] = std::abs((Delta_state_2[i-1] - Delta_state_1[i-1]))/(2.0*state_ini[i-1]);
     }
-    PLOG_DEBUG << "Error vector: " << error;
+    PLOG_DEBUG << "Initial estimate error vector: " << error;
     R_n = error.maxCoeff();
 
     // Check error estimate against machine tolerance.
