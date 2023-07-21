@@ -631,7 +631,7 @@ class Model {
         /**
          * @brief Derivatives of the thrid deviatoric stress invariant with respect to the effective stress state.
          */
-        Cauchy dJ_3_dsigma_prime;
+        Cauchy dJ_3_dsigma_prime = Cauchy::Zero();
 
         /**
          * @brief Model type.

@@ -10,7 +10,7 @@ C2MC::C2MC(Parameters parameters, State state, std::string log_severity) : param
     // Check inputs.
     Checks::check_inputs(name, (int)parameters.size(), (int)state.size(), parameters_required, state_required);
 
-    settings.MAXITS_YSC = 100;
+    settings.MAXITS_YSC = 1000;
 }
 
 State C2MC::get_state_variables(void) {
