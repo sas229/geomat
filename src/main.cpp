@@ -99,7 +99,7 @@ int main() {
     int ntens = 6;
     double stress[6] = {-50, -50, -50, 0, 0, 0};
     int nstatv = 0;
-    double statev[0];
+    double *statev; // Need to declare a pointer to a double because Windows cannot initialise an array of zero length!
     double ddsdde[36] = {0};
     double sse, spd, scd, rpl;
     double ddsddt[6], drplde[6];
