@@ -97,7 +97,7 @@ int main() {
     int ndi = 3;
     int nshr = 3;
     int ntens = 6;
-    double stress[6] = {-50, -50, -50, 0, 0, 0};
+    double stress[6] = {-49, -50, -50, 0, 0, 0};
     int nstatv = 0;
     double statev[0] = {};
     double ddsdde[36] = {0};

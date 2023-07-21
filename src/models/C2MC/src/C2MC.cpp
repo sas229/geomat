@@ -33,7 +33,6 @@ double C2MC::compute_f(Cauchy sigma_prime, State state) {
 
     // Stress invariants.
     double p_prime = compute_p_prime(sigma_prime); // C2MC definition is tension positive.
-    double sigma_bar = compute_sigma_bar(sigma_prime, p_prime);
 
     // State variables.
     // No state variables for this model.
@@ -44,6 +43,7 @@ double C2MC::compute_f(Cauchy sigma_prime, State state) {
     {   
         compute_stress_invariants(sigma_prime, I_1, I_2, I_3, J_1, J_2, J_3);
         compute_lode(J_2, J_3, theta_c, theta_s, theta_s_bar);
+        double sigma_bar = compute_sigma_bar(J_2);
         compute_coefficients(phi_r, theta_s_bar, A, B, C, K_theta);
         f = -p_prime*sin(phi_r) + sqrt(pow(sigma_bar,2.0)*pow((K_theta),2.0) + pow(a_h,2.0)*pow(sin(phi_r),2.0)) - cohs*cos(phi_r); 
     }
@@ -61,7 +61,7 @@ void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     s = compute_s(sigma_prime, p_prime);
     compute_stress_invariants(sigma_prime, I_1, I_2, I_3, J_1, J_2, J_3);
     compute_lode(J_2, J_3, theta_c, theta_s, theta_s_bar);
-    sigma_bar = compute_sigma_bar(sigma_prime, p_prime);
+    sigma_bar = compute_sigma_bar(J_2);
     dsigma_bar_dsigma_prime = compute_dsigma_bar_dsigma_prime(sigma_prime, s, sigma_bar);
     dJ_3_dsigma_prime = compute_dJ_3_dsigma_prime(sigma_prime, s, sigma_bar);
 

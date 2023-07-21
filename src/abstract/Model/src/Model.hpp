@@ -393,13 +393,12 @@ class Model {
         void compute_stress_invariants(Cauchy sigma, double &I_1, double &I_2, double &I_3, double &J_1, double &J_2, double &J_3);
 
         /**
-         * @brief Method to compute the stress invariant \f$ \overbar{\sigma} = \frac{q}{\sqrt{3}} \f$.
+         * @brief Method to compute the stress invariant \f$ \overbar{\sigma} = \sqrt{J_{2} \f$.
          * 
-         * @param sigma Stress tensor.
-         * @param p Mean stress.
+         * @param J_2 Second deviatoric stress invariant.
          * @return double 
          */
-        double compute_sigma_bar(Cauchy sigma, double p);
+        double compute_sigma_bar(double J_2);
 
         // Members.
 
