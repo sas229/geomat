@@ -93,7 +93,7 @@ class C2MC : public Elastoplastic {
         State compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, double H, Voigt Delta_epsilon_tilde_p=Voigt::Zero()) override;
 
         /**
-         * @brief Method to compute C2MC specific coefficients.
+         * @brief Method to compute C2MC surface specific coefficients.
          * 
          * @param angle Friction or dilation angle in radians.
          * @param theta Lode's angle in radians.
