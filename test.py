@@ -12,7 +12,7 @@ ea_increment = ea_max/increments
 Delta_epsilon_tilde = np.array([ea_increment, -ea_increment/2, -ea_increment/2, 0.0, 0.0, 0.0])
 axial_strain = np.arange(0, increments*ea_increment, ea_increment)
 
-model = LinearElastic(parameters=parameters, state=state, log_severity="verbose")
+model = LinearElastic(parameters=parameters, state=state, log_severity="none")
 print("Model name: {}".format(model.name))
 print("Model type: {}".format(model.type))
 model.set_sigma_prime_tilde(stress)
@@ -48,7 +48,7 @@ ea_increment = ea_max/increments
 Delta_epsilon_tilde = np.array([ea_increment, -ea_increment/2, -ea_increment/2, 0.0, 0.0, 0.0])
 axial_strain = np.arange(0, increments*ea_increment, ea_increment)
 
-model = MCC(parameters=parameters, state=state, log_severity="verbose")
+model = MCC(parameters=parameters, state=state, log_severity="none")
 print("Model name: {}".format(model.name))
 print("Model type: {}".format(model.type))
 model.set_sigma_prime_tilde(stress)
@@ -84,7 +84,7 @@ ea_increment = ea_max/increments
 Delta_epsilon_tilde = np.array([ea_increment, -ea_increment/2, -ea_increment/2, 0.0, 0.0, 0.0])
 axial_strain = np.arange(0, increments*ea_increment, ea_increment)
 
-model = SMCC(log_severity="verbose", parameters=parameters, state=state)
+model = SMCC(log_severity="none", parameters=parameters, state=state)
 print("Model name: {}".format(model.name))
 print("Model type: {}".format(model.type))
 model.set_sigma_prime_tilde(stress)
@@ -120,7 +120,7 @@ ea_increment = ea_max/increments
 Delta_epsilon_tilde = np.array([ea_increment, -ea_increment/2, -ea_increment/2, 0.0, 0.0, 0.0])
 axial_strain = np.arange(0, increments*ea_increment, ea_increment)
 
-model = C2MC(log_severity="verbose", parameters=parameters, state=state)
+model = C2MC(log_severity="none", parameters=parameters, state=state)
 print("Model name: {}".format(model.name))
 print("Model type: {}".format(model.type))
 model.set_sigma_prime_tilde(stress)

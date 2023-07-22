@@ -64,6 +64,9 @@ void Explicit::solve(
 }
 
 void Explicit::compute_yield_surface_correction(void) {
+    // Calculate uncorrected yield surface function value.
+    f_u = mf->compute_f(sigma_prime_u, state_u);
+
     // Calculate uncorrected elastic constitutive matrix using tangent moduli and elastic stress increment.
     Constitutive D_e_u = mf->compute_D_e(sigma_prime_u, Cauchy::Zero());
 
@@ -88,12 +91,11 @@ void Explicit::compute_yield_surface_correction(void) {
 
     // Check yield surface function value.
     f_c = mf->compute_f(sigma_prime_c, state_c);
-    f_u = mf->compute_f(sigma_prime_u, state_u);
     if (std::abs(f_c) > std::abs(f_u)) {
         // Apply normal correction instead.
         double delta_lambda_c = f_u/(a_u.transpose()*a_u);
         
-        //Update stress and state variables using correction.
+        // Update stress and state variables using correction.
         Voigt Delta_sigma_prime_c = -delta_lambda_c*a_u;
         sigma_prime_c = sigma_prime_u + to_cauchy(Delta_sigma_prime_c);
         state_c = state_u; /* i.e. no correction to state variables. */

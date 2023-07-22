@@ -158,8 +158,6 @@ class Model {
          */
         std::string get_model_type(void);
 
-    protected:
-
         /** 
          * @brief Mean effective stress calculated via:
          * 

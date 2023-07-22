@@ -38,8 +38,8 @@ int main() {
     // int nshr = 3;
     // int ntens = 6;
     // double stress[ntens] = {-10, -10, -10, 0, 0, 0};
-    // int nstatv = 2;
-    // double statev[nstatv] = {1.7477796692480023, 10};
+    // int nstatv = 1;
+    // double statev[nstatv] = {10};
     // double ddsdde[ntens*ntens] = {0};
     // double sse, spd, scd, rpl;
     // double ddsddt[ntens], drplde[ntens];
@@ -68,8 +68,8 @@ int main() {
     // int nshr = 3;
     // int ntens = 6;
     // double stress[6] = {-10, -10, -10, 0, 0, 0};
-    // int nstatv = 3;
-    // double statev[3] = {1.7477796692480023, 10, 3.0};
+    // int nstatv = 2;
+    // double statev[3] = {10, 3.0};
     // double ddsdde[36] = {0};
     // double sse, spd, scd, rpl;
     // double ddsddt[6], drplde[6];

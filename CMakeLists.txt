@@ -37,6 +37,17 @@ target_compile_definitions(${TARGET} PUBLIC EIGEN_DONT_PARALLELIZE=1)
 install(TARGETS models DESTINATION ./)
 
 # Tests.
-set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-include(CPack)
+find_package(Catch2 QUIET)
+if(TARGET Catch2::Catch2)
+    message("Catch2 has been found. Tests will be generated.") 
+    include(Catch)
+
+    # Build tests.
+    set(TARGET tests)
+    add_executable(${TARGET} tests/tests.cpp)
+    target_include_directories(${TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+    target_link_libraries(tests Catch2::Catch2WithMain MCC)
+    catch_discover_tests(tests)
+else()
+    message("Catch2 not found hence no tests generated.")
+endif()
