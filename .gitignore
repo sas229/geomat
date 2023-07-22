@@ -137,3 +137,6 @@ dmypy.json
 
 # docs build folder.
 docs/build
+
+# Testing temporary folder.
+Testing
