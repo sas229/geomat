@@ -51,7 +51,7 @@ double SMCC::compute_f(Cauchy sigma_prime, State state) {
     return f;
 }
 
-void SMCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &H) {
+void SMCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, HardeningModuli  &H_s) {
     // State variables.
     double e = state[0];
     double p_c = state[1];
@@ -98,7 +98,7 @@ State SMCC::compute_elastic_state_variable(Voigt Delta_epsilon_tilde_e) {
     return elastic_state;
 }
 
-State SMCC::compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, double H, Voigt Delta_epsilon_tilde_p) {
+State SMCC::compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, HardeningModuli  H_s, Voigt Delta_epsilon_tilde_p) {
     double Delta_epsilon_vol_p = compute_Delta_epsilon_vol(to_cauchy(Delta_epsilon_tilde_p));
     State delta_state(state.size());
     delta_state[0] = -(1+e)*Delta_epsilon_vol_p;

@@ -41,6 +41,11 @@ typedef Eigen::VectorXd Parameters;
 typedef Eigen::VectorXd State;
 
 /**
+ * @brief Vector of hardening moduli.
+ */
+typedef Eigen::VectorXd HardeningModuli;
+
+/**
  * @brief Yield function binding.
  * 
  * @tparam sigma_prime_f Effective stress tensor.
@@ -67,25 +72,25 @@ typedef std::function<Constitutive(Cauchy sigma_prime_f, Cauchy Delta_epsilon)> 
 /**
  * @brief Derivative computation function binding.
  * 
- * @tparam sigma_prime_f Effective stress tensor.
- * @tparam state_f State variables.
- * @tparam df_dsigma_prime_f Derivatives of the yield function with respect to effective stress tensor in Cauchy form.
- * @tparam a_f Derivatives of the yield function with respect to effective stress tensor in Voigt form.
- * @tparam dg_dsigma_prime_f Derivatives of the plastic potential function with respect to state variables in Cauchy form.
- * @tparam b_f Derivatives of the plastic potential function with respect to state variables in Voigt form.
- * @tparam H_f Hardening modulus.
+ * @tparam sigma_prime Effective stress tensor.
+ * @tparam state State variables.
+ * @tparam df_dsigma_prime Derivatives of the yield function with respect to effective stress tensor in Cauchy form.
+ * @tparam a Derivatives of the yield function with respect to effective stress tensor in Voigt form.
+ * @tparam dg_dsigma_prime Derivatives of the plastic potential function with respect to state variables in Cauchy form.
+ * @tparam b Derivatives of the plastic potential function with respect to state variables in Voigt form.
+ * @tparam H Hardening moduli vector.
  */
-typedef std::function<void(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &H)> DerivativeFunction;
+typedef std::function<void(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, HardeningModuli  &H_s)> DerivativeFunction;
 
 /**
  * @brief State variable increment function binding.
  * 
  * @tparam delta_lambda Increment of the plastic multiplier.
  * @tparam df_dsigma_prime Derivatives of the yield function with respect to effective stress tensor in Cauchy form.
- * @tparam H Hardening modulus.
+ * @tparam H Hardening moduli.
  * @tparam Delta_epsilon_tilde_p_dT Strain increment in Voigt form.
  */
-typedef std::function<State(double delta_lambda, Cauchy df_dsigma_prime, double H, Voigt Delta_epsilon_tilde_p_dT)> StateIncrementFunction;
+typedef std::function<State(double delta_lambda, Cauchy df_dsigma_prime, HardeningModuli  H_s, Voigt Delta_epsilon_tilde_p_dT)> StateIncrementFunction;
 
 /**
  * @brief Plastic increment function binding.

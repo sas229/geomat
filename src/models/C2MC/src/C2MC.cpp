@@ -50,7 +50,7 @@ double C2MC::compute_f(Cauchy sigma_prime, State state) {
     return f;
 }
 
-void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &H) {
+void C2MC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, HardeningModuli  &H_s) {
     // State variables.
     // No state variables for this model.
 
@@ -126,7 +126,7 @@ State C2MC::compute_elastic_state_variable(Voigt Delta_epsilon_tilde_e) {
     return elastic_state;
 }
 
-State C2MC::compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, double H, Voigt Delta_epsilon_tilde_p) {
+State C2MC::compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, HardeningModuli  H_s, Voigt Delta_epsilon_tilde_p) {
     State delta_state(state.size());
     return delta_state;
 }

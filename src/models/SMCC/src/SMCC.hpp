@@ -161,7 +161,7 @@ class SMCC : public Elastoplastic {
          * @param[in,out] b Vector of derivatives of plastic potential function with respect to the stress state.
          * @param[in,out] H Hardening modulus.
          */
-        void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &H) override;
+        void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, HardeningModuli  &H_s) override;
 
         /**
          * @brief Overriden method to compute the elastic update of the models state variables.
@@ -180,7 +180,7 @@ class SMCC : public Elastoplastic {
          * @param[in] H Hardening modulus.
          * @return State
          */
-        State compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, double H, Voigt Delta_epsilon_tilde_p=Voigt::Zero()) override;
+        State compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, HardeningModuli  H_s, Voigt Delta_epsilon_tilde_p=Voigt::Zero()) override;
 
        /** 
          * @brief Parameters. 

@@ -85,14 +85,15 @@ void Elastoplastic::compute_plastic_increment(
     // Compute elastoplastic constitutive matrix and elastoplastic multiplier. 
     Cauchy df_dsigma_prime, dg_dsigma_prime;
     Voigt a, b;
-    double H;
-    compute_derivatives(sigma_prime, state, df_dsigma_prime, a, dg_dsigma_prime, b, H);
-    Constitutive D_ep = D_e-(D_e*b*a.transpose()*D_e)/(H+a.transpose()*D_e*b);
+    HardeningModuli H_s(state.size());
+    compute_derivatives(sigma_prime, state, df_dsigma_prime, a, dg_dsigma_prime, b, H_s);
+    double H = H_s.sum();
+    Constitutive D_ep = D_e-(D_e*b*a.transpose()*D_e)/(H + a.transpose()*D_e*b);
     Voigt Delta_sigma_prime_e = D_e*Delta_epsilon_tilde_p_dT;
     double delta_lambda = (double)(a.transpose()*Delta_sigma_prime_e)/(double)(H + a.transpose()*D_e*b);
     PLOG_DEBUG << "Plastic multiplier, delta_lambda = " << delta_lambda;
 
     // Update stress and state variable increment by reference.
     Delta_sigma_prime = D_ep*Delta_epsilon_tilde_p_dT;
-    delta_state = compute_plastic_state_variable_increment(delta_lambda, df_dsigma_prime, H, Delta_epsilon_tilde_p_dT);
+    delta_state = compute_plastic_state_variable_increment(delta_lambda, df_dsigma_prime, H_s, Delta_epsilon_tilde_p_dT);
 }

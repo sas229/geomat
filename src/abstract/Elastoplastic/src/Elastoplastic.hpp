@@ -59,7 +59,7 @@ class Elastoplastic : public Elastic {
          * 
          * @note Must be overriden by model implementations.
          */
-        virtual void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, double &H) = 0;
+        virtual void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, HardeningModuli  &H_s) = 0;
 
         /**
          * @brief Pure virtual method to compute the elastic update of the state variables for the model implemented.
@@ -81,7 +81,7 @@ class Elastoplastic : public Elastic {
          * 
          * @note Must be overriden by model implementations.
          */
-        virtual State compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, double H, Voigt Delta_epsilon_tilde_p=Voigt::Zero()) = 0;
+        virtual State compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, HardeningModuli  H_s, Voigt Delta_epsilon_tilde_p=Voigt::Zero()) = 0;
 
         /**
          * @brief Sloan et al. explicit substepping algorithm for solving the plastic portion of a strain increment.
@@ -103,7 +103,7 @@ class Elastoplastic : public Elastic {
          * @param[in] H Hardening modulus.
          * @return Constitutive
          */
-        Constitutive compute_elastoplastic_matrix(Constitutive D_e, Voigt a, Voigt b, double H);
+        Constitutive compute_elastoplastic_matrix(Constitutive D_e, Voigt a, Voigt b, HardeningModuli  H_s);
 
         /**
          * @brief Compute elastoplastic multiplier.
@@ -115,7 +115,7 @@ class Elastoplastic : public Elastic {
          * @param[in] H Hardening modulus.
          * @return double
          */
-        double compute_elastoplastic_multiplier(Voigt Delta_sigma_prime_e, Constitutive D_e, Voigt a, Voigt b, double H);
+        double compute_elastoplastic_multiplier(Voigt Delta_sigma_prime_e, Constitutive D_e, Voigt a, Voigt b, HardeningModuli  H_s);
 
         /**
          * @brief Compute error estimate.
