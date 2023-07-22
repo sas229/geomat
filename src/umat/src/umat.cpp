@@ -60,32 +60,33 @@ void umat(
     State state = map_to_state;
     Parameters parameters = map_to_parameters;
 
-    // On first call, initialise logger and instantiate model.
+    // On first call, initialise logger.
     if (first_call) {
         // Initialise logger.
         char log_filename[] = "umat.log";
         std::remove(log_filename);
         plog::init(plog::debug, log_filename);
-
-        // Instantiate model.
-        PLOG_INFO << *ndi << "D problem defined with " << *ntens << " stress variables.";
-        PLOG_INFO << "Attempting to instantiate " << cmname << " model.";
-        if (strcmp(cmname, "LinearElastic") == 0) {
-            model.reset(new LinearElastic(parameters, state, "verbose"));    
-        } else if (strcmp(cmname, "C2MC") == 0) {
-            model.reset(new C2MC(parameters, state, "verbose"));   
-        } else if (strcmp(cmname, "MCC") == 0) {
-            model.reset(new MCC(parameters, state, "verbose"));   
-        } else if (strcmp(cmname, "SMCC") == 0) {
-            model.reset(new SMCC(parameters, state, "verbose"));    
-        } else {
-            PLOG_FATAL << "Model name given not implemented. Check name given in CAE / input file.";
-            assert(true);
-        }
         first_call = false;
-        // Set initial stress state.
-        model->set_sigma_prime_tilde(-Eigen_sigma);
-    } 
+    }
+
+    // Instantiate model.
+    PLOG_INFO << *ndi << "D problem defined with " << *ntens << " stress variables.";
+    PLOG_INFO << "Attempting to instantiate " << cmname << " model.";
+    if (strcmp(cmname, "LinearElastic") == 0) {
+        model.reset(new LinearElastic(parameters, state, "verbose"));    
+    } else if (strcmp(cmname, "C2MC") == 0) {
+        model.reset(new C2MC(parameters, state, "verbose"));   
+    } else if (strcmp(cmname, "MCC") == 0) {
+        model.reset(new MCC(parameters, state, "verbose"));   
+    } else if (strcmp(cmname, "SMCC") == 0) {
+        model.reset(new SMCC(parameters, state, "verbose"));    
+    } else {
+        PLOG_FATAL << "Model name given not implemented. Check name given in CAE / input file.";
+        assert(true);
+    }
+        
+    // Set initial stress state.
+    model->set_sigma_prime_tilde(-Eigen_sigma);
 
     // Set variables within model.    
     model->set_Delta_epsilon_tilde(-Eigen_dstran);
@@ -93,7 +94,8 @@ void umat(
 
     // // Equate map to updated variable in order to map back to input variable.
     // std::cout << "Stress prior to update:\n" << map_to_stress << "\n";
-    // map_to_stress = model->get_sigma_prime();
+    map_to_stress = -model->get_sigma_prime_tilde();
+    map_to_state = model->get_state_variables();
     // std::cout << "Updated stress after remapping:\n" << map_to_stress << "\n";
 
     // // The map to the jacobian below somehow overwrites the stress state in the LinearElastic model class!!!
@@ -103,10 +105,10 @@ void umat(
     // statev = state.data();
     // std::cout << "Jacobian:\n" << jacobian << "\n";
     // std::cout << "Updated stress after sign change:\n" << map_to_stress << "\n";
-    // std::cout << "From C array:\n";
     // for (auto i=0; i<6; i++) {
-    //     std::cout << stress[i] << "\n";
+    //     std::cout << stress[i] << " ";
     // }
+    // std::cout << "\n";
     // if (*nstatv > 0) {
     //     std::cout << "statev[0]: " << statev[0] << "\n";
     // }   

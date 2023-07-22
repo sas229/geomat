@@ -111,7 +111,7 @@ int main() {
     double predef, dpred;
     char cmname[] = "C2MC";
     int nprops = 7;
-    double props[7] = {500.0, 0.2, 0.0, 33.0, 0.0, 29.0, 1.1};
+    double props[7] = {500.0, 0.2, 0.0, 33.0, 5.0, 29.0, 1.1};
     double coords[3] = {0.0, 0.0, 0.0};
     double drot;
     double pnewdt, celent;
@@ -123,6 +123,12 @@ int main() {
     int kspt;
     int kstep;
     int kinc;
+
+    // Print stress state.
+    for (auto i=0; i<6; i++) {
+        std::cout << stress[i] << " ";
+    }
+    std::cout << "\n";
 
     // Try some increments.
     for (int i=0; i < 100; ++i) {
@@ -165,5 +171,10 @@ int main() {
             &kstep,
             &kinc
         );
+        // Print stress state.
+        for (auto i=0; i<6; i++) {
+            std::cout << stress[i] << " ";
+        }
+        std::cout << "\n";
     }
 }
