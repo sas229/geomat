@@ -156,31 +156,10 @@ class SMCC : public Elastoplastic {
          * @param[in] sigma_prime Effective stress tensor.
          * @param[in] state State variables.
          * @param[in,out] df_dsigma_prime Derivatives of yield function with respect to the stress state.
-         * @param[in,out] a Vector of derivatives of yield function with respect to the stress state.
          * @param[in,out] dg_dsigma_prime Derivatives of plastic potential function with respect to the stress state.
-         * @param[in,out] b Vector of derivatives of plastic potential function with respect to the stress state.
          * @param[in,out] H Hardening modulus.
          */
-        void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, HardeningModuli  &H_s) override;
-
-        /**
-         * @brief Overriden method to compute the elastic update of the models state variables.
-         * 
-         * @param[in] Delta_epsilon_tilde_e Elastic strain increment. 
-         * @return State
-         */
-        State compute_elastic_state_variable(Voigt Delta_epsilon_tilde_e) override;
-
-        /**
-         * @brief Overriden method to compute the plastic increment in the models state variables.
-         * 
-         * @param[in] Delta_epsilon_tilde_p Plastic strain increment.
-         * @param[in] delta_lambda Plastic multiplier increment.
-         * @param[in] df_dsigma_prime Derivatives of yield function with respect to the stress state.
-         * @param[in] H Hardening modulus.
-         * @return State
-         */
-        State compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, HardeningModuli  H_s, Voigt Delta_epsilon_tilde_p=Voigt::Zero()) override;
+        void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, HardeningModuli &H_s, StateFactors &B_s) override;
 
        /** 
          * @brief Parameters. 
@@ -233,19 +212,14 @@ class SMCC : public Elastoplastic {
         const double &A = parameters[7];
 
         /** 
-         * @brief State variable: voids ratio. 
-         */
-        double &e  = state[0];
-
-        /** 
          * @brief State variable: preconsolidation pressure. 
          */
-        double &p_c = state[1];
+        double &p_c = state[0];
 
         /** 
          * @brief State variable: current sensitivity. 
          */
-        double &s_ep = state[2];
+        double &s_ep = state[1];
 
         /**
          * @brief Number of required parameters.
@@ -255,7 +229,7 @@ class SMCC : public Elastoplastic {
         /**
          * @brief Number of required state variables.
          */
-        int state_required = 3;
+        int state_required = 2;
 
 };
 

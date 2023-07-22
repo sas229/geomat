@@ -55,8 +55,11 @@ bool Intersection::check_unload_reload(void) {
     // Compute required derivatives for the given stress state.
     Cauchy df_dsigma_prime_c, dg_dsigma_prime_c;
     Voigt a_c, b_c;
-    double H_c;
-    mf->compute_derivatives(sigma_prime, state, df_dsigma_prime_c, a_c, dg_dsigma_prime_c, b_c, H_c);
+    HardeningModuli H_s_c(state.size());
+    StateFactors B_s_c(state.size());
+    mf->compute_derivatives(sigma_prime, state, df_dsigma_prime_c, dg_dsigma_prime_c, H_s_c, B_s_c);
+    a_c = to_voigt(df_dsigma_prime_c);
+    b_c = to_voigt(dg_dsigma_prime_c);
 
     // Compute the elastic matrix using tangent moduli.
     Constitutive D_e_tan = mf->compute_D_e(sigma_prime, Cauchy::Zero());

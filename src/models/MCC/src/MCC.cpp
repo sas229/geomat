@@ -41,8 +41,7 @@ double MCC::compute_f(Cauchy sigma_prime, State state) {
     double p_prime = compute_p_prime(sigma_prime);
     
     // State variables.
-    double e = state[0];
-    double p_c = state[1];
+    double p_c = state[0];
     
     // Yield surface function.
     double f = std::pow(q,2) + std::pow(M,2)*p_prime*(p_prime-p_c);
@@ -50,10 +49,9 @@ double MCC::compute_f(Cauchy sigma_prime, State state) {
     return f;
 }
 
-void MCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, HardeningModuli  &H_s) {
+void MCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, HardeningModuli &H_s, StateFactors &B_s) {
     // State variables.
-    double e = state[0];
-    double p_c = state[1];
+    double p_c = state[0];
 
     // Compute mean effective stress, deviatoric stress tensor and derivatives of the stress state for current stress state.
     double q, p_prime;
@@ -71,27 +69,11 @@ void MCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma
     // Derivatives of yield surface and plastic potential function.
     df_dsigma_prime = (df_dp_prime*dp_prime_dsigma_prime) + (df_dq*dq_dsigma_prime);
     dg_dsigma_prime = df_dsigma_prime; // Associated flow.
-    
-    // Vectors of derivatives.
-    a = to_voigt(df_dsigma_prime);
-    b = to_voigt(dg_dsigma_prime);
 
-    // Hardening modulus.
-    H = (std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*df_dsigma_prime.trace();
-}
+    // Hardening moduli.
+    H_s[0] = (std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*df_dsigma_prime.trace();
 
-State MCC::compute_elastic_state_variable(Voigt Delta_epsilon_tilde_e) {
-    double Delta_epsilon_vol_e = compute_Delta_epsilon_vol(to_cauchy(Delta_epsilon_tilde_e));
-    State elastic_state(state.size());
-    elastic_state[0] = e-(e*Delta_epsilon_vol_e);
-    elastic_state[1] = p_c;
-    return elastic_state;
-}
-
-State MCC::compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, HardeningModuli  H_s, Voigt Delta_epsilon_tilde_p) {
-    double Delta_epsilon_vol_p = compute_Delta_epsilon_vol(to_cauchy(Delta_epsilon_tilde_p));
-    State delta_state(state.size());
-    delta_state[0] = -(1+e)*Delta_epsilon_vol_p;
-    delta_state[1] = delta_lambda*H/(pow(M,2)*p_prime);
-    return delta_state;
+    // State variable increment factors.
+    double df_dp_c = -std::pow(M,2)*p_prime;
+    B_s[0] = H_s[0]/df_dp_c;
 }

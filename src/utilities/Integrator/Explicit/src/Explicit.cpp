@@ -70,15 +70,19 @@ void Explicit::compute_yield_surface_correction(void) {
     // Calculate uncorrected derivatives.
     Cauchy df_dsigma_prime_u, dg_dsigma_prime_u;
     Voigt a_u, b_u;
-    double H_u;
-    mf->compute_derivatives(sigma_prime_u, state_u, df_dsigma_prime_u, a_u, dg_dsigma_prime_u, b_u, H_u);
+    HardeningModuli H_s_u(state_ep.size());
+    StateFactors B_s_u(state_ep.size());
+    mf->compute_derivatives(sigma_prime_u, state_u, df_dsigma_prime_u, dg_dsigma_prime_u, H_s_u, B_s_u);
+    a_u = to_voigt(df_dsigma_prime_u);
+    b_u = to_voigt(dg_dsigma_prime_u);
 
     // Compute correction factor.
+    double H_u = H_s_u.sum();
     double delta_lambda_c = f_u/(H_u + a_u.transpose()*D_e_u*b_u);
 
     // Update stress and state variables using corrections.
     Voigt Delta_sigma_prime_c = -delta_lambda_c*D_e_u*b_u;
-    State Delta_state_c = mf->compute_state_increment(delta_lambda_c, df_dsigma_prime_u, H_u, Voigt::Zero());
+    State Delta_state_c = -delta_lambda_c*B_s_u;
     sigma_prime_c = sigma_prime_u + to_cauchy(Delta_sigma_prime_c);
     state_c = state_u + Delta_state_c;
 

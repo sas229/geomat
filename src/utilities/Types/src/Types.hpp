@@ -46,6 +46,11 @@ typedef Eigen::VectorXd State;
 typedef Eigen::VectorXd HardeningModuli;
 
 /**
+ * @brief Vector of state variable factors.
+ */
+typedef Eigen::VectorXd StateFactors;
+
+/**
  * @brief Yield function binding.
  * 
  * @tparam sigma_prime_f Effective stress tensor.
@@ -75,22 +80,11 @@ typedef std::function<Constitutive(Cauchy sigma_prime_f, Cauchy Delta_epsilon)> 
  * @tparam sigma_prime Effective stress tensor.
  * @tparam state State variables.
  * @tparam df_dsigma_prime Derivatives of the yield function with respect to effective stress tensor in Cauchy form.
- * @tparam a Derivatives of the yield function with respect to effective stress tensor in Voigt form.
  * @tparam dg_dsigma_prime Derivatives of the plastic potential function with respect to state variables in Cauchy form.
- * @tparam b Derivatives of the plastic potential function with respect to state variables in Voigt form.
- * @tparam H Hardening moduli vector.
+ * @tparam H_s Hardening moduli vector.
+ * @tparam B_s State factor vector.
  */
-typedef std::function<void(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, HardeningModuli  &H_s)> DerivativeFunction;
-
-/**
- * @brief State variable increment function binding.
- * 
- * @tparam delta_lambda Increment of the plastic multiplier.
- * @tparam df_dsigma_prime Derivatives of the yield function with respect to effective stress tensor in Cauchy form.
- * @tparam H Hardening moduli.
- * @tparam Delta_epsilon_tilde_p_dT Strain increment in Voigt form.
- */
-typedef std::function<State(double delta_lambda, Cauchy df_dsigma_prime, HardeningModuli  H_s, Voigt Delta_epsilon_tilde_p_dT)> StateIncrementFunction;
+typedef std::function<void(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, HardeningModuli &H_s , StateFactors &B_s)> DerivativeFunction;
 
 /**
  * @brief Plastic increment function binding.
@@ -111,7 +105,6 @@ struct ModelFunctions {
     TrialFunction compute_trial_stress;
     ConstitutiveMatrixFunction compute_D_e;
     DerivativeFunction compute_derivatives;
-    StateIncrementFunction compute_state_increment;
     PlasticIncrementFunction compute_plastic_increment;
 };
 
@@ -121,14 +114,14 @@ struct ModelFunctions {
 struct Settings{
     std::string solver = "Explicit";
     std::string method = "ModifiedEuler";
-    double FTOL = 1e-8;
-    double LTOL = 1e-6;
-    double STOL = 1e-4;
-    double EPS = 1e-16;
-    double DT_MIN = 1e-6;
-    int MAXITS_YSI = 10;
-    int MAXITS_YSC = 30;
-    int NSUB = 10;
+    double FTOL = 1e-8;     /** @brief Yield surface tolerance. */
+    double LTOL = 1e-6;     /** @brief Unload-reload tolerance. */
+    double STOL = 1e-4;     /** @brief Stress integration tolerance. */
+    double EPS = 1e-16;     /** @brief Double precision tolerance. */
+    double DT_MIN = 1e-6;   /** @brief Minimum pseudo-time increment for stress integration procedure. */
+    int MAXITS_YSI = 10;    /** @brief Maximum number of Pegasus method iterations. */
+    int MAXITS_YSC = 30;    /** @brief Maximum number of yield surface correction iterations. */
+    int NSUB = 10;          /** @brief Maximum number of unload-reload intersection substeps.*/
 };
 
 /**

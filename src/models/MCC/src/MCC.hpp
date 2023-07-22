@@ -147,53 +147,10 @@ class MCC : public Elastoplastic {
          * @param[in] sigma_prime Effective stress tensor.
          * @param[in] state State variables.
          * @param[in,out] df_dsigma_prime Derivatives of yield function with respect to the stress state.
-         * @param[in,out] a Vector of derivatives of yield function with respect to the stress state.
          * @param[in,out] dg_dsigma_prime Derivatives of plastic potential function with respect to the stress state.
-         * @param[in,out] b Vector of derivatives of plastic potential function with respect to the stress state.
          * @param[in,out] H Hardening modulus.
          */
-        void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, HardeningModuli  &H_s) override;
-
-        /**
-         * @brief Overriden method to compute the elastic update of the models state variables.
-         * 
-         * State variable elastic update for void ratio:
-         * 
-         * \f[ e = e - e \Delta \epsilon_{vol, e}\f]
-         *
-         * State variable elastic update for preconsolidation pressure:
-         * 
-         * \f[ p_{c} = constant \f]
-         *
-         * @param[in] Delta_epsilon_tilde_e Elastic strain increment. 
-         * @return State
-         */
-        State compute_elastic_state_variable(Voigt Delta_epsilon_tilde_e) override;
-
-        /**
-         * @brief Overriden method to compute the plastic increment in the models state variables.
-         * 
-         * State variable plastic increment for void ratio:
-         * 
-         * \f[ \Delta e = -(1+e) \Delta \epsilon_{vol, p} \f]
-         * 
-         * where \f$ e \f$ is the void ratio and \f$ \Delta \epsilon_{vol, p} \f$ 
-         * is the plastic volumetric strain.
-         * 
-         * State variable plastic increment for preconsolidation pressure:
-         * 
-         * /f[ \Delta p_{c} = \Delta \lambda \frac{H}{M^2 p^{\prime}} /f]
-         * 
-         * where \f$ \Delta \lambda \f$ is the plastic multiplier, \f$ H \f$ is the hardening modulus, 
-         * \f$ M \f$ is a frictional constant and \f$ p^{\prime} \f$ is the mean effective stress.
-         * 
-         * @param[in] delta_lambda Plastic multiplier increment.
-         * @param[in] df_dsigma_prime Derivatives of yield function with respect to the stress state.
-         * @param[in] H Hardening modulus.
-         * @param[in] Delta_epsilon_tilde_p Plastic strain increment.
-         * @return State
-         */
-        State compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, HardeningModuli  H_s, Voigt Delta_epsilon_tilde_p=Voigt::Zero()) override;
+        void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, HardeningModuli &H_s, StateFactors &B_s) override;
 
        /** 
          * @brief Parameters. 
@@ -231,14 +188,9 @@ class MCC : public Elastoplastic {
         const double &kappa_star = parameters[4];
 
         /** 
-         * @brief State variable: voids ratio. 
-         */
-        double &e  = state[0];
-
-        /** 
          * @brief State variable: preconsolidation pressure. 
          */
-        double &p_c = state[1];
+        double &p_c = state[0];
 
         /**
          * @brief Number of required parameters.
@@ -248,7 +200,7 @@ class MCC : public Elastoplastic {
         /**
          * @brief Number of required state variables.
          */
-        int state_required = 2;
+        int state_required = 1;
 
 };
 

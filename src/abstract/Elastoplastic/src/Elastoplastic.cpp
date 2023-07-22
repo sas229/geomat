@@ -6,8 +6,7 @@ Elastoplastic::Elastoplastic() : intersection(&settings, &mf), integrator(&setti
     mf.compute_f = std::bind(&Elastoplastic::compute_f, this, _1, _2);
     mf.compute_trial_stress = std::bind(&Elastoplastic::compute_elastic_stress, this, _1, _2);
     mf.compute_D_e = std::bind(&Elastoplastic::compute_D_e, this, _1, _2);
-    mf.compute_derivatives = std::bind(&Elastoplastic::compute_derivatives, this, _1, _2, _3, _4, _5, _6, _7);
-    mf.compute_state_increment = std::bind(&Elastoplastic::compute_plastic_state_variable_increment, this, _1, _2, _3, _4);
+    mf.compute_derivatives = std::bind(&Elastoplastic::compute_derivatives, this, _1, _2, _3, _4, _5, _6);
     mf.compute_plastic_increment = std::bind(&Elastoplastic::compute_plastic_increment, this, _1, _2, _3, _4, _5);
 }
 
@@ -32,12 +31,12 @@ void Elastoplastic::solve(void) {
             state_e = state;
         }
         if (alpha > 0.0) {
-            // Update stress and state variables based on elastic portion of strain increment.
+            // Update stress based on elastic portion of strain increment.
             Voigt Delta_epsilon_tilde_e = alpha*Delta_epsilon_tilde;
             Cauchy Delta_epsilon_e = to_cauchy(Delta_epsilon_tilde_e);
             D_e = compute_D_e(sigma_prime, Delta_epsilon_e);
             sigma_prime_e = sigma_prime + to_cauchy(D_e*alpha*Delta_epsilon_tilde);
-            state_e = compute_elastic_state_variable(Delta_epsilon_tilde_e);
+            state_e = state;    // No elastic change in state variables.
         } 
         PLOG_DEBUG << "Elastic strain increment, Delta_epsilon_e = " << Delta_epsilon_tilde_e;
         PLOG_DEBUG << "Stress state after elastic increment, sigma_prime_e_tilde = " << to_voigt(sigma_prime_e);
@@ -86,14 +85,17 @@ void Elastoplastic::compute_plastic_increment(
     Cauchy df_dsigma_prime, dg_dsigma_prime;
     Voigt a, b;
     HardeningModuli H_s(state.size());
-    compute_derivatives(sigma_prime, state, df_dsigma_prime, a, dg_dsigma_prime, b, H_s);
+    StateFactors B_s(state.size());
+    compute_derivatives(sigma_prime, state, df_dsigma_prime, dg_dsigma_prime, H_s, B_s);
+    a = to_voigt(df_dsigma_prime);
+    b = to_voigt(dg_dsigma_prime);
     double H = H_s.sum();
     Constitutive D_ep = D_e-(D_e*b*a.transpose()*D_e)/(H + a.transpose()*D_e*b);
     Voigt Delta_sigma_prime_e = D_e*Delta_epsilon_tilde_p_dT;
     double delta_lambda = (double)(a.transpose()*Delta_sigma_prime_e)/(double)(H + a.transpose()*D_e*b);
     PLOG_DEBUG << "Plastic multiplier, delta_lambda = " << delta_lambda;
 
-    // Update stress and state variable increment by reference.
+    // Update stress and state variable.
     Delta_sigma_prime = D_ep*Delta_epsilon_tilde_p_dT;
-    delta_state = compute_plastic_state_variable_increment(delta_lambda, df_dsigma_prime, H_s, Delta_epsilon_tilde_p_dT);
+    delta_state = -delta_lambda*B_s;
 }

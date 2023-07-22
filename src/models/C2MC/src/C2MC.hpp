@@ -66,43 +66,45 @@ class C2MC : public Elastoplastic {
          * @param[in] sigma_prime Effective stress tensor.
          * @param[in] state State variables.
          * @param[in,out] df_dsigma_prime Derivatives of yield function with respect to the stress state.
-         * @param[in,out] a Vector of derivatives of yield function with respect to the stress state.
          * @param[in,out] dg_dsigma_prime Derivatives of plastic potential function with respect to the stress state.
-         * @param[in,out] b Vector of derivatives of plastic potential function with respect to the stress state.
          * @param[in,out] H Hardening modulus.
          */
-        void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Voigt &a, Cauchy &dg_dsigma_prime, Voigt &b, HardeningModuli  &H_s) override;
+        void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, HardeningModuli &H_s, StateFactors &B_s) override;
 
         /**
-         * @brief Overriden method to compute the elastic update of the models state variables.
+         * @brief Method to compute the C2 continuous form of \f$ K \left( \theta \right) \f$ for the Mohr-Coulomb surface.
          * 
-         * @param[in] Delta_epsilon_tilde_e Elastic strain increment. 
-         * @return State
+         * @param[in] angle_r Friction or dilation angle in radians.
+         * @param[in] theta_s_bar Lode's angle in radians.
+         * @param[in] A C2 continuous approximation coefficient after Abbo et al. (2011).
+         * @param[in] B C2 continuous approximation coefficient after Abbo et al. (2011).
+         * @param[in] C C2 continuous approximation coefficient after Abbo et al. (2011).
+         * @param[in,out] K_theta \f$ K \left( \theta \right) \f$ for the Mohr-Coulomb surface.
          */
-        State compute_elastic_state_variable(Voigt Delta_epsilon_tilde_e) override;
+        void compute_K_theta(double angle_r, double theta_s_bar, double A, double B, double C, double &K_theta);
 
         /**
-         * @brief Overriden method to compute the plastic increment in the models state variables.
+         * @brief Method to compute the C2 continuous Mohr-Coulomb model coefficients.
          * 
-         * @param[in] Delta_epsilon_tilde_p Plastic strain increment.
-         * @param[in] delta_lambda Plastic multiplier increment.
-         * @param[in] df_dsigma_prime Derivatives of yield function with respect to the stress state.
-         * @param[in] H Hardening modulus.
-         * @return State
+         * @param[in] angle_r Friction or dilation angle in radians.
+         * @param[in] theta_s_bar Lode's angle in radians.
+         * @param[in,out] A C2 continuous approximation coefficient \f$ A \f$.
+         * @param[in,out] B C2 continuous approximation coefficient \f$ B \f$.
+         * @param[in,out] C C2 continuous approximation coefficient \f$ C \f$.
          */
-        State compute_plastic_state_variable_increment(double delta_lambda, Cauchy df_dsigma_prime, HardeningModuli  H_s, Voigt Delta_epsilon_tilde_p=Voigt::Zero()) override;
+        void compute_A_B_C(double angle_r, double theta_s_bar, double &A, double &B, double &C);
 
         /**
-         * @brief Method to compute C2MC surface specific coefficients.
+         * @brief 
          * 
-         * @param angle Friction or dilation angle in radians.
-         * @param theta Lode's angle in radians.
-         * @param A Coeffient A after Abbo et al. (2011).
-         * @param B Coeffient B after Abbo et al. (2011).
-         * @param C Coeffient C after Abbo et al. (2011).
-         * @param k_theta Coeffient k_theta after Abbo et al. (2011).
+         * @param[in] sigma_bar Stress invariant.
+         * @param[in] angle_r Friction or dilation angle in radians.
+         * @param[in] theta_s_bar Lode's angle in radians.
+         * @param[in,out] C_1 Derivative coefficient \f$ C_{1} \f$.
+         * @param[in,out] C_2 Derivative coefficient \f$ C_{2} \f$.
+         * @param[in,out] C_3 Derivative coefficient \f$ C_{3} \f$.
          */
-        void compute_coefficients(double angle_r, double theta, double &A, double &B, double &C, double &k_theta);
+        void compute_derivative_coefficients(double sigma_bar, double angle_r, double theta_s_bar, double &C_1, double &C_2, double &C_3);
 
        /** 
          * @brief Parameters. 

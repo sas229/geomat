@@ -98,7 +98,8 @@
         "numericaldiff": "cpp",
         "openglsupport": "cpp",
         "specialfunctions": "cpp",
-        "splines": "cpp"
+        "splines": "cpp",
+        "*.inc": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceFolder}",
     // "editor.formatOnSave": true,
