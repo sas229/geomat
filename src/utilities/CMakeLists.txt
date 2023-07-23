@@ -4,3 +4,6 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Intersection)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Logging)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Tensor)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Types)
+
+add_library(Utilities INTERFACE)
+target_link_libraries(Utilities INTERFACE plog Eigen3::Eigen Checks Integrator Intersection Logging Tensor Types)
