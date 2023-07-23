@@ -11,14 +11,6 @@ SMCC::SMCC(Parameters parameters, State state, std::string log_severity) : param
     Checks::check_inputs(name, (int)parameters.size(), (int)state.size(), parameters_required, state_required);
 }
 
-State SMCC::get_state_variables(void) {
-    return state;
-}
-
-void SMCC::set_state_variables(State new_state) {
-    state = new_state;
-}
-
 Constitutive SMCC::compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) {
     double Delta_epsilon_e_vol = compute_Delta_epsilon_vol(Delta_epsilon);
     double K = compute_K_Butterfield(p_prime, Delta_epsilon_e_vol, kappa_star, settings.EPS);

@@ -31,7 +31,7 @@ class SMCC : public Elastoplastic {
          * 
          * @return State
          */
-        State get_state_variables(void) override;
+        State get_state_variables(void) {return state;};
 
     protected:
 
@@ -40,7 +40,7 @@ class SMCC : public Elastoplastic {
          * 
          * @param[in] new_state Vector of new state variables.
          */
-        void set_state_variables(State new_state) override;
+        void set_state_variables(State new_state) {state = new_state;};
  
         /**
          * @brief Overriden method to compute the elastic constitutive matrix.
@@ -161,7 +161,7 @@ class SMCC : public Elastoplastic {
          */
         void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, HardeningModuli &H_s, StateFactors &B_s) override;
 
-       /** 
+        /** 
          * @brief Parameters. 
          */
         Parameters parameters;

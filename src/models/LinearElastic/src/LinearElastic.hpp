@@ -31,8 +31,8 @@ class LinearElastic : public Elastic {
          * 
          * @return State
          */
-        State get_state_variables(void) override;
-        
+        State get_state_variables(void) {return state;};
+
     protected:
 
         /**
@@ -40,7 +40,7 @@ class LinearElastic : public Elastic {
          * 
          * @param[in] new_state Vector of new state variables.
          */
-        void set_state_variables(State new_state) override;
+        void set_state_variables(State new_state) {state = new_state;};
 
         /**
          * @brief Overriden method to compute the elastic matrix.

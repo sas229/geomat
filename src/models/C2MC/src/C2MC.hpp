@@ -31,7 +31,7 @@ class C2MC : public Elastoplastic {
          * 
          * @return State
          */
-        State get_state_variables(void) override;
+        State get_state_variables(void) {return state;};
 
     protected:
 
@@ -40,7 +40,7 @@ class C2MC : public Elastoplastic {
          * 
          * @param[in] new_state Vector of new state variables.
          */
-        void set_state_variables(State new_state) override;
+        void set_state_variables(State new_state) {state = new_state;};
  
         /**
          * @brief Overriden method to compute the elastic constitutive matrix.
@@ -106,7 +106,7 @@ class C2MC : public Elastoplastic {
          */
         void compute_derivative_coefficients(double sigma_bar, double angle_r, double theta_s_bar, double &C_1, double &C_2, double &C_3);
 
-       /** 
+        /** 
          * @brief Parameters. 
          */
         Parameters parameters;

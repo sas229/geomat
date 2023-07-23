@@ -11,14 +11,6 @@ C2MC::C2MC(Parameters parameters, State state, std::string log_severity) : param
     Checks::check_inputs(name, (int)parameters.size(), (int)state.size(), parameters_required, state_required);
 }
 
-State C2MC::get_state_variables(void) {
-    return state;
-}
-
-void C2MC::set_state_variables(State new_state) {
-    state = new_state;
-}
-
 Constitutive C2MC::compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) {
     // Compute elastic constants.
     double K = compute_K_given_E_nu(E, nu);
