@@ -1,11 +1,35 @@
 #include "Elastic.hpp"
 
-double Elastic::compute_K(double E, double nu) {
-    return E/(3.0*(1.0-2.0*nu));
+double Elastic::compute_K_given_E_nu(double E, double nu) {
+    double K = E/(3.0*(1.0-2.0*nu));
+    PLOG_VERBOSE << "Bulk modulus, K = " << K;
+    return K;
 }
 
-double Elastic::compute_G(double E, double nu) {
-    return E/(2.0*(1.0+nu));
+double Elastic::compute_K_Butterfield(double p_prime, double Delta_epsilon_e_vol, double kappa_star, double tolerance) {
+    Delta_epsilon_e_vol = abs(Delta_epsilon_e_vol) > tolerance ? Delta_epsilon_e_vol : 0.0;
+    double K;
+    if (Delta_epsilon_e_vol != 0.0) {
+        // Secant bulk modulus.
+        K = (p_prime/Delta_epsilon_e_vol)*(exp(Delta_epsilon_e_vol/kappa_star)-1.0);
+    } else {
+        // Tangent bulk modulus.
+        K = p_prime/kappa_star;
+    }
+    PLOG_VERBOSE << "Bulk modulus, K = " << K;
+    return K;
+}
+
+double Elastic::compute_G_given_E_nu(double E, double nu) {
+    double G = E/(2.0*(1.0+nu));
+    PLOG_VERBOSE << "Shear modulus, G = " << G; 
+    return G;
+}
+
+double Elastic::compute_G_given_K_nu(double K, double nu) {
+    double G = (3.0*(1.0-2.0*nu)*K)/(2.0*(1.0+nu));
+    PLOG_VERBOSE << "Shear modulus, G = " << G; 
+    return G;
 }
 
 Constitutive Elastic::compute_isotropic_linear_elastic_matrix(double K, double G) {
@@ -17,6 +41,7 @@ Constitutive Elastic::compute_isotropic_linear_elastic_matrix(double K, double G
     D_e(0,0) = D_e(1,1) = D_e(2,2) += K + 4.0/3.0*G; 
     D_e(0,1) = D_e(0,2) = D_e(1,2) = D_e(1,0) = D_e(2,0) = D_e(2,1) += K - 2.0/3.0*G;
     D_e(3,3) = D_e(4,4) = D_e(5,5) += G; 
+    PLOG_VERBOSE << "Elastic matrix, D_e = \n" << D_e;
     return D_e;
 }
 

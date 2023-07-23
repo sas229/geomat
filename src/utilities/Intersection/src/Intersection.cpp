@@ -72,8 +72,10 @@ bool Intersection::check_unload_reload(void) {
 
     // Check against tolerance.
     if (cos_theta >= -settings->LTOL) {
+        PLOG_INFO << "No unload-reload in current increment.";
         return false;
     } else {
+        PLOG_INFO << "Elastoplastic unload-reload increment.";
         return true;
     }
 }

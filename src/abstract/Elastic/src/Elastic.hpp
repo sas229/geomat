@@ -30,17 +30,39 @@ class Elastic : public Model {
         * @param nu Poisson's ratio.
         * @return double 
         */
-       double compute_K(double E, double nu);
+       double compute_K_given_E_nu(double E, double nu);
+
+       /**
+        * @brief Method to compute a pressure dependent bulk modulus following Butterfields
+        * ln(e)-ln(p') compression law.
+        * 
+        * @param p_prime Mean effective stress.
+        * @param Delta_epsilon_e_vol Elastic volumetric strain.
+        * @param kappa_star Slope of the recompression line in ln(e)-ln(p') space.
+        * @param tolerance Numerical tolerance on elastic volumetric strain.
+        * @return double 
+        */
+       double compute_K_Butterfield(double p_prime, double Delta_epsilon_e_vol, double kappa_star, double tolerance);
 
        /**
         * @brief Method to compute the shear modulus from elastic parameters:
-        * \f[ G = \frac{E}{(2(1+\nu))} \f]
+        * \f[ G = \frac{E}{(2 \left( 1+\nu) \right)} \f]
         * 
         * @param E Young's modulus.
         * @param nu Poisson's ratio.
         * @return double 
         */
-       double compute_G(double E, double nu);
+       double compute_G_given_E_nu(double E, double nu);
+
+       /**
+        * @brief Method to compute the shear modulus from elastic parameters:
+        * \f[ G = \frac{3 \left( 1 - 2 \nu \right)} { (2 \left(1+\nu \right)) } \f]
+        * 
+        * @param K Bulk modulus.
+        * @param nu Poisson's ratio.
+        * @return double 
+        */
+       double compute_G_given_K_nu(double K, double nu);
 
        /** @brief Method to compute the isotropic linear elastic matrix:
         *  \f[ D_e = \left[\begin{array}{cccccc}

@@ -20,38 +20,33 @@ void MCC::set_state_variables(State new_state) {
 }
 
 Constitutive MCC::compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) {
-    double Delta_epsilon_e_vol = Delta_epsilon.trace();
-    double p_prime = compute_p_prime(sigma_prime);
-    double K;
-    if (Delta_epsilon_e_vol != 0.0) {
-        // Secant bulk modulus.
-        K = (p_prime/Delta_epsilon_e_vol)*(std::exp(Delta_epsilon_e_vol/kappa_star)-1);
-    } else {
-        // Tangent bulk modulus.
-        K = p_prime/kappa_star;
-    }
-    double G = (3.0*(1-2.0*nu)*K)/(2.0*(1.0+nu));
+    using namespace std;
+    double Delta_epsilon_e_vol = compute_Delta_epsilon_vol(Delta_epsilon);
+    double K = compute_K_Butterfield(p_prime, Delta_epsilon_e_vol, kappa_star, settings.EPS);
+    double G = compute_G_given_K_nu(K, nu);
     Constitutive D_e = compute_isotropic_linear_elastic_matrix(K, G);  
     return D_e;
 }
 
 double MCC::compute_f(Cauchy sigma_prime, State state) {
+    using namespace std;
     // Stress invariants.
     double q = compute_q(sigma_prime);
     double p_prime = compute_p_prime(sigma_prime);
     
     // State variables.
-    double p_c = state[0];
+    double p_c = state(0);
     
     // Yield surface function.
-    double f = std::pow(q,2) + std::pow(M,2)*p_prime*(p_prime-p_c);
+    double f = pow(q,2) + pow(M,2)*p_prime*(p_prime-p_c);
 
     return f;
 }
 
 void MCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, HardeningModuli &H_s, StateFactors &B_s) {
+    using namespace std;
     // State variables.
-    double p_c = state[0];
+    double p_c = state(0);
 
     // Compute mean effective stress, deviatoric stress tensor and derivatives of the stress state for current stress state.
     double q, p_prime;
@@ -63,7 +58,7 @@ void MCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma
     
     // Yield surface derivatives.
     double df_dq = 2*q;
-    double df_dp_prime = std::pow(M,2)*(2*p_prime-p_c);
+    double df_dp_prime = pow(M,2)*(2*p_prime-p_c);
     double df_dtheta = 0;
 
     // Derivatives of yield surface and plastic potential function.
@@ -71,9 +66,9 @@ void MCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma
     dg_dsigma_prime = df_dsigma_prime; // Associated flow.
 
     // Hardening moduli.
-    H_s[0] = (std::pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*df_dsigma_prime.trace();
+    H_s(0) = (pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*df_dsigma_prime.trace();
 
     // State variable increment factors.
-    double df_dp_c = -std::pow(M,2)*p_prime;
-    B_s[0] = H_s[0]/df_dp_c;
+    double df_dp_c = -pow(M,2)*p_prime;
+    B_s(0) = H_s(0)/df_dp_c;
 }

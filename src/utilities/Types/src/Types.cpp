@@ -22,6 +22,19 @@ Cauchy to_cauchy(Voigt voigt) {
     return cauchy;
 }
 
+Cauchy dev(Cauchy cauchy) {
+    Cauchy eye = Cauchy::Identity();
+    return cauchy - 1.0/3.0*eye*cauchy.trace();
+}
+
+double double_dot_product(Cauchy cauchy) {
+    return cauchy.cwisePow(2.0).sum();
+}
+
+double double_dot_product(Cauchy a, Cauchy b) {
+    return a.cwiseProduct(b).sum();
+}
+
 double to_radians(double angle) {
     return angle*pi/180.0;
 }

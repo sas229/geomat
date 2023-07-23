@@ -147,7 +147,7 @@ class SMCC : public Elastoplastic {
          * and:
          * 
          * \f[ H_{s_{ep}} = -\frac{M^2 p^{\prime} p_c}{\lambda^*-\kappa^*} k \left(s_{ep}-1\right) \sqrt{\left(1-A\right) {\operatorname{tr}\left( \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} \right)}^2 
-         * + A \frac{2}{3} \operatorname{tr} \left( \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}} {\frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}}}^T \right) } \f]
+         * + A \frac{2}{3} \operatorname{dev} \left( \frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}}\right) : \operatorname{dev} \left( {\frac{\partial f}{\partial \boldsymbol{\sigma}^{\prime}}} \right) } \f]
          * 
          * where \f$ M \f$ is a frictional constant,\f$ p^{\prime} \f$ is the mean effective stress,
          * \f$ p_{c} \f$ is the preconsolidation pressure, \f$ \lambda^* \f$ and \f$ \kappa^* \f$ are the slopes of the normal compression 

@@ -21,8 +21,8 @@ void C2MC::set_state_variables(State new_state) {
 
 Constitutive C2MC::compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) {
     // Compute elastic constants.
-    double K = compute_K(E, nu);
-    double G = compute_G(E, nu);
+    double K = compute_K_given_E_nu(E, nu);
+    double G = compute_G_given_E_nu(E, nu);
 
     // Compute elastic matrix.
     Constitutive D_e = compute_isotropic_linear_elastic_matrix(K, G);

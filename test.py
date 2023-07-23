@@ -45,7 +45,7 @@ state = np.array([50.0])
 stress = np.array([50.0, 50.0, 50.0, 0.0, 0.0, 0.0])
 ea_max = 0.5
 ea_increment = ea_max/increments
-Delta_epsilon_tilde = np.array([ea_increment, -ea_increment/2, -ea_increment/2, 0.0, 0.0, 0.0])
+Delta_epsilon_tilde = np.array([ea_increment, -ea_increment/2.2, -ea_increment/2.2, 0.0, 0.0, 0.0])
 axial_strain = np.arange(0, increments*ea_increment, ea_increment)
 
 model = MCC(parameters=parameters, state=state, log_severity="none")
@@ -81,7 +81,7 @@ state = np.array([10.0, 5.0])
 stress = np.array([50.0, 50.0, 50.0, 0.0, 0.0, 0.0])
 ea_max = 0.5
 ea_increment = ea_max/increments
-Delta_epsilon_tilde = np.array([ea_increment, -ea_increment/2, -ea_increment/2, 0.0, 0.0, 0.0])
+Delta_epsilon_tilde = np.array([ea_increment, -ea_increment/2.2, -ea_increment/2.2, 0.0, 0.0, 0.0])
 axial_strain = np.arange(0, increments*ea_increment, ea_increment)
 
 model = SMCC(log_severity="none", parameters=parameters, state=state)
@@ -108,11 +108,10 @@ while i<increments-1:
 plt.plot(axial_strain, q)
 plt.xlabel(r"$\epsilon_{a}$ (-)")
 plt.ylabel("q (kPa)")
-plt.show()
 
 # C2MC test.
 increments = 100
-parameters = np.array([500.0, 0.2, 0.0, 33.0, 1.0, 29.0, 1.1])
+parameters = np.array([1000.0, 0.0, 0.0, 15.0, 3.0, 29.0, 1.1])
 state = np.array([])
 stress = np.array([50, 50, 50, 0, 0, 0])
 ea_max = 0.5
