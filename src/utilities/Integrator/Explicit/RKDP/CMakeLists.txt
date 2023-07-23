@@ -5,4 +5,4 @@ target_sources(RKDP INTERFACE
 target_include_directories(RKDP INTERFACE 
     ${CMAKE_CURRENT_LIST_DIR}/src/
 )
-target_link_libraries(RKDP INTERFACE plog Types Explicit)
+target_link_libraries(RKDP INTERFACE plog Tensor Types Explicit)

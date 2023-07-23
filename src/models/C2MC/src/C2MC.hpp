@@ -1,12 +1,11 @@
 #ifndef C2MC_H
 #define C2MC_H
 
-#include <plog/Log.h>
-#include <Eigen/Eigen>
 #include "Checks.hpp"
+#include "Elastoplastic.hpp"
 #include "Logging.hpp"
 #include "Types.hpp"
-#include "Elastoplastic.hpp"
+
 
 class C2MC : public Elastoplastic {
 

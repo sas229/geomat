@@ -1,10 +1,7 @@
 #ifndef ELASTIC_H
 #define ELASTIC_H
 
-#include <iostream>
-#include <plog/Log.h>
-#include <cassert>
-#include <Eigen/Eigen>
+#include "Tensor.hpp"
 #include "Checks.hpp"
 #include "Types.hpp"
 #include "Model.hpp"

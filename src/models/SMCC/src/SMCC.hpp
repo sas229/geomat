@@ -1,12 +1,11 @@
 #ifndef SMCC_H
 #define SMCC_H
 
-#include <plog/Log.h>
-#include <Eigen/Eigen>
 #include "Checks.hpp"
-#include "Logging.hpp"
-#include "Types.hpp"
 #include "Elastoplastic.hpp"
+#include "Logging.hpp"
+#include "Tensor.hpp"
+#include "Types.hpp"
 
 class SMCC : public Elastoplastic {
 

@@ -2,6 +2,7 @@
 #define INTERSECTION_H
 
 #include <plog/Log.h>
+#include "Tensor.hpp"
 #include "Types.hpp"
 
 class Intersection {

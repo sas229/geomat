@@ -2,6 +2,7 @@
 #define EXPLICIT_H
 
 #include <plog/Log.h>
+#include "Tensor.hpp"
 #include "Types.hpp"
 
 class Explicit {

@@ -1,12 +1,11 @@
 #ifndef MCC_H
 #define MCC_H
 
-#include <plog/Log.h>
-#include <Eigen/Eigen>
-#include "Types.hpp"
+#include "Checks.hpp"
 #include "Elastoplastic.hpp"
 #include "Logging.hpp"
-#include "Checks.hpp"
+#include "Tensor.hpp"
+#include "Types.hpp"
 
 class MCC : public Elastoplastic {
 

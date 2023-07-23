@@ -1,4 +1,4 @@
-#include "Types.hpp"
+#include "Tensor.hpp"
 
 Voigt to_voigt(Cauchy cauchy) {
     Voigt voigt = Voigt::Zero();
@@ -35,6 +35,6 @@ double double_dot_product(Cauchy a, Cauchy b) {
     return a.cwiseProduct(b).sum();
 }
 
-double to_radians(double angle) {
-    return angle*pi/180.0;
+double tr(Cauchy cauchy) {
+    return cauchy.trace();
 }

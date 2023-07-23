@@ -2,6 +2,7 @@
 #define INTEGRATOR_H
 
 #include <plog/Log.h>
+#include "Tensor.hpp"
 #include "Types.hpp"
 #include "ModifiedEuler.hpp"
 #include "RKDP.hpp"

@@ -1,11 +1,7 @@
 #ifndef ELASTOPLASTIC_H
 #define ELASTOPLASTIC_H
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <plog/Log.h>
-#include <Eigen/Eigen>
+#include "Tensor.hpp"
 #include "Types.hpp"
 #include "Elastic.hpp"
 #include "Intersection.hpp"

@@ -7,4 +7,4 @@ target_sources(Integrator INTERFACE
 target_include_directories(Integrator INTERFACE 
     ${CMAKE_CURRENT_LIST_DIR}/src/
 )
-target_link_libraries(Integrator INTERFACE plog Types ModifiedEuler RKDP)
+target_link_libraries(Integrator INTERFACE plog Tensor Types ModifiedEuler RKDP)

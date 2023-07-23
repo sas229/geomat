@@ -1,11 +1,10 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <iostream>
-#include <vector> 
 #include <string>
 #include <plog/Log.h>
 #include <Eigen/Eigen>
+#include "Tensor.hpp"
 #include "Types.hpp"
 
 /** @brief The Model class contains methods and attributes that are common to all genera of constitutive model. 

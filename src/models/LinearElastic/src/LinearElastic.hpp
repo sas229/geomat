@@ -1,11 +1,10 @@
 #ifndef LinearElastic_H
 #define LinearElastic_H
 
-#include <plog/Log.h>
-#include <Eigen/Eigen>
-#include "Elastic.hpp"
 #include "Checks.hpp"
+#include "Elastic.hpp"
 #include "Logging.hpp"
+#include "Tensor.hpp"
 #include "Types.hpp"
 
 class LinearElastic : public Elastic {
