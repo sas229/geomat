@@ -20,7 +20,6 @@ void SMCC::set_state_variables(State new_state) {
 }
 
 Constitutive SMCC::compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) {
-    using namespace std;
     double Delta_epsilon_e_vol = compute_Delta_epsilon_vol(Delta_epsilon);
     double K = compute_K_Butterfield(p_prime, Delta_epsilon_e_vol, kappa_star, settings.EPS);
     double G = compute_G_given_K_nu(K, nu);
@@ -29,7 +28,6 @@ Constitutive SMCC::compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) {
 }
 
 double SMCC::compute_f(Cauchy sigma_prime, State state) {
-    using namespace std;
     // Stress invariants.
     double q = compute_q(sigma_prime);
     double p_prime = compute_p_prime(sigma_prime);
@@ -39,29 +37,26 @@ double SMCC::compute_f(Cauchy sigma_prime, State state) {
     double s_ep = state(1);
 
     // Yield surface function.
+    using namespace std;
     double f = pow(q,2) + pow(M,2)*p_prime*(p_prime-p_c*s_ep);
     return f;
 }
 
 void SMCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, HardeningModuli &H_s, StateFactors &B_s) {
-    using namespace std;
     // State variables.
     double p_c = state(0);
     double s_ep = state(1);
 
     // Compute mean effective stress, deviatoric stress tensor and derivatives of the stress state for current stress state.
-    double q, p_prime, I_1, I_2, I_3, J_1, J_2, J_3, theta_c, theta_s, theta_s_bar;
-    Cauchy s, dq_dsigma_prime, dJ_3_dsigma_prime, sigma;
+    double q, p_prime;
+    Cauchy s, dq_dsigma_prime;
     q = compute_q(sigma_prime);
     p_prime = compute_p_prime(sigma_prime);
     s = compute_s(sigma_prime, p_prime);
     dq_dsigma_prime = compute_dq_dsigma_prime(sigma_prime, s, q);
-    dJ_3_dsigma_prime = compute_dJ_3_dsigma_prime(sigma_prime, s, q);
-    sigma = compute_sigma(sigma_prime, u);
-    compute_stress_invariants(sigma, I_1, I_2, I_3, J_1, J_2, J_3);
-    compute_lode(J_2, J_3, theta_c, theta_s, theta_s_bar);
     
     // Yield surface derivatives.
+    using namespace std;
     double df_dq = 2*q;
     double df_dp_prime = pow(M,2)*(2*p_prime-p_c*s_ep);
     double df_dtheta = 0;
