@@ -55,7 +55,7 @@ class Elastoplastic : public Elastic {
         virtual void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, HardeningModuli &H_s, StateFactors &B_s) = 0;
 
         /**
-         * @brief Method to compute the elastic state variable increment. 
+         * @brief Virtual method to compute the elastic state variable increment. 
          * 
          * @note Can be optionally overriden, otherwise does nothing but pass back the original state variable vector.
          * 
@@ -64,7 +64,7 @@ class Elastoplastic : public Elastic {
          * @param[in] Delta_epsilon_tilde_e Elastic strain increment.
          * @return State 
          */
-        State compute_elastic_state_variable_increment(Cauchy sigma_prime, State state, Voigt Delta_epsilon_tilde_e);
+        virtual State compute_elastic_state_variable_increment(Cauchy sigma_prime, State state, Voigt Delta_epsilon_tilde_e);
 
         /**
          * @brief Compute the elastic stress increment.

@@ -73,6 +73,7 @@ void Elastoplastic::solve(void) {
 
 State Elastoplastic::compute_elastic_state_variable_increment(Cauchy sigma_prime, State state, Voigt Delta_epsilon_tilde_e) {
     State Delta_state = State::Zero(state.size());
+    PLOG_VERBOSE << "In compute_elastic_state_variable_increment().";
     return Delta_state;
 }
 
