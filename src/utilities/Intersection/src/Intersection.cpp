@@ -20,8 +20,13 @@ double Intersection::solve(Cauchy sigma_prime, State state, Voigt Delta_epsilon_
     PLOG_DEBUG << "f_0 = " << f_0;
 
     // Compute trial stress state with full strain increment.
-    Cauchy sigma_prime_1 = mf->compute_trial_stress(sigma_prime, 1.0 * Delta_epsilon_tilde);
-    f_1 = mf->compute_f(sigma_prime_1, state);
+    Cauchy sigma_prime_1, Delta_sigma_prime_1;
+    State state_1(state.size());
+    State Delta_state_1(state.size());
+    mf->compute_trial_stress_increment(sigma_prime, state, 1.0 * Delta_epsilon_tilde, Delta_sigma_prime_1, Delta_state_1);
+    sigma_prime_1 = sigma_prime + Delta_sigma_prime_1;
+    state_1 = state + Delta_state_1;
+    f_1 = mf->compute_f(sigma_prime_1, state_1);
     PLOG_DEBUG << "f_1 = " << f_1;
 
     // Check increment type by finding alpha.
@@ -65,10 +70,10 @@ bool Intersection::check_unload_reload(void) {
     Constitutive D_e_tan = mf->compute_D_e(sigma_prime, Cauchy::Zero());
 
     // Compute elastic stress increment.
-    Voigt Delta_sigma_e = D_e_tan * Delta_epsilon_tilde;
+    Voigt Delta_sigma_prime_e = D_e_tan * Delta_epsilon_tilde;
 
     // Check unloading-reloading criterion.
-    double cos_theta = (double)(a_c.transpose() * Delta_sigma_e) / (double)(a_c.squaredNorm() * Delta_sigma_e.squaredNorm());
+    double cos_theta = (double)(a_c.transpose() * Delta_sigma_prime_e) / (double)(a_c.squaredNorm() * Delta_sigma_prime_e.squaredNorm());
 
     // Check against tolerance.
     if (cos_theta >= -settings->LTOL) {
@@ -90,13 +95,17 @@ void Intersection::refine_alpha_bounds(void) {
         while (j < settings->NSUB) {
             // Compute the elastic matrix.
             Cauchy Delta_epsilon = to_cauchy(Delta_epsilon_tilde);
-            Constitutive D_e_n = mf->compute_D_e(sigma_prime, alpha_n * Delta_epsilon);
 
             // Compute elastic stress increment.
-            Cauchy sigma_prime_n = mf->compute_trial_stress(sigma_prime, alpha_n * Delta_epsilon_tilde);
+            Cauchy sigma_prime_n, Delta_sigma_prime_n;
+            State state_n(state.size());
+            State Delta_state_n(state.size());
+            mf->compute_trial_stress_increment(sigma_prime, state, alpha_n * Delta_epsilon_tilde, Delta_sigma_prime_n, Delta_state_n);
+            sigma_prime_n = sigma_prime + Delta_sigma_prime_n;
+            state_n = state + state_n;
 
             // Check yield function.
-            double f_n = mf->compute_f(sigma_prime_n, state);
+            double f_n = mf->compute_f(sigma_prime_n, state_n);
 
             // Check criterion.
             if (f_n > settings->FTOL) {
@@ -104,12 +113,20 @@ void Intersection::refine_alpha_bounds(void) {
                 alpha_1 = alpha_n;
                 
                 // Update yield function value for current lower bound stress state (i.e. alpha = alpha_0).
-                Cauchy sigma_prime_0 = mf->compute_trial_stress(sigma_prime, alpha_0 * Delta_epsilon_tilde);
-                f_0 = mf->compute_f(sigma_prime, state);
+                Cauchy sigma_prime_0, Delta_sigma_prime_0;
+                State state_0, Delta_state_0;
+                mf->compute_trial_stress_increment(sigma_prime, state, alpha_0 * Delta_epsilon_tilde, Delta_sigma_prime_0, Delta_state_0);
+                sigma_prime_0 = sigma_prime + Delta_sigma_prime_0;
+                state_0 = state + Delta_state_0;
+                f_0 = mf->compute_f(sigma_prime_0, state_0);
 
                 // Update yield function value for current upper bound stress state (i.e. alpha = alpha_1).
-                Cauchy sigma_prime_1 = mf->compute_trial_stress(sigma_prime, alpha_1 * Delta_epsilon_tilde);
-                f_1 = mf->compute_f(sigma_prime_1, state);
+                Cauchy sigma_prime_1, Delta_sigma_prime_1;
+                State state_1, Delta_state_1;
+                mf->compute_trial_stress_increment(sigma_prime, state, alpha_1 * Delta_epsilon_tilde, Delta_sigma_prime_1, Delta_state_1);
+                sigma_prime_1 = sigma_prime + Delta_sigma_prime_1;
+                state_1 = state + Delta_state_1;
+                f_1 = mf->compute_f(sigma_prime_1, state_1);
                 
                 // Break from loops.
                 return;
@@ -129,15 +146,18 @@ double Intersection::pegasus_regula_falsi(void) {
     // Pegasus algorithm.
     double alpha_n;
     double f_n = settings->FTOL;
-    Cauchy sigma_prime_n = sigma_prime;
-    State state_n = state;
+    Cauchy sigma_prime_n, Delta_sigma_prime_n;
+    State state_n(state.size());
+    State Delta_state_n(state.size());
 
     // Iterate to find optimal alpha if a plastic increment.
     double ITS_YSI = 0;
     while (ITS_YSI < settings->MAXITS_YSI && std::abs(f_n) >= settings->FTOL) {
         alpha_n = alpha_1 - f_1 * (alpha_1 - alpha_0) / (f_1 - f_0);
 
-        sigma_prime_n = mf->compute_trial_stress(sigma_prime, alpha_n * Delta_epsilon_tilde);
+        mf->compute_trial_stress_increment(sigma_prime, state, alpha_n * Delta_epsilon_tilde, Delta_sigma_prime_n, Delta_state_n);
+        sigma_prime_n = sigma_prime + Delta_sigma_prime_n;
+        state_n = state + state_n;
         f_n = mf->compute_f(sigma_prime_n, state_n);
 
         // Update trial using Pegasus method rules.

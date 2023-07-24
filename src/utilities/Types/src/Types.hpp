@@ -60,10 +60,13 @@ typedef std::function<double(Cauchy sigma_prime_f, State state_f)> YieldFunction
 /**
  * @brief Trial stress function binding.
  * 
- * @tparam sigma_prime_f Effective stress tensor.
+ * @tparam sigma_prime Effective stress tensor.
+ * @tparam state State variables.
  * @tparam delta_epsilon_tilde Strain increment in Voigt form.
+ * @tparam sigma_prime_n Trial effective stress tensor.
+ * @tparam state_n Trial state variables.
  */
-typedef std::function<Cauchy(Cauchy sigma_prime_f, Voigt delta_epsilon_tilde)> TrialFunction;
+typedef std::function<void(Cauchy sigma_prime, State state, Voigt delta_epsilon_tilde, Cauchy &sigma_prime_n, State &state_n)> TrialFunction;
 
 /**
  * @brief Constitutive matrix function binding.
@@ -101,7 +104,7 @@ typedef std::function<void(Cauchy sigma_prime, State state, Voigt Delta_epsilon_
  */
 struct ModelFunctions {
     YieldFunction compute_f;
-    TrialFunction compute_trial_stress;
+    TrialFunction compute_trial_stress_increment;
     ConstitutiveMatrixFunction compute_D_e;
     DerivativeFunction compute_derivatives;
     PlasticIncrementFunction compute_plastic_increment;

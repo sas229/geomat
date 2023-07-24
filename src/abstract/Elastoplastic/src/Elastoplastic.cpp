@@ -4,12 +4,10 @@ Elastoplastic::Elastoplastic() : intersection(&settings, &mf), integrator(&setti
     // Define binds to model functions.
     using namespace std::placeholders;
     mf.compute_f = std::bind(&Elastoplastic::compute_f, this, _1, _2);
-    mf.compute_trial_stress = std::bind(&Elastoplastic::compute_elastic_stress, this, _1, _2);
+    mf.compute_trial_stress_increment = std::bind(&Elastoplastic::compute_elastic_increment, this, _1, _2, _3, _4, _5);
     mf.compute_D_e = std::bind(&Elastoplastic::compute_D_e, this, _1, _2);
     mf.compute_derivatives = std::bind(&Elastoplastic::compute_derivatives, this, _1, _2, _3, _4, _5, _6);
     mf.compute_plastic_increment = std::bind(&Elastoplastic::compute_plastic_increment, this, _1, _2, _3, _4, _5);
-
-    settings.method = "RKDP";
 }
 
 void Elastoplastic::solve(void) {
@@ -73,13 +71,30 @@ void Elastoplastic::solve(void) {
     }
 }
 
+State Elastoplastic::compute_elastic_state_variable_increment(Cauchy sigma_prime, State state, Voigt Delta_epsilon_tilde_e) {
+    State Delta_state = State::Zero(state.size());
+    return Delta_state;
+}
+
+void Elastoplastic::compute_elastic_increment(Cauchy sigma_prime, State state, Voigt Delta_epsilon_tilde_e, Cauchy &Delta_sigma_prime_e, State &Delta_state_e) {
+    // Update state variables, if required (method does nothing if not overriden by model implementation).
+    Delta_state_e = compute_elastic_state_variable_increment(sigma_prime, state, Delta_epsilon_tilde_e);
+
+    // Elastic constitutive matrix.
+    Constitutive D_e = compute_D_e(sigma_prime, to_cauchy(Delta_epsilon_tilde_e));
+
+    // Elastic stress increment.
+    Voigt Delta_sigma_prime_tilde_e = compute_elastic_stress_increment(D_e, Delta_epsilon_tilde_e);
+    Delta_sigma_prime_e =  to_cauchy(Delta_sigma_prime_tilde_e);
+}
+
 void Elastoplastic::compute_plastic_increment(
     Cauchy sigma_prime, 
     State state, 
     Voigt Delta_epsilon_tilde_p_dT, 
     Voigt &Delta_sigma_prime, 
     State &delta_state
-    ) {   
+) {   
     // Calculate elastic constitutive matrix using tangent moduli and elastic stress increment.
     Constitutive D_e = compute_D_e(sigma_prime, Cauchy::Zero());
 
