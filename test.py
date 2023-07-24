@@ -45,7 +45,7 @@ state = np.array([50.0])
 stress = np.array([50.0, 50.0, 50.0, 0.0, 0.0, 0.0])
 ea_max = 0.5
 ea_increment = ea_max/increments
-Delta_epsilon_tilde = np.array([ea_increment, -ea_increment/2.2, -ea_increment/2.2, 0.0, 0.0, 0.0])
+Delta_epsilon_tilde = np.array([ea_increment, -ea_increment/2, -ea_increment/2, 0.0, 0.0, 0.0])
 axial_strain = np.arange(0, increments*ea_increment, ea_increment)
 
 model = MCC(parameters=parameters, state=state, log_severity="none")
@@ -81,7 +81,7 @@ state = np.array([10.0, 5.0])
 stress = np.array([50.0, 50.0, 50.0, 0.0, 0.0, 0.0])
 ea_max = 0.5
 ea_increment = ea_max/increments
-Delta_epsilon_tilde = np.array([ea_increment, -ea_increment/2.2, -ea_increment/2.2, 0.0, 0.0, 0.0])
+Delta_epsilon_tilde = np.array([ea_increment, -ea_increment/2, -ea_increment/2, 0.0, 0.0, 0.0])
 axial_strain = np.arange(0, increments*ea_increment, ea_increment)
 
 model = SMCC(log_severity="none", parameters=parameters, state=state)
