@@ -148,7 +148,7 @@ plt.show()
 # EMC test.
 increments = 100
 parameters = np.array([1000.0, 0.2, 0.0, 40.0, 30.0, 0.0015, 29.0, 1.1])
-state = np.array([20.0])
+state = np.array([10.0])
 stress = np.array([50, 50, 50, 0, 0, 0])
 ea_max = 0.5
 ea_increment = ea_max/increments
