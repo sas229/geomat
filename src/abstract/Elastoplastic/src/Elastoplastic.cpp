@@ -111,7 +111,6 @@ void Elastoplastic::compute_plastic_increment(
     // Compute elastoplastic constitutive matrix.
     double H = H_s.sum();
     Constitutive D_ep = D_e-(D_e*b*a.transpose()*D_e)/(H + a.transpose()*D_e*b);
-    PLOG_DEBUG << "Elastoplastic matrix, D_ep = \n" << D_ep;
 
     // Compute elastoplastic multiplier. 
     Voigt Delta_sigma_prime_e = D_e*Delta_epsilon_tilde_p_dT;
