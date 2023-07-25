@@ -32,7 +32,7 @@ target_compile_definitions(${TARGET} PUBLIC EIGEN_DONT_PARALLELIZE=1)
 # Create Python module.
 set(TARGET models)
 pybind11_add_module(${TARGET} src/geomat/models.cpp)
-target_link_libraries(${TARGET} PUBLIC Types Model Elastic Elastoplastic C2MC LinearElastic MCC SMCC Eigen3::Eigen)
+target_link_libraries(${TARGET} PUBLIC Types Model Elastic Elastoplastic Models Eigen3::Eigen)
 target_compile_definitions(${TARGET} PUBLIC EIGEN_DONT_PARALLELIZE=1)
 install(TARGETS models DESTINATION ./)
 

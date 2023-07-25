@@ -94,7 +94,7 @@ class C2MC : public Elastoplastic {
         void compute_A_B_C(double angle_r, double theta_s_bar, double &A, double &B, double &C);
 
         /**
-         * @brief 
+         * @brief Method to compute the derivatives of the yield surface with respect to the stress state.
          * 
          * @param[in] sigma_bar Stress invariant.
          * @param[in] angle_r Friction or dilation angle in radians.
@@ -126,9 +126,9 @@ class C2MC : public Elastoplastic {
         const double &nu = parameters[1];
 
         /** 
-         * @brief Parameter: cohesion intercept.
+         * @brief Parameter: effective cohesion.
          */
-        const double &cohs = parameters[2];
+        const double &c_prime = parameters[2];
 
         /** 
          * @brief Parameter: angle of internal friction. 
@@ -173,7 +173,7 @@ class C2MC : public Elastoplastic {
         /**
          * @brief C2 rounding parameter in radians.
          */
-        const double theta_tr = to_radians(theta_t);
+        const double theta_t_r = to_radians(theta_t);
 
 };
 

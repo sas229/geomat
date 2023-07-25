@@ -9,6 +9,7 @@
 #include "Elastoplastic.hpp"
 
 #include "C2MC.hpp"
+#include "EMC.hpp"
 #include "LinearElastic.hpp"
 #include "MCC.hpp"
 #include "SMCC.hpp"
@@ -54,6 +55,30 @@ PYBIND11_MODULE(models, m) {
         .def_property_readonly("J_2", &C2MC::get_J_2)
         .def_property_readonly("J_3", &C2MC::get_J_3)
         .def("solve", &C2MC::solve);
+
+    // Extended Mohr Coulomb (EMC).
+    py::class_<EMC, Elastoplastic>(m, "EMC")
+        .def(py::init<Parameters, State>(), py::kw_only(), py::arg("parameters"), py::arg("state")) // Constructor.
+        .def(py::init<Parameters, State, std::string>(), py::kw_only(), py::arg("parameters"), py::arg("state"), py::arg("log_severity")) // Overloaded constructor.
+        .def("set_sigma_prime_tilde", &EMC::set_sigma_prime_tilde)
+        .def("get_sigma_prime_tilde", &EMC::get_sigma_prime_tilde)
+        .def("set_Delta_epsilon_tilde", &EMC::set_Delta_epsilon_tilde)
+        .def("get_state", &EMC::get_state_variables)
+        .def("get_p_prime", &EMC::get_p_prime)
+        .def("get_q", &EMC::get_q)
+        .def_property_readonly("name", &EMC::get_model_name)
+        .def_property_readonly("type", &EMC::get_model_type)
+        .def_property_readonly("p_prime", &EMC::get_p_prime)
+        .def_property_readonly("q", &EMC::get_q)
+        .def_property_readonly("sigma_prime_tilde", &EMC::get_sigma_prime_tilde)
+        .def_property_readonly("state", &EMC::get_state_variables)
+        .def_property_readonly("I_1", &EMC::get_I_1)
+        .def_property_readonly("I_2", &EMC::get_I_2)
+        .def_property_readonly("I_3", &EMC::get_I_3)
+        .def_property_readonly("J_1", &EMC::get_J_1)
+        .def_property_readonly("J_2", &EMC::get_J_2)
+        .def_property_readonly("J_3", &EMC::get_J_3)
+        .def("solve", &EMC::solve);
 
     // Linear isotropic elasticity (LinearElastic).
     py::class_<LinearElastic, Elastic>(m, "LinearElastic")
