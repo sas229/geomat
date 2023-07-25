@@ -119,19 +119,11 @@ struct Settings{
     double FTOL = 1e-8;     /** @brief Yield surface tolerance. */
     double LTOL = 1e-6;     /** @brief Unload-reload tolerance. */
     double STOL = 1e-4;     /** @brief Stress integration tolerance. */
-    double EPS = 1e-16;     /** @brief Double precision tolerance. */
+    double EPS = 1e-16;     /** @brief Numerical precision tolerance. */
     double DT_MIN = 1e-6;   /** @brief Minimum pseudo-time increment for stress integration procedure. */
     int MAXITS_YSI = 10;    /** @brief Maximum number of Pegasus method iterations. */
     int MAXITS_YSC = 30;    /** @brief Maximum number of yield surface correction iterations. */
     int NSUB = 10;          /** @brief Maximum number of unload-reload intersection substeps.*/
 };
-
-/**
- * @brief Function to convert degrees to radians.
- * 
- * @param angle 
- * @return double 
- */
-inline double to_radians(double angle) {return angle*pi/180.0;};
 
 #endif

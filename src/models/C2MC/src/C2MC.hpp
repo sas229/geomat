@@ -4,8 +4,8 @@
 #include "Checks.hpp"
 #include "Elastoplastic.hpp"
 #include "Logging.hpp"
+#include "Math.hpp"
 #include "Types.hpp"
-
 
 class C2MC : public Elastoplastic {
 
