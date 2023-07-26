@@ -37,7 +37,7 @@ double EMC::compute_f(Cauchy sigma_prime, State state) {
         double sigma_bar = compute_sigma_bar(J_2);
         compute_A_B_C(phi_m_r, theta_s_bar, A, B, C);
         compute_K_theta(phi_m_r, theta_s_bar, A, B, C, K_theta);
-        f = sqrt(pow(sigma_bar,2.0)*pow((K_theta),2.0) + pow(a_h,2.0)*pow(sin(phi_m_r),2.0)) - c_prime*cos(phi_m_r) - p_prime*sin(phi_m_r); 
+        f = sqrt(pow(sigma_bar,2.0)*pow((K_theta),2.0) + pow(a_h,2.0)*pow(sin(phi_m_r),2.0)) - a*sin(phi_m_r) - p_prime*sin(phi_m_r); 
     }
     return f;
 }
@@ -71,7 +71,7 @@ void EMC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma
     double A, B, C, K_theta;
     compute_A_B_C(phi_cv_r, theta_s_bar, A, B, C);
     compute_K_theta(phi_cv_r, theta_s_bar, A, B, C, K_theta);
-    double df_dphi_m = -((p_prime - (c_prime/tan(phi_m_r)))*cos(phi_m_r) - sigma_bar*((sin(theta_s_bar)*cos(phi_m_r))/sqrt(3.0)));
+    double df_dphi_m = (-p_prime - a)*cos(phi_m_r) - sigma_bar*((sin(theta_s_bar)*cos(phi_m_r))/sqrt(3.0));
     
     // Hardening modulus.
     H_s(0) = df_dphi_m*(pow((phi_p_r-phi_m_r),2.0)/(beta*phi_p_r))*K_theta;
@@ -150,7 +150,7 @@ void EMC::compute_plastic_potential_derivative_coefficients(double p_prime, doub
 
     // Derivative coefficients.
     alpha = (sigma_bar*K_theta)/sqrt(pow(sigma_bar,2.0)*pow(K_theta,2.0) + pow(a_h,2.0)*pow(sin(phi_cv_r),2.0));
-    C_1 = -((sigma_bar*K_theta)/(p_prime-(c_prime/tan(phi_cv_r)))) - sin(phi_cv_r);
+    C_1 = sin(phi_cv_r) - ((sigma_bar*K_theta)/(-p_prime-a));
     if (abs(theta_s_bar) > theta_t_r) {
         // C2 rounding.
         dK_dtheta = 3.0*B*cos(3.0*theta_s_bar) + 3.0*C*sin(6.0*theta_s_bar);

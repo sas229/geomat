@@ -8,6 +8,7 @@ Elastoplastic::Elastoplastic() : intersection(&settings, &mf), integrator(&setti
     mf.compute_D_e = std::bind(&Elastoplastic::compute_D_e, this, _1, _2);
     mf.compute_derivatives = std::bind(&Elastoplastic::compute_derivatives, this, _1, _2, _3, _4, _5, _6);
     mf.compute_plastic_increment = std::bind(&Elastoplastic::compute_plastic_increment, this, _1, _2, _3, _4, _5);
+    mf.check_yield_surface_drift = std::bind(&Elastoplastic::check_yield_surface_drift, this, _1, _2, _3, _4, _5);
 }
 
 void Elastoplastic::solve(void) {
@@ -71,6 +72,65 @@ void Elastoplastic::solve(void) {
     }
 }
 
+void Elastoplastic::check_yield_surface_drift(Cauchy sigma_prime_u, State state_u, Cauchy &sigma_prime_c, State &state_c, int &ITS_YSC) {
+    PLOG_DEBUG << "Checking for yield surface drift.";
+    double f_u, f_c;
+    f_u = f_c = compute_f(sigma_prime_u, state_u);
+    ITS_YSC = 0;
+    while (std::abs(f_c) > settings.FTOL) {
+        // If yield surface drift correction unsuccessful, log fault.
+        if (ITS_YSC >= settings.MAXITS_YSC && std::abs(f_c) > settings.FTOL) {
+            PLOG_FATAL << "Maximum number of " << settings.MAXITS_YSC << " yield surface correction iterations performed and |f| = " << std::abs(f_c) << " > FTOL = " << settings.FTOL << ".";
+            assert(false);
+        } else {
+            ITS_YSC++;
+        }
+
+        // Calculate uncorrected elastic constitutive matrix using tangent moduli and elastic stress increment.
+        Constitutive D_e_u = compute_D_e(sigma_prime_u, Cauchy::Zero());
+
+        // Calculate uncorrected derivatives.
+        Cauchy df_dsigma_prime_u, dg_dsigma_prime_u;
+        Voigt a_u, b_u;
+        HardeningModuli H_s_u(state_u.size());
+        StateFactors B_s_u(state_u.size());
+        compute_derivatives(sigma_prime_u, state_u, df_dsigma_prime_u, dg_dsigma_prime_u, H_s_u, B_s_u);
+        a_u = to_voigt(df_dsigma_prime_u);
+        b_u = to_voigt(dg_dsigma_prime_u);
+
+        // Compute correction plastic multiplier.
+        double H_u = H_s_u.sum();
+        double delta_lambda_c = f_u/(H_u + a_u.transpose()*D_e_u*b_u);
+
+        // Apply consistent correction to stress state and state variables.
+        Voigt Delta_sigma_prime_c = -delta_lambda_c*D_e_u*b_u;
+        State Delta_state_c = -delta_lambda_c*B_s_u;
+        sigma_prime_c = sigma_prime_u + to_cauchy(Delta_sigma_prime_c);
+        state_c = state_u + Delta_state_c;
+
+        // Check corrected yield surface function value.
+        f_c = compute_f(sigma_prime_c, state_c);
+        if (std::abs(f_c) > std::abs(f_u)) {
+            // Apply normal correction instead.
+            double delta_lambda_c = f_u/(a_u.transpose()*a_u);
+            
+            // Update stress and state variables using correction.
+            Voigt Delta_sigma_prime_c = -delta_lambda_c*a_u;
+            sigma_prime_c = sigma_prime_u + to_cauchy(Delta_sigma_prime_c);
+            state_c = state_u; /* i.e. no correction to state variables. */
+
+            // Check yield surface function value again.
+            f_c = compute_f(sigma_prime_c, state_c);
+        }
+
+        // Update uncorrected values for next iteration.
+        f_u = f_c;
+        sigma_prime_u = sigma_prime_c;
+        state_u = state_c;
+    }
+    PLOG_DEBUG << "Yield surface drift correction converged in " << ITS_YSC << " iterations.";
+}
+
 State Elastoplastic::compute_elastic_state_variable_increment(Cauchy sigma_prime, State state, Voigt Delta_epsilon_tilde_e) {
     State Delta_state = State::Zero(state.size());
     PLOG_VERBOSE << "In compute_elastic_state_variable_increment().";
@@ -116,7 +176,7 @@ void Elastoplastic::compute_plastic_increment(
     Voigt Delta_sigma_prime_e = D_e*Delta_epsilon_tilde_p_dT;
     double delta_lambda = (double)(a.transpose()*Delta_sigma_prime_e)/(double)(H + a.transpose()*D_e*b);
     PLOG_DEBUG << "Plastic multiplier, delta_lambda = " << delta_lambda;
-    
+
     // Update stress and state variable.
     Delta_sigma_prime = D_ep*Delta_epsilon_tilde_p_dT;
     delta_state = -delta_lambda*B_s;
