@@ -58,13 +58,13 @@ void SMCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     dg_dsigma_prime = df_dsigma_prime; // Associated flow.
 
     // Hardening moduli.
-    H_s(0) = (pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*s_ep*tr(df_dsigma_prime);
-    H_s(1) = (pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*-k*(s_ep-1.0)*sqrt((1-A)*pow(tr(df_dsigma_prime),2)
-        + (A*2.0/3.0*(double_dot_product(dev(df_dsigma_prime)))));
+    H_s(0) = (pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*s_ep*tr(dg_dsigma_prime);
+    H_s(1) = (pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*-k*(s_ep-1.0)*sqrt((1-A)*pow(tr(dg_dsigma_prime),2)
+        + (A*2.0/3.0*(double_dot_product(dev(dg_dsigma_prime)))));
 
     // State variable increment factors.
-    double df_dp_c = -pow(M,2)*p_prime*s_ep;
-    double df_ds_ep = -pow(M,2)*p_prime*p_c;
-    B_s(0) = H_s(0)/df_dp_c;
-    B_s(1) = H_s(1)/df_ds_ep;
+    double dg_dp_c = -pow(M,2)*p_prime*s_ep;
+    double dg_ds_ep = -pow(M,2)*p_prime*p_c;
+    B_s(0) = H_s(0)/dg_dp_c;
+    B_s(1) = H_s(1)/dg_ds_ep;
 }

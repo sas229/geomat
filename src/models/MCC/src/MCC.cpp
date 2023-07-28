@@ -57,9 +57,9 @@ void MCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma
     dg_dsigma_prime = df_dsigma_prime; // Associated flow.
 
     // Hardening moduli.
-    H_s(0) = (pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*tr(df_dsigma_prime);
+    H_s(0) = (pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*tr(dg_dsigma_prime);
 
     // State variable increment factors.
-    double df_dp_c = -pow(M,2)*p_prime;
-    B_s(0) = H_s(0)/df_dp_c;
+    double dg_dp_c = -pow(M,2)*p_prime;
+    B_s(0) = H_s(0)/dg_dp_c;
 }

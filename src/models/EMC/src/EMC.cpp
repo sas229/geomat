@@ -68,13 +68,13 @@ void EMC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma
     dg_dsigma_prime = (C_1*dp_prime_dsigma_prime) + (C_2*dsigma_bar_dsigma_prime) + (pow(sigma_bar,2.0)*C_3)*((1.0/(pow(sigma_bar,2.0)))*dJ_3_dsigma_prime);
 
     // Derivative of yield surface with respect to mobilised friction angle.
-    double A, B, C, K_theta;
+    double A, B, C, K_theta_cv;
     compute_A_B_C(phi_cv_r, theta_s_bar, A, B, C);
-    compute_K_theta(phi_cv_r, theta_s_bar, A, B, C, K_theta);
+    compute_K_theta(phi_cv_r, theta_s_bar, A, B, C, K_theta_cv);
     double df_dphi_m = -((p_prime - (c_prime/tan(phi_m_r)))*cos(phi_m_r) - sigma_bar*((sin(theta_s_bar)*cos(phi_m_r))/sqrt(3.0)));
     
     // Hardening modulus.
-    H_s(0) = df_dphi_m*(pow((phi_p_r-phi_m_r),2.0)/(beta*phi_p_r))*K_theta;
+    H_s(0) = df_dphi_m*(pow((phi_p_r-phi_m_r),2.0)/(beta*phi_p_r))*K_theta_cv;
 
     // State variable factors.
     B_s(0) = H_s(0)/df_dphi_m;
