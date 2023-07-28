@@ -138,9 +138,9 @@ class EMC : public Elastoplastic {
         const double &nu = parameters[1];
 
         /** 
-         * @brief Parameter: effective cohesion.
+         * @brief Parameter: attraction component.
          */
-        const double &c_prime = parameters[2];
+        const double &a = parameters[2];
 
         /** 
          * @brief Parameter: peak friction angle. 

@@ -100,6 +100,18 @@ typedef std::function<void(Cauchy sigma_prime, State state, Cauchy &df_dsigma_pr
 typedef std::function<void(Cauchy sigma_prime, State state, Voigt Delta_epsilon_p_dT, Voigt &Delta_sigma_prime, State &Delta_state)> PlasticIncrementFunction;
 
 /**
+ * @brief Yield surface drift function binding.
+ * 
+ * @tparam sigma_prime_u Uncorrected effective stress tensor in Cauchy form.
+ * @tparam state_u Uncorrected state variables.
+ * @tparam sigma_prime_c Corrected effective stress tensor in Cauchy form.
+ * @tparam state_c Corrected state variables.
+ * @tparam ITS_YSC Number of yield surface correction iterations.
+ */
+typedef std::function<void(Cauchy sigma_prime_u, State state_u, Cauchy &sigma_prime_c, State &state_c, int &ITS_YSC)> CheckDriftFunction;
+
+
+/**
  * @brief Object containing functions to be bound to model specific implementation.
  */
 struct ModelFunctions {
@@ -108,6 +120,7 @@ struct ModelFunctions {
     ConstitutiveMatrixFunction compute_D_e;
     DerivativeFunction compute_derivatives;
     PlasticIncrementFunction compute_plastic_increment;
+    CheckDriftFunction check_yield_surface_drift;
 };
 
 /**

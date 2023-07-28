@@ -55,6 +55,17 @@ class Elastoplastic : public Elastic {
         virtual void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, HardeningModuli &H_s, StateFactors &B_s) = 0;
 
         /**
+         * @brief Method to check for yield surface drift and apply appropriate corrections.
+         * 
+         * @param sigma_prime_u Uncorrected effective stress tensor.
+         * @param state_u Uncorrected state variables.
+         * @param sigma_prime_c Corrected effective stress tensor.
+         * @param state_c Corrected state variables.
+         * @param ITS_YSC Number of yield surface corrections applied.
+         */
+        void check_yield_surface_drift(Cauchy sigma_prime_u, State state_u, Cauchy &sigma_prime_c, State &state_c, int &ITS_YSC);
+        
+        /**
          * @brief Virtual method to compute the elastic state variable increment. 
          * 
          * @note Can be optionally overriden, otherwise does nothing but pass back the original state variable vector.

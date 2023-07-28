@@ -35,11 +35,6 @@ class Explicit {
         virtual void compute_initial_estimate(void) = 0;
 
         /**
-         * @brief Method to compute the yield surface correction.
-         */
-        void compute_yield_surface_correction(void);
-
-        /**
          * @brief Method to compute the new substep size for the next increment.
          * 
          * @return double 
