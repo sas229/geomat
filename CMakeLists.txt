@@ -24,13 +24,13 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/src)
 
 # Create Fortran interface test executable.
 set(TARGET umat_fortran_test)
-add_executable(${TARGET} src/umat/src/test_umat.f90)
+add_executable(${TARGET} tests/umat_integration.f90)
 target_link_libraries(${TARGET} PUBLIC umat Model Models)
 target_compile_definitions(${TARGET} PUBLIC EIGEN_DONT_PARALLELIZE=1)
 
 # Create C++ test executable.
 set(TARGET umat_cpp_test)
-add_executable(${TARGET} src/umat/src/test_umat.cpp)
+add_executable(${TARGET} tests/umat_integration.cpp)
 target_include_directories(${TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(${TARGET} PUBLIC umat Model Models)
 target_compile_definitions(${TARGET} PUBLIC EIGEN_DONT_PARALLELIZE=1)
