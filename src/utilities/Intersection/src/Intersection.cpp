@@ -55,7 +55,7 @@ double Intersection::solve(Cauchy sigma_prime, State state, Voigt Delta_epsilon_
     }
     return 0.0;
 }
-
+    
 bool Intersection::check_unload_reload(void) {
     // Compute required derivatives for the given stress state.
     Cauchy df_dsigma_prime_c, dg_dsigma_prime_c;
