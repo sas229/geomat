@@ -1,7 +1,7 @@
 #include <iostream>
 #include <typeinfo>
 
-#include "umat.hpp"
+#include "umat_cpp_interface.hpp"
 
 int main() {      
     // int ndi = 3;
@@ -132,7 +132,7 @@ int main() {
 
     // Try some increments.
     for (int i=0; i < 100; ++i) {
-        umat(
+        umat_cpp_interface(
             stress,
             statev,
             ddsdde,

@@ -99,7 +99,8 @@
         "openglsupport": "cpp",
         "specialfunctions": "cpp",
         "splines": "cpp",
-        "*.inc": "cpp"
+        "*.inc": "cpp",
+        "any": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceFolder}",
     // "editor.formatOnSave": true,

@@ -1,7 +1,22 @@
 #ifndef UMAT_CPP_INTERFACE_H
 #define UMAT_CPP_INTERFACE_H
 
-#include "stdio.h"
+#include <iostream>
+#include <string>
+#include <vector>
+#include <typeinfo>
+#include <memory>
+#include <cassert>
+#include <Eigen/Eigen>
+#include <plog/Log.h>
+#include <plog/Initializers/RollingFileInitializer.h>
+#include "Types.hpp"
+#include "Model.hpp"
+#include "LinearElastic.hpp"
+#include "EMC.hpp"
+#include "C2MC.hpp"
+#include "MCC.hpp"
+#include "SMCC.hpp"
 
 #ifdef __cplusplus
 extern "C"
