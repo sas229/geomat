@@ -4,7 +4,7 @@ Elastoplastic::Elastoplastic() : intersection(&settings, &mf), integrator(&setti
     // Define binds to model functions.
     using namespace std::placeholders;
     mf.compute_f = std::bind(&Elastoplastic::compute_f, this, _1, _2);
-    mf.compute_trial_stress_increment = std::bind(&Elastoplastic::compute_elastic_increment, this, _1, _2, _3, _4, _5);
+    mf.compute_trial_increment = std::bind(&Elastoplastic::compute_elastic_increment, this, _1, _2, _3, _4, _5);
     mf.compute_D_e = std::bind(&Elastoplastic::compute_D_e, this, _1, _2);
     mf.compute_derivatives = std::bind(&Elastoplastic::compute_derivatives, this, _1, _2, _3, _4, _5, _6);
     mf.compute_plastic_increment = std::bind(&Elastoplastic::compute_plastic_increment, this, _1, _2, _3, _4, _5);

@@ -116,7 +116,7 @@ typedef std::function<void(Cauchy sigma_prime_u, State state_u, Cauchy &sigma_pr
  */
 struct ModelFunctions {
     YieldFunction compute_f;
-    TrialFunction compute_trial_stress_increment;
+    TrialFunction compute_trial_increment;
     ConstitutiveMatrixFunction compute_D_e;
     DerivativeFunction compute_derivatives;
     PlasticIncrementFunction compute_plastic_increment;

@@ -23,7 +23,7 @@ double Intersection::solve(Cauchy sigma_prime, State state, Voigt Delta_epsilon_
     Cauchy sigma_prime_1, Delta_sigma_prime_1;
     State state_1(state.size());
     State Delta_state_1(state.size());
-    mf->compute_trial_stress_increment(sigma_prime, state, 1.0 * Delta_epsilon_tilde, Delta_sigma_prime_1, Delta_state_1);
+    mf->compute_trial_increment(sigma_prime, state, 1.0 * Delta_epsilon_tilde, Delta_sigma_prime_1, Delta_state_1);
     sigma_prime_1 = sigma_prime + Delta_sigma_prime_1;
     state_1 = state + Delta_state_1;
     f_1 = mf->compute_f(sigma_prime_1, state_1);
@@ -100,7 +100,7 @@ void Intersection::refine_alpha_bounds(void) {
             Cauchy sigma_prime_n, Delta_sigma_prime_n;
             State state_n(state.size());
             State Delta_state_n(state.size());
-            mf->compute_trial_stress_increment(sigma_prime, state, alpha_n * Delta_epsilon_tilde, Delta_sigma_prime_n, Delta_state_n);
+            mf->compute_trial_increment(sigma_prime, state, alpha_n * Delta_epsilon_tilde, Delta_sigma_prime_n, Delta_state_n);
             sigma_prime_n = sigma_prime + Delta_sigma_prime_n;
             state_n = state + state_n;
 
@@ -115,7 +115,7 @@ void Intersection::refine_alpha_bounds(void) {
                 // Update yield function value for current lower bound stress state (i.e. alpha = alpha_0).
                 Cauchy sigma_prime_0, Delta_sigma_prime_0;
                 State state_0, Delta_state_0;
-                mf->compute_trial_stress_increment(sigma_prime, state, alpha_0 * Delta_epsilon_tilde, Delta_sigma_prime_0, Delta_state_0);
+                mf->compute_trial_increment(sigma_prime, state, alpha_0 * Delta_epsilon_tilde, Delta_sigma_prime_0, Delta_state_0);
                 sigma_prime_0 = sigma_prime + Delta_sigma_prime_0;
                 state_0 = state + Delta_state_0;
                 f_0 = mf->compute_f(sigma_prime_0, state_0);
@@ -123,7 +123,7 @@ void Intersection::refine_alpha_bounds(void) {
                 // Update yield function value for current upper bound stress state (i.e. alpha = alpha_1).
                 Cauchy sigma_prime_1, Delta_sigma_prime_1;
                 State state_1, Delta_state_1;
-                mf->compute_trial_stress_increment(sigma_prime, state, alpha_1 * Delta_epsilon_tilde, Delta_sigma_prime_1, Delta_state_1);
+                mf->compute_trial_increment(sigma_prime, state, alpha_1 * Delta_epsilon_tilde, Delta_sigma_prime_1, Delta_state_1);
                 sigma_prime_1 = sigma_prime + Delta_sigma_prime_1;
                 state_1 = state + Delta_state_1;
                 f_1 = mf->compute_f(sigma_prime_1, state_1);
@@ -155,7 +155,7 @@ double Intersection::pegasus_regula_falsi(void) {
     while (ITS_YSI < settings->MAXITS_YSI && std::abs(f_n) >= settings->FTOL) {
         alpha_n = alpha_1 - f_1 * (alpha_1 - alpha_0) / (f_1 - f_0);
 
-        mf->compute_trial_stress_increment(sigma_prime, state, alpha_n * Delta_epsilon_tilde, Delta_sigma_prime_n, Delta_state_n);
+        mf->compute_trial_increment(sigma_prime, state, alpha_n * Delta_epsilon_tilde, Delta_sigma_prime_n, Delta_state_n);
         sigma_prime_n = sigma_prime + Delta_sigma_prime_n;
         state_n = state + state_n;
         f_n = mf->compute_f(sigma_prime_n, state_n);
