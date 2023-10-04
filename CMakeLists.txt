@@ -25,25 +25,27 @@ FortranCInterface_VERIFY(CXX)
 # Create Abaqus Fortran interface integration test executable.
 set(TARGET umat_fortran_test)
 add_executable(${TARGET} tests/umat_integration.f90)
-target_link_libraries(${TARGET} PUBLIC umat Model Models)
+target_link_libraries(${TARGET} PUBLIC umat)
 target_compile_definitions(${TARGET} PUBLIC EIGEN_DONT_PARALLELIZE=1)
 
 # Create Abaqus C++ interface integration test executable.
 set(TARGET umat_cpp_test)
 add_executable(${TARGET} tests/umat_integration.cpp)
-target_link_libraries(${TARGET} PUBLIC umat Model Models)
+target_link_libraries(${TARGET} PUBLIC umat)
 target_compile_definitions(${TARGET} PUBLIC EIGEN_DONT_PARALLELIZE=1)
 
-if(WIN32)
-    # Compile shared library for Abaqus.
+# Create static library for use with Abaqus, Plaxis etc...
+add_library(geomat STATIC)
+target_link_libraries(geomat PUBLIC umat)
+target_compile_definitions(geomat PUBLIC EIGEN_DONT_PARALLELIZE=1)
+
+# Create Python modules.
+if(${pybind11_FOUND})
+    pybind11_add_module(library MODULE src/geomat/geomat.cpp)
+    target_link_libraries(library PUBLIC abstract models utilities)
+    target_compile_definitions(library PUBLIC EIGEN_DONT_PARALLELIZE=1)
+    install(TARGETS library LIBRARY DESTINATION ./)
 endif()
-
-# Create Python module.
-set(TARGET models)
-pybind11_add_module(${TARGET} src/geomat/models.cpp)
-target_link_libraries(${TARGET} PUBLIC Types Model Elastic Elastoplastic Models Eigen3::Eigen)
-target_compile_definitions(${TARGET} PUBLIC EIGEN_DONT_PARALLELIZE=1)
-install(TARGETS models DESTINATION ./)
 
 # Tests.
 find_package(Catch2 QUIET)

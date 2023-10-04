@@ -12,11 +12,7 @@
 #include <plog/Initializers/RollingFileInitializer.h>
 #include "Types.hpp"
 #include "Model.hpp"
-#include "LinearElastic.hpp"
-#include "EMC.hpp"
-#include "C2MC.hpp"
-#include "MCC.hpp"
-#include "SMCC.hpp"
+#include "models.hpp"
 
 #ifdef __cplusplus
 extern "C"
