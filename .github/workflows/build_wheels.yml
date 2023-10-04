@@ -11,10 +11,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
 
-    steps:
-      - name: Setup GNU Fortran
-        uses: modflowpy/install-gfortran-action@v1
-        
+    steps:        
       - uses: actions/checkout@v3
         with:
           submodules: recursive
