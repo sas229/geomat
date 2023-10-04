@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.5.0)
 project(geomat 
     VERSION 0.1.0
-    LANGUAGES C CXX Fortran
+    LANGUAGES C CXX
 )
 include(CTest)
 enable_testing()
@@ -18,15 +18,18 @@ if(${BUILD_DOCS})
 endif()
 add_subdirectory(${PROJECT_SOURCE_DIR}/src)
 
-# Verify CXX Fortran interface compatibility.
-include(FortranCInterface)
-FortranCInterface_VERIFY(CXX)
+# if(NOT WIN32)
+#     # Verify CXX Fortran interface compatibility.
+#     enable_language(Fortran)
+#     include(FortranCInterface)
+#     FortranCInterface_VERIFY(CXX)
 
-# Create Abaqus Fortran interface integration test executable.
-set(TARGET umat_fortran_test)
-add_executable(${TARGET} tests/umat_integration.f90)
-target_link_libraries(${TARGET} PUBLIC umat)
-target_compile_definitions(${TARGET} PUBLIC EIGEN_DONT_PARALLELIZE=1)
+#     # Create Abaqus Fortran interface integration test executable.
+#     set(TARGET umat_fortran_test)
+#     add_executable(${TARGET} tests/umat_integration.f90)
+#     target_link_libraries(${TARGET} PUBLIC umat)
+#     target_compile_definitions(${TARGET} PUBLIC EIGEN_DONT_PARALLELIZE=1)
+# endif()
 
 # Create Abaqus C++ interface integration test executable.
 set(TARGET umat_cpp_test)
