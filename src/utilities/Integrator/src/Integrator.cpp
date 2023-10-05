@@ -17,6 +17,9 @@ void Integrator::solve(
             me.solve(sigma_prime, state, Delta_epsilon_tilde);
         } else if (settings->method == std::string("RKDP")) {
             rkdp.solve(sigma_prime, state, Delta_epsilon_tilde);
+        } else {
+            PLOG_FATAL << "Invalid method defined. This option is not yet implemented.";
+            assert(false);
         }
     } else {
         PLOG_FATAL << "Invalid solver defined. This option is not yet implemented.";
