@@ -49,8 +49,8 @@ jobs:
         with:
           path: dist/*.tar.gz
 
+on: [release]
   upload_pypi:
-    on: [release]
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
 
