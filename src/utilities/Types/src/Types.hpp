@@ -126,7 +126,7 @@ struct ModelFunctions {
 /**
  * @brief Stress integration settings with defaults.
  */
-struct Settings{
+struct Settings {
     std::string solver = "Explicit";
     std::string method = "ModifiedEuler";
     double FTOL = 1e-8;     /** @brief Yield surface tolerance. */
@@ -157,6 +157,13 @@ struct Settings{
     double get_MAXITS_YSI(void) {return MAXITS_YSI;};
     double get_MAXITS_YSC(void) {return MAXITS_YSC;};
     double get_NSUB(void) {return NSUB;};
+};
+
+struct Derivatives {
+    Cauchy df_dsigma_prime;
+    Cauchy dg_dsigma_prime;
+    HardeningModuli H_s;
+    StateFactors B_s;
 };
 
 #endif

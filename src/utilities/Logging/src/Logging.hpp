@@ -6,6 +6,7 @@
 #include <plog/Formatters/TxtFormatter.h>
 #include <plog/Appenders/ColorConsoleAppender.h>
 #include <string>
+#include <iostream>
 
 namespace Logging {
     /**
