@@ -48,6 +48,16 @@ if(${pybind11_FOUND})
     target_link_libraries(library PUBLIC abstract models utilities)
     target_compile_definitions(library PUBLIC EIGEN_DONT_PARALLELIZE=1)
     install(TARGETS library LIBRARY DESTINATION ./)
+
+    pybind11_add_module(checks MODULE src/geomat/geomat.cpp)
+    target_link_libraries(checks PUBLIC abstract models utilities)
+    target_compile_definitions(checks PUBLIC EIGEN_DONT_PARALLELIZE=1)
+    install(TARGETS checks LIBRARY DESTINATION ./)
+
+    pybind11_add_module(logging MODULE src/geomat/geomat.cpp)
+    target_link_libraries(logging PUBLIC abstract models utilities)
+    target_compile_definitions(logging PUBLIC EIGEN_DONT_PARALLELIZE=1)
+    install(TARGETS logging LIBRARY DESTINATION ./)
 endif()
 
 # Tests.

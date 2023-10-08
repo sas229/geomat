@@ -1,6 +1,7 @@
 #include "C2MC.hpp"
 
 C2MC::C2MC(Parameters parameters, State state, std::string log_severity) : parameters(parameters), state(state), Elastoplastic::Elastoplastic() {   
+    PLOG_INFO << "In C2MC init...";
     set_model_name("C2MC");
     set_model_type("Elastoplastic");
 
@@ -8,7 +9,7 @@ C2MC::C2MC(Parameters parameters, State state, std::string log_severity) : param
     Logging::initialise_log(log_severity);
 
     // Check inputs.
-    Checks::check_inputs(name, (int)parameters.size(), (int)state.size(), parameters_required, state_required);
+    Checks::check_inputs(get_model_name(), (int)parameters.size(), (int)state.size(), parameters_required, state_required);
 }
 
 Constitutive C2MC::compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) {

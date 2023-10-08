@@ -8,7 +8,7 @@ EMC::EMC(Parameters parameters, State state, std::string log_severity) : paramet
     Logging::initialise_log(log_severity);
 
     // Check inputs.
-    Checks::check_inputs(name, (int)parameters.size(), (int)state.size(), parameters_required, state_required);
+    Checks::check_inputs(get_model_name(), (int)parameters.size(), (int)state.size(), parameters_required, state_required);
 }
 
 Constitutive EMC::compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) {

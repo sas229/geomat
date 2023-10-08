@@ -48,8 +48,9 @@ void umat_cpp_interface(
     int *kspt,
     int *kstep,
     int *kinc) {  
-
+    
     // Create maps to data.
+    PLOG_INFO << "Creating maps to data...";
     Eigen::Map<Voigt> map_to_stress(stress);
     Eigen::Map<Voigt> map_to_strain_increment(dstran);
     Eigen::Map<State> map_to_state(statev, *nstatv, 1);

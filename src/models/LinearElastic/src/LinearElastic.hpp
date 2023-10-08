@@ -32,14 +32,9 @@ class LinearElastic : public Elastic {
          */
         State get_state_variables(void) {return state;};
 
-    protected:
+        void set_state_variables(State new_state) {this->state = new_state;};
 
-        /**
-         * @brief Set the state variables vector.
-         * 
-         * @param[in] new_state Vector of new state variables.
-         */
-        void set_state_variables(State new_state) {state = new_state;};
+    protected:
 
         /**
          * @brief Overriden method to compute the elastic matrix.
@@ -65,13 +60,13 @@ class LinearElastic : public Elastic {
         /** 
          * @brief Parameters. 
          */
-        State parameters;
+        Parameters parameters;
 
         /** 
          * @brief State variables. 
          */
         State state;
-    
+
         /** 
          * @brief Parameter: bulk modulus. 
          */

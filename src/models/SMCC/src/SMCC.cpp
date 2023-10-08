@@ -8,11 +8,12 @@ SMCC::SMCC(Parameters parameters, State state, std::string log_severity) : param
     Logging::initialise_log(log_severity);
 
     // Check inputs.
-    Checks::check_inputs(name, (int)parameters.size(), (int)state.size(), parameters_required, state_required);
+    Checks::check_inputs(get_model_name(), (int)parameters.size(), (int)state.size(), parameters_required, state_required);
 }
 
 Constitutive SMCC::compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) {
     double Delta_epsilon_e_vol = compute_Delta_epsilon_vol(Delta_epsilon);
+    double p_prime = compute_p_prime(sigma_prime);
     double K = compute_K_Butterfield(p_prime, Delta_epsilon_e_vol, kappa_star, settings.EPS);
     double G = compute_G_given_K_nu(K, nu);
     Constitutive D_e = compute_isotropic_linear_elastic_matrix(K, G);  
@@ -51,7 +52,6 @@ void SMCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     using namespace std;
     double df_dq = 2*q;
     double df_dp_prime = pow(M,2)*(2*p_prime-p_c*s_ep);
-    double df_dtheta = 0;
 
     // Derivatives of yield surface and plastic potential function.
     df_dsigma_prime = (df_dp_prime*dp_prime_dsigma_prime) + (df_dq*dq_dsigma_prime);

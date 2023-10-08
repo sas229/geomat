@@ -98,7 +98,21 @@ class Elastoplastic : public Elastic {
          * @param[in,out] delta_state Increment in state variables.
          */
         void compute_plastic_increment(Cauchy sigma_prime, State state, Voigt Delta_epsilon_tilde_p_dT, Voigt &Delta_sigma_prime, State &delta_state);
-        
+
+        /**
+         * @brief Get the settings object.
+         * 
+         * @return Settings 
+         */
+        Settings get_settings(void) {return this->settings;};
+
+        /**
+         * @brief Set the settings object.
+         * 
+         * @param settings 
+         */
+        void set_settings(Settings settings) {this->settings = settings;};
+
         /**
          * @brief Object containing model specific function bindings.
          */

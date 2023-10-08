@@ -137,6 +137,26 @@ struct Settings{
     int MAXITS_YSI = 10;    /** @brief Maximum number of Pegasus method iterations. */
     int MAXITS_YSC = 30;    /** @brief Maximum number of yield surface correction iterations. */
     int NSUB = 10;          /** @brief Maximum number of unload-reload intersection substeps.*/
+
+    // Setters.
+    void set_FTOL(double FTOL) {this->FTOL = FTOL;};
+    void set_LTOL(double LTOL) {this->LTOL = LTOL;};
+    void set_STOL(double STOL) {this->STOL = STOL;};
+    void set_EPS(double EPS) {this->EPS = EPS;};
+    void set_DT_MIN(double DT_MIN) {this->DT_MIN = DT_MIN;};
+    void set_MAXITS_YSI(double MAXITS_YSI) {this->MAXITS_YSI = MAXITS_YSI;};
+    void set_MAXITS_YSC(double MAXITS_YSC) {this->MAXITS_YSC = MAXITS_YSC;};
+    void set_NSUB(double NSUB) {this->NSUB = NSUB;};
+
+    // Getters.
+    double get_FTOL(void) {return FTOL;};
+    double get_LTOL(void) {return LTOL;};
+    double get_STOL(void) {return STOL;};
+    double get_EPS(void) {return EPS;};
+    double get_DT_MIN(void) {return DT_MIN;};
+    double get_MAXITS_YSI(void) {return MAXITS_YSI;};
+    double get_MAXITS_YSC(void) {return MAXITS_YSC;};
+    double get_NSUB(void) {return NSUB;};
 };
 
 #endif

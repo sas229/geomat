@@ -23,24 +23,6 @@ class Model {
          */
         virtual void solve(void) {};
 
-        /**
-         * @brief Pure virtual method to get the state variables from the model implementation.
-         * 
-         * @return State
-         *  
-         * @note Must be overriden by model implementations.
-         */
-        virtual State get_state_variables(void) = 0;
-
-        /**
-         * @brief Pure virtual method to set the state variables in the model implementation.
-         * 
-         * @param[in] new_state Vector of state variables.
-         *  
-         * @note Must be overriden by model implementations.
-         */
-        virtual void set_state_variables(State new_state) = 0;
-
         // Setters.
 
         /** 
@@ -70,8 +52,24 @@ class Model {
          * @param[in] model_type Type of model.
          */
         void set_model_type(std::string model_type);
-        
-        // Getters.
+
+        /**
+         * @brief Pure virtual method to get the state variables.
+         * 
+         * @note Must be overrident by model implemenation.
+         * 
+         * @return State
+         */
+        virtual State get_state_variables(void) = 0;
+
+        /**
+         * @brief Set the state variables object.
+         * 
+         * @note Must be overrident by model implemenation.
+         * 
+         * @param new_state 
+         */
+        virtual void set_state_variables(State new_state) = 0;
 
         /**
          * @brief Method to get Jacobian matrix.

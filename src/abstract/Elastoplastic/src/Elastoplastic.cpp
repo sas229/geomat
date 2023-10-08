@@ -50,7 +50,7 @@ void Elastoplastic::solve(void) {
             state_ep = state_e;
             PLOG_DEBUG << "Plastic strain increment, Delta_epsilon_tilde_p = " << Delta_epsilon_tilde_p;
             PLOG_DEBUG << "Initial elastoplastic stress state, sigma_prime_ep_tilde = " << to_voigt(sigma_prime_ep);
-            PLOG_DEBUG << "Initial elastoplastic state variables, state_ep = " <<state_ep;
+            PLOG_DEBUG << "Initial elastoplastic state variables, state_ep = " << state_ep;
             integrator.solve(sigma_prime_ep, state_ep, Delta_epsilon_tilde_p);
             sigma_prime = sigma_prime_ep;
             set_state_variables(state_ep);

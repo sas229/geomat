@@ -32,14 +32,9 @@ class EMC : public Elastoplastic {
          */
         State get_state_variables(void) {return state;};
 
-    protected:
+        void set_state_variables(State new_state) {this->state = new_state;};
 
-        /**
-         * @brief Set the state variables vector.
-         * 
-         * @param[in] new_state Vector of new state variables.
-         */
-        void set_state_variables(State new_state) {state = new_state;};
+    protected:
  
         /**
          * @brief Overriden method to compute the elastic constitutive matrix.
@@ -116,7 +111,7 @@ class EMC : public Elastoplastic {
          * @param[in,out] C_3 Derivative coefficient \f$ C_{3} \f$.
          */
         void compute_plastic_potential_derivative_coefficients(double p_prime, double sigma_bar, double phi_cv_r, double theta_s_bar, double &C_1, double &C_2, double &C_3);
-        
+
         /** 
          * @brief Parameters. 
          */
