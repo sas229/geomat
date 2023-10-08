@@ -5,7 +5,6 @@
 #include <Eigen/Eigen>
 
 #include "abstract.hpp"
-#include "models.hpp"
 #include "utilities.hpp"
 
 namespace py = pybind11;
@@ -149,13 +148,15 @@ class PyElastoplastic : public Elastoplastic {
     }
 };
 
-PYBIND11_MODULE(library, m) {
-    // // Docs.
-    // m.doc() = "Constitutive model library.";
+PYBIND11_MODULE(abstract, m) {
+    // Docs.
+    m.doc() = "Abstract base classes.";
 
     // Abstract base classes.
     py::class_<Model, PyModel>(m, "Model")
         .def(py::init<>())
+        .def("initialise_log", &Model::initialise_log)
+        .def("check_inputs", &Model::check_inputs)
         .def("set_model_name", &Model::set_model_name)
         .def("set_model_type", &Model::set_model_type)
         .def("get_model_name", &Model::get_model_name)
@@ -193,63 +194,7 @@ PYBIND11_MODULE(library, m) {
 
     py::class_<Elastoplastic, PyElastoplastic, Elastic>(m, "Elastoplastic", py::multiple_inheritance())
         .def(py::init<>())
-        .def("get_settings", &Elastoplastic::get_settings)
-        .def("set_settings", &Elastoplastic::set_settings)
+        .def_property("settings", &Elastoplastic::get_settings, &Elastoplastic::set_settings)
         .def("get_state_variables", &Elastoplastic::get_state_variables)
         .def("set_state_variables", &Elastoplastic::set_state_variables);
-
-    // Settings.
-    py::class_<Settings>(m, "Settings")
-        .def(py::init<>())
-        .def_property("FTOL", &Settings::get_FTOL, &Settings::set_FTOL)
-        .def_property("LTOL", &Settings::get_LTOL, &Settings::set_LTOL)
-        .def_property("STOL", &Settings::get_STOL, &Settings::set_STOL)
-        .def_property("EPS", &Settings::get_EPS, &Settings::set_EPS)
-        .def_property("DT_MIN", &Settings::get_DT_MIN, &Settings::set_DT_MIN)
-        .def_property("MAXITS_YSI", &Settings::get_MAXITS_YSI, &Settings::set_MAXITS_YSI)
-        .def_property("MAXITS_YSC", &Settings::get_MAXITS_YSC, &Settings::set_MAXITS_YSC)
-        .def_property("NSUB", &Settings::get_NSUB, &Settings::set_NSUB);
-
-    // Derivatives object.
-    py::class_<Derivatives>(m, "Derivatives")
-        .def(py::init<>())
-        .def_property("df_dsigma_prime", &Derivatives::get_df_dsigma_prime, &Derivatives::set_df_dsigma_prime)
-        .def_property("dg_dsigma_prime", &Derivatives::get_dg_dsigma_prime, &Derivatives::set_dg_dsigma_prime)
-        .def_property("H_s", &Derivatives::get_H_s, &Derivatives::set_H_s)
-        .def_property("B_s", &Derivatives::get_B_s, &Derivatives::set_B_s);
-
-    // Models.
-
-    // C2 Continuous Mohr Coulomb (C2MC).
-    py::class_<C2MC, Elastoplastic>(m, "C2MC")
-        .def(py::init<Parameters, State>(), py::kw_only(), py::arg("parameters"), py::arg("state")) // Constructor.
-        .def(py::init<Parameters, State, std::string>(), py::kw_only(), py::arg("parameters"), py::arg("state"), py::arg("log_severity")); // Overloaded constructor.
-
-    // Extended Mohr Coulomb (EMC).
-    py::class_<EMC, Elastoplastic>(m, "EMC")
-        .def(py::init<Parameters, State>(), py::kw_only(), py::arg("parameters"), py::arg("state")) // Constructor.
-        .def(py::init<Parameters, State, std::string>(), py::kw_only(), py::arg("parameters"), py::arg("state"), py::arg("log_severity")); // Overloaded constructor.
-
-    // Linear isotropic elasticity (LinearElastic).
-    py::class_<LinearElastic, Elastic>(m, "LinearElastic")
-        .def(py::init<Parameters, State>(), py::kw_only(), py::arg("parameters"), py::arg("state")) // Constructor.
-        .def(py::init<Parameters, State, std::string>(), py::kw_only(), py::arg("parameters"), py::arg("state"), py::arg("log_severity")); // Overloaded constructor.
-
-    // Modified Cam Clay (MCC).
-    py::class_<MCC, Elastoplastic>(m, "MCC")
-        .def(py::init<Parameters, State>(), py::kw_only(), py::arg("parameters"), py::arg("state")) // Constructor.
-        .def(py::init<Parameters, State, std::string>(), py::kw_only(), py::arg("parameters"), py::arg("state"), py::arg("log_severity")); // Overloaded constructor.
-
-    // Soft Modified Cam Clay (SMCC).
-    py::class_<SMCC, Elastoplastic>(m, "SMCC")
-        .def(py::init<Parameters, State>(), py::kw_only(), py::arg("parameters"), py::arg("state")) // Constructor.
-        .def(py::init<Parameters, State, std::string>(), py::kw_only(), py::arg("parameters"), py::arg("state"), py::arg("log_severity")); // Overloaded constructor.
-}
-
-PYBIND11_MODULE(checks, m) {
-    m.def("check_inputs", &Checks::check_inputs);
-}
-
-PYBIND11_MODULE(logging, m) {
-    m.def("initialise_log", &Logging::initialise_log);
 }

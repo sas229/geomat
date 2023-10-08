@@ -1,6 +1,9 @@
 #include "Elastoplastic.hpp"
 
-Elastoplastic::Elastoplastic() : intersection(&settings, &mf), integrator(&settings, &mf) {
+Elastoplastic::Elastoplastic(std::string log_severity) : intersection(&settings, &mf), integrator(&settings, &mf) {
+    // Initialise log.
+    initialise_log(log_severity);
+
     // Define binds to model functions.
     using namespace std::placeholders;
     mf.compute_f = std::bind(&Elastoplastic::compute_f, this, _1, _2);
@@ -82,6 +85,7 @@ void Elastoplastic::check_yield_surface_drift(Cauchy sigma_prime_u, State state_
         if (ITS_YSC >= settings.MAXITS_YSC && std::abs(f_c) > settings.FTOL) {
             PLOG_FATAL << "Maximum number of " << settings.MAXITS_YSC << " yield surface correction iterations performed and |f| = " << std::abs(f_c) << " > FTOL = " << settings.FTOL << ".";
             assert(false);
+            throw std::range_error("Maximum number of yield surface correction iterations performed.");
         } else {
             ITS_YSC++;
         }

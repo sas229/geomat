@@ -1,11 +1,11 @@
 #ifndef ELASTOPLASTIC_H
 #define ELASTOPLASTIC_H
 
-#include "Tensor.hpp"
-#include "Types.hpp"
 #include "Elastic.hpp"
 #include "Intersection.hpp"
 #include "Integrator.hpp"
+#include "Tensor.hpp"
+#include "Types.hpp"
 
 /**
  * @brief Elastoplastic base class. Inherits Elastic class.
@@ -17,7 +17,7 @@ class Elastoplastic : public Elastic {
         /** 
          * @brief Elastoplastic model constructor.
          */
-        explicit Elastoplastic();
+        explicit Elastoplastic(std::string log_severity="none");
 
         /**
          *  @brief Elastoplastic model destructor. 

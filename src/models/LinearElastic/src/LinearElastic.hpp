@@ -1,9 +1,7 @@
 #ifndef LinearElastic_H
 #define LinearElastic_H
 
-#include "Checks.hpp"
 #include "Elastic.hpp"
-#include "Logging.hpp"
 #include "Tensor.hpp"
 #include "Types.hpp"
 

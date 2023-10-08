@@ -1,5 +1,23 @@
 #include "Model.hpp"
 
+Model::Model(std::string log_severity) {
+    // Initialise log.
+    initialise_log(log_severity);
+}
+
+bool Model::check_inputs(std::string name, int parameters_size, int state_size, int parameters_required, int state_required) {
+    PLOG_FATAL_IF(parameters_size != parameters_required) << parameters_size << " parameters supplied when " << parameters_required << " expected.";
+    PLOG_FATAL_IF(state_size != state_required) << state_size << " state variables supplied when " << state_required << " expected.";
+    if (parameters_size == parameters_required && state_size == state_required) {
+        PLOG_INFO << name << " model instantiated with " << parameters_size << " parameters and " << state_size << " state variables.";  
+        return true;
+    } else {
+        assert(false);
+        throw std::invalid_argument("Incorrect number of parameters or state variables supplied.");
+        return false;
+    }
+}
+
 // Setters.
 
 void Model::set_model_name(std::string s) {
@@ -233,4 +251,34 @@ Cauchy Model::compute_dJ_3_dsigma_prime(Cauchy sigma_prime, Cauchy s, double sig
     dJ_3_dsigma_prime(2,0) = dJ_3_dsigma_prime(0,2);
     dJ_3_dsigma_prime(2,1) = dJ_3_dsigma_prime(1,2);
     return dJ_3_dsigma_prime;
+}
+
+void Model::initialise_log(std::string severity) {
+    // If no logger found, initialise the logger.
+    auto log = plog::get();
+    if (log == NULL) {
+        static plog::ColorConsoleAppender<plog::TxtFormatter> consoleAppender;
+        if (severity == "verbose") {
+            plog::init(plog::verbose, &consoleAppender);
+        } else if (severity == "debug") {
+            plog::init(plog::debug, &consoleAppender);
+        } else if (severity == "info") {
+            plog::init(plog::info, &consoleAppender);
+        } else if (severity == "warning") {
+            plog::init(plog::warning, &consoleAppender);
+        } else if (severity == "error") {
+            plog::init(plog::error, &consoleAppender);
+        } else if (severity == "fatal") {
+            plog::init(plog::fatal, &consoleAppender);
+        } else if (severity == "none") {
+            plog::init(plog::none, &consoleAppender);
+        } else {
+            plog::init(plog::warning, &consoleAppender);
+            PLOG_WARNING << "Unrecognised log severity set. Possible options include \"verbose\", \"debug\", \"info\", \"warning\", \"error\", \"fatal\", or \"none\". Defaulting to \"error\".";
+            plog::get()->setMaxSeverity(plog::error);
+        }
+    } else {
+        // Otherwise adjust the severity.
+        log->setMaxSeverity(plog::severityFromString(severity.c_str()));
+    }
 }

@@ -6,10 +6,10 @@ C2MC::C2MC(Parameters parameters, State state, std::string log_severity) : param
     set_model_type("Elastoplastic");
 
     // Initialise logger.
-    Logging::initialise_log(log_severity);
+    initialise_log(log_severity);
 
     // Check inputs.
-    Checks::check_inputs(get_model_name(), (int)parameters.size(), (int)state.size(), parameters_required, state_required);
+    check_inputs(get_model_name(), (int)parameters.size(), (int)state.size(), parameters_required, state_required);
 }
 
 Constitutive C2MC::compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon) {

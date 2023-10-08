@@ -1,9 +1,7 @@
 #ifndef C2MC_H
 #define C2MC_H
 
-#include "Checks.hpp"
 #include "Elastoplastic.hpp"
-#include "Logging.hpp"
 #include "Math.hpp"
 #include "Types.hpp"
 

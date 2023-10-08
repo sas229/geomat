@@ -2,7 +2,6 @@
 #define ELASTIC_H
 
 #include "Tensor.hpp"
-#include "Checks.hpp"
 #include "Types.hpp"
 #include "Model.hpp"
 
@@ -14,7 +13,7 @@ class Elastic : public Model {
     public: 
 
         /** @brief Elastic model constructor. */
-        Elastic() {}
+        explicit Elastic(std::string log_severity="none");
 
         /** @brief Elastic model destructor. */
         virtual ~Elastic() {}
@@ -105,6 +104,14 @@ class Elastic : public Model {
          * @return Constitutive
          */
         virtual Constitutive compute_D_e(Cauchy sigma_prime, Cauchy Delta_epsilon=Cauchy::Zero()) = 0;
+
+       /**
+        * @brief Check the elastic parameters.
+        * 
+        * @param K Bulk modulus.
+        * @param G Secant modulus.
+        */
+       void check_elastic_parameters(double K, double G);
        
         /**
          *  @brief Solve current strain increment. 

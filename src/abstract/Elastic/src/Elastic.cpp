@@ -1,5 +1,10 @@
 #include "Elastic.hpp"
 
+Elastic::Elastic(std::string log_severity) {
+    // Initialise log.
+    initialise_log(log_severity);
+}
+
 double Elastic::compute_K_given_E_nu(double E, double nu) {
     double K = E/(3.0*(1.0-2.0*nu));
     PLOG_VERBOSE << "Bulk modulus, K = " << K;
@@ -34,7 +39,7 @@ double Elastic::compute_G_given_K_nu(double K, double nu) {
 
 Constitutive Elastic::compute_isotropic_linear_elastic_matrix(double K, double G) {
     // Check elastic paramaters are valid.
-    Checks::check_elastic_parameters(K, G);
+    check_elastic_parameters(K, G);
 
     // Fill elastic matrix with isotropic linear elastic coefficients.
     Constitutive D_e = Constitutive::Zero();
@@ -69,3 +74,15 @@ void Elastic::solve(void) {
     jacobian = D_e;
 }
 
+void Elastic::check_elastic_parameters(double K, double G) {
+    PLOG_FATAL_IF(std::isnan(K)) << "Bulk modulus is " << K << ".";
+    PLOG_FATAL_IF(std::isnan(G)) << "Shear modulus is " << G << ".";
+    PLOG_FATAL_IF(K <= 0.0) << "Bulk modulus less than or equal to zero.";
+    PLOG_FATAL_IF(G <= 0.0) << "Shear modulus less than or equal to zero.";
+    if (K > 0.0 && G > 0.0) {
+        return; 
+    } else {
+        assert(false);
+        throw std::invalid_argument("Invalid elastic parameters.");
+    }
+}

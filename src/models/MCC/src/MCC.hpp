@@ -1,9 +1,7 @@
 #ifndef MCC_H
 #define MCC_H
 
-#include "Checks.hpp"
 #include "Elastoplastic.hpp"
-#include "Logging.hpp"
 #include "Tensor.hpp"
 #include "Types.hpp"
 

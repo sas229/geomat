@@ -1,9 +1,7 @@
 #ifndef SMCC_H
 #define SMCC_H
 
-#include "Checks.hpp"
 #include "Elastoplastic.hpp"
-#include "Logging.hpp"
 #include "Tensor.hpp"
 #include "Types.hpp"
 

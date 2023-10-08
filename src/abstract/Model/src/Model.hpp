@@ -1,8 +1,11 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <string>
 #include <plog/Log.h>
+#include <plog/Init.h>
+#include <plog/Formatters/TxtFormatter.h>
+#include <plog/Appenders/ColorConsoleAppender.h>
+#include <string>
 #include <Eigen/Eigen>
 #include "Tensor.hpp"
 #include "Types.hpp"
@@ -12,9 +15,24 @@
 class Model {
 
     public:
+        
+        /** @brief Model constructor. */
+        explicit Model(std::string log_severity="none");
 
         /** @brief Virtual destructor for Model class. */
         virtual ~Model() {}
+
+        /**
+         * @brief Function to check model inputs.
+         * 
+         * @param name Model name.
+         * @param parameters_size Size of parameters vector.
+         * @param state_size Size of state variables vector.
+         * @param parameters_required Number of parameters required.
+         * @param state_required Number of state variables required.
+         * @return bool
+         */
+        bool check_inputs(std::string name, int parameters_size, int state_size, int parameters_required, int state_required);
 
         /**
          * @brief Method to solve stress increment given the current strain increment.
@@ -70,6 +88,15 @@ class Model {
          * @param new_state 
          */
         virtual void set_state_variables(State new_state) = 0;
+
+        /**
+         * @brief Function to initialise a console log using plog. 
+         * Possible options include \"verbose\", \"debug\", \"info\", \"warning\",
+         * \"error\", \"fatal\", or \"none\". Defaults to \"error\"."
+         * 
+         * @param level Log level to use. 
+        */
+        void initialise_log(std::string severity);
 
         /**
          * @brief Method to get Jacobian matrix.
