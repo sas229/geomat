@@ -45,14 +45,11 @@ class Elastoplastic : public Elastic {
          * 
          * @param[in] sigma_prime Effective stress tensor.
          * @param[in] state State variables.
-         * @param[in,out] df_dsigma_prime Derivatives of the yield function with respect to the stress state.
-         * @param[in,out] dg_dsigma_prime Derivatives of the plastic potential function with respect to the stress state.
-         * @param[in,out] H_s Hardening moduli vector.
-         * @param[in,out] B_s State factor vector.
+         * @return Derivatives
          * 
          * @note Must be overriden by model implementations.
          */
-        virtual void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, HardeningModuli &H_s, StateFactors &B_s) = 0;
+        virtual Derivatives compute_derivatives(Cauchy sigma_prime, State state) = 0;
 
         /**
          * @brief Method to check for yield surface drift and apply appropriate corrections.

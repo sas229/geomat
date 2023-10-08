@@ -24,7 +24,6 @@ void Logging::initialise_log(std::string severity) {
             PLOG_WARNING << "Unrecognised log severity set. Possible options include \"verbose\", \"debug\", \"info\", \"warning\", \"error\", \"fatal\", or \"none\". Defaulting to \"error\".";
             plog::get()->setMaxSeverity(plog::error);
         }
-        std::cout << "Log initialised..." << std::endl;
     } else {
         // Otherwise adjust the severity.
         log->setMaxSeverity(plog::severityFromString(severity.c_str()));

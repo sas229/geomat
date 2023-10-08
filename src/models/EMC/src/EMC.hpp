@@ -59,11 +59,9 @@ class EMC : public Elastoplastic {
          * 
          * @param[in] sigma_prime Effective stress tensor.
          * @param[in] state State variables.
-         * @param[in,out] df_dsigma_prime Derivatives of yield function with respect to the stress state.
-         * @param[in,out] dg_dsigma_prime Derivatives of plastic potential function with respect to the stress state.
-         * @param[in,out] H Hardening modulus.
+         * @return Derivatives
          */
-        void compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, HardeningModuli &H_s, StateFactors &B_s) override;
+        Derivatives compute_derivatives(Cauchy sigma_prime, State state) override;
 
         /**
          * @brief Method to compute the C2 continuous form of \f$ K \left( \theta \right) \f$ for the Mohr-Coulomb surface.

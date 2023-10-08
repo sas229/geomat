@@ -35,14 +35,16 @@ double SMCC::compute_f(Cauchy sigma_prime, State state) {
     return f;
 }
 
-void SMCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, HardeningModuli &H_s, StateFactors &B_s) {
+Derivatives SMCC::compute_derivatives(Cauchy sigma_prime, State state) {
     // State variables.
     double p_c = state(0);
     double s_ep = state(1);
 
     // Compute mean effective stress, deviatoric stress tensor and derivatives of the stress state for current stress state.
     double q, p_prime;
-    Cauchy s, dq_dsigma_prime;
+    Cauchy df_dsigma_prime, dg_dsigma_prime, s, dq_dsigma_prime;
+    HardeningModuli H_s(state.size());
+    StateFactors B_s(state.size());
     q = compute_q(sigma_prime);
     p_prime = compute_p_prime(sigma_prime);
     s = compute_s(sigma_prime, p_prime);
@@ -67,4 +69,12 @@ void SMCC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigm
     double dg_ds_ep = -pow(M,2)*p_prime*p_c;
     B_s(0) = H_s(0)/dg_dp_c;
     B_s(1) = H_s(1)/dg_ds_ep;
+
+    // Return Derivatives object.
+    Derivatives derivatives;
+    derivatives.df_dsigma_prime = df_dsigma_prime;
+    derivatives.dg_dsigma_prime = dg_dsigma_prime;
+    derivatives.H_s = H_s;
+    derivatives.B_s = B_s;
+    return derivatives;
 }

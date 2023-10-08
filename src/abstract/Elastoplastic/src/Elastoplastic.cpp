@@ -6,7 +6,7 @@ Elastoplastic::Elastoplastic() : intersection(&settings, &mf), integrator(&setti
     mf.compute_f = std::bind(&Elastoplastic::compute_f, this, _1, _2);
     mf.compute_trial_increment = std::bind(&Elastoplastic::compute_elastic_increment, this, _1, _2, _3, _4, _5);
     mf.compute_D_e = std::bind(&Elastoplastic::compute_D_e, this, _1, _2);
-    mf.compute_derivatives = std::bind(&Elastoplastic::compute_derivatives, this, _1, _2, _3, _4, _5, _6);
+    mf.compute_derivatives = std::bind(&Elastoplastic::compute_derivatives, this, _1, _2);
     mf.compute_plastic_increment = std::bind(&Elastoplastic::compute_plastic_increment, this, _1, _2, _3, _4, _5);
     mf.check_yield_surface_drift = std::bind(&Elastoplastic::check_yield_surface_drift, this, _1, _2, _3, _4, _5);
 }
@@ -90,13 +90,13 @@ void Elastoplastic::check_yield_surface_drift(Cauchy sigma_prime_u, State state_
         Constitutive D_e_u = compute_D_e(sigma_prime_u, Cauchy::Zero());
 
         // Calculate uncorrected derivatives.
-        Cauchy df_dsigma_prime_u, dg_dsigma_prime_u;
-        Voigt a_u, b_u;
-        HardeningModuli H_s_u(state_u.size());
-        StateFactors B_s_u(state_u.size());
-        compute_derivatives(sigma_prime_u, state_u, df_dsigma_prime_u, dg_dsigma_prime_u, H_s_u, B_s_u);
-        a_u = to_voigt(df_dsigma_prime_u);
-        b_u = to_voigt(dg_dsigma_prime_u);
+        Derivatives derivatives = compute_derivatives(sigma_prime_u, state_u);
+        Cauchy df_dsigma_prime_u = derivatives.df_dsigma_prime;
+        Cauchy dg_dsigma_prime_u = derivatives.dg_dsigma_prime;
+        Voigt a_u = to_voigt(df_dsigma_prime_u);
+        Voigt b_u = to_voigt(dg_dsigma_prime_u);
+        HardeningModuli H_s_u = derivatives.H_s;
+        StateFactors B_s_u = derivatives.B_s;
 
         // Compute correction plastic multiplier.
         double H_u = H_s_u.sum();
@@ -160,13 +160,13 @@ void Elastoplastic::compute_plastic_increment(
     Constitutive D_e = compute_D_e(sigma_prime, Cauchy::Zero());
 
     // Derivatives of yield surface and plastic potential function.
-    Cauchy df_dsigma_prime, dg_dsigma_prime;
-    Voigt a, b;
-    HardeningModuli H_s(state.size());
-    StateFactors B_s(state.size());
-    compute_derivatives(sigma_prime, state, df_dsigma_prime, dg_dsigma_prime, H_s, B_s);
-    a = to_voigt(df_dsigma_prime);
-    b = to_voigt(dg_dsigma_prime);
+    Derivatives derivatives = compute_derivatives(sigma_prime, state);
+    Cauchy df_dsigma_prime = derivatives.df_dsigma_prime;
+    Cauchy dg_dsigma_prime = derivatives.dg_dsigma_prime;
+    Voigt a = to_voigt(df_dsigma_prime);
+    Voigt b = to_voigt(dg_dsigma_prime);
+    HardeningModuli H_s = derivatives.H_s;
+    StateFactors B_s = derivatives.B_s;
 
     // Compute elastoplastic constitutive matrix.
     double H = H_s.sum();

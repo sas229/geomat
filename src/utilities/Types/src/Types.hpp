@@ -50,6 +50,28 @@ typedef Eigen::VectorXd HardeningModuli;
 typedef Eigen::VectorXd StateFactors;
 
 /**
+ * @brief Structure containing the model derivatives.
+ */
+struct Derivatives {
+    Cauchy df_dsigma_prime; /** @brief Derivatives of the yield function with respect to the stress state.*/
+    Cauchy dg_dsigma_prime; /** @brief Derivatives of the plastic potential function with respect to the stress state.*/
+    HardeningModuli H_s;    /** @brief Hardening moduli vector.*/
+    StateFactors B_s;       /** @brief State factor vector.*/
+
+    // Setters.
+    void set_df_dsigma_prime(Cauchy df_dsigma_prime) {this->df_dsigma_prime = df_dsigma_prime;};
+    void set_dg_dsigma_prime(Cauchy dg_dsigma_prime) {this->dg_dsigma_prime = dg_dsigma_prime;};
+    void set_H_s(HardeningModuli H_s) {this->H_s = H_s;};
+    void set_B_s(StateFactors B_s) {this->B_s = B_s;};
+
+    // Getters.
+    Cauchy get_df_dsigma_prime(void) {return this->df_dsigma_prime;};
+    Cauchy get_dg_dsigma_prime(void) {return this->dg_dsigma_prime;};
+    HardeningModuli get_H_s(void) {return this->H_s;};
+    StateFactors get_B_s(void) {return this->B_s;};
+};
+
+/**
  * @brief Yield function binding.
  * 
  * @tparam sigma_prime_f Effective stress tensor.
@@ -81,12 +103,8 @@ typedef std::function<Constitutive(Cauchy sigma_prime_f, Cauchy Delta_epsilon)> 
  * 
  * @tparam sigma_prime Effective stress tensor.
  * @tparam state State variables.
- * @tparam df_dsigma_prime Derivatives of the yield function with respect to effective stress tensor in Cauchy form.
- * @tparam dg_dsigma_prime Derivatives of the plastic potential function with respect to state variables in Cauchy form.
- * @tparam H_s Hardening moduli vector.
- * @tparam B_s State factor vector.
  */
-typedef std::function<void(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, HardeningModuli &H_s , StateFactors &B_s)> DerivativeFunction;
+typedef std::function<Derivatives(Cauchy sigma_prime, State state)> DerivativeFunction;
 
 /**
  * @brief Plastic increment function binding.
@@ -159,11 +177,9 @@ struct Settings {
     double get_NSUB(void) {return NSUB;};
 };
 
-struct Derivatives {
-    Cauchy df_dsigma_prime;
-    Cauchy dg_dsigma_prime;
-    HardeningModuli H_s;
-    StateFactors B_s;
-};
-
 #endif
+
+
+         
+         
+         

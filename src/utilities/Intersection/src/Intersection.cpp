@@ -62,7 +62,9 @@ bool Intersection::check_unload_reload(void) {
     Voigt a_c, b_c;
     HardeningModuli H_s_c(state.size());
     StateFactors B_s_c(state.size());
-    mf->compute_derivatives(sigma_prime, state, df_dsigma_prime_c, dg_dsigma_prime_c, H_s_c, B_s_c);
+    Derivatives derivatives = mf->compute_derivatives(sigma_prime, state);
+    df_dsigma_prime_c = derivatives.df_dsigma_prime;
+    dg_dsigma_prime_c = derivatives.dg_dsigma_prime;
     a_c = to_voigt(df_dsigma_prime_c);
     b_c = to_voigt(dg_dsigma_prime_c);
 

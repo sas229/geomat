@@ -42,14 +42,16 @@ double EMC::compute_f(Cauchy sigma_prime, State state) {
     return f;
 }
 
-void EMC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma_prime, Cauchy &dg_dsigma_prime, HardeningModuli &H_s, StateFactors &B_s) {
+Derivatives EMC::compute_derivatives(Cauchy sigma_prime, State state) {
     using namespace std;
     // State variables.
     double phi_m_r = to_radians(phi_m);
 
     // Compute mean effective stress, deviatoric stress tensor and derivatives of the stress state for current stress state.
     double p_prime, I_1, I_2, I_3, J_1, J_2, J_3, theta_c, theta_s, theta_s_bar, sigma_bar;
-    Cauchy s, dq_dsigma_prime, dJ_3_dsigma_prime, sigma, dsigma_bar_dsigma_prime;
+    Cauchy df_dsigma_prime, dg_dsigma_prime, s, dq_dsigma_prime, dJ_3_dsigma_prime, sigma, dsigma_bar_dsigma_prime;
+    HardeningModuli H_s(state.size());
+    StateFactors B_s(state.size());
     p_prime = compute_p_prime(sigma_prime);
     s = compute_s(sigma_prime, p_prime);
     compute_stress_invariants(sigma_prime, I_1, I_2, I_3, J_1, J_2, J_3);
@@ -78,6 +80,14 @@ void EMC::compute_derivatives(Cauchy sigma_prime, State state, Cauchy &df_dsigma
 
     // State variable factors.
     B_s(0) = H_s(0)/df_dphi_m;
+
+    // Return Derivatives object.
+    Derivatives derivatives;
+    derivatives.df_dsigma_prime = df_dsigma_prime;
+    derivatives.dg_dsigma_prime = dg_dsigma_prime;
+    derivatives.H_s = H_s;
+    derivatives.B_s = B_s;
+    return derivatives;
 }
 
 void EMC::compute_K_theta(double angle_r, double theta_s_bar, double A, double B, double C, double &K_theta) {

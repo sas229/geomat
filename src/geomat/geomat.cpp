@@ -120,24 +120,16 @@ class PyElastoplastic : public Elastoplastic {
         );
     }
 
-    void compute_derivatives(
+    Derivatives compute_derivatives(
         Cauchy sigma_prime, 
-        State state, 
-        Cauchy &df_dsigma_prime, 
-        Cauchy &dg_dsigma_prime, 
-        HardeningModuli &H_s, 
-        StateFactors &B_s
+        State state
     ) override {
         PYBIND11_OVERRIDE_PURE(
-            void,
+            Derivatives,
             Elastoplastic,
             compute_derivatives,
             sigma_prime,
-            state,
-            df_dsigma_prime,
-            dg_dsigma_prime,
-            H_s,
-            B_s
+            state
         );
     }
 
@@ -171,16 +163,14 @@ PYBIND11_MODULE(library, m) {
         .def("set_sigma_prime_tilde", &Model::set_sigma_prime_tilde)
         .def("get_sigma_prime_tilde", &Model::get_sigma_prime_tilde)
         .def("set_Delta_epsilon_tilde", &Model::set_Delta_epsilon_tilde)
-        // .def("get_state_variables", &Model::get_state_variables)
-        // .def("set_state_variables", &Model::set_state_variables)
         .def("get_p_prime", &Model::get_p_prime)
         .def("compute_p_prime", &Model::compute_p_prime)
         .def("compute_q", &Model::compute_q)
         .def("compute_s", &Model::compute_s)
         .def("compute_dq_dsigma_prime", &Model::compute_dq_dsigma_prime)
         .def("get_q", &Model::get_q)
-        .def_property_readonly("name", &Model::get_model_name)
-        .def_property_readonly("type", &Model::get_model_type)
+        .def_property("name", &Model::get_model_name, &Model::set_model_name)
+        .def_property("type", &Model::get_model_type, &Model::set_model_type)
         .def_property_readonly("p_prime", &Model::get_p_prime)
         .def_property_readonly("q", &Model::get_q)
         .def_property_readonly("sigma_prime_tilde", &Model::get_sigma_prime_tilde)
@@ -211,14 +201,22 @@ PYBIND11_MODULE(library, m) {
     // Settings.
     py::class_<Settings>(m, "Settings")
         .def(py::init<>())
-        .def_property_readonly("FTOL", &Settings::get_FTOL)
-        .def_property_readonly("LTOL", &Settings::get_LTOL)
-        .def_property_readonly("STOL", &Settings::get_STOL)
-        .def_property_readonly("EPS", &Settings::get_EPS)
-        .def_property_readonly("DT_MIN", &Settings::get_DT_MIN)
-        .def_property_readonly("MAXITS_YSI", &Settings::get_MAXITS_YSI)
-        .def_property_readonly("MAXITS_YSC", &Settings::get_MAXITS_YSC)
-        .def_property_readonly("NSUB", &Settings::get_NSUB);
+        .def_property("FTOL", &Settings::get_FTOL, &Settings::set_FTOL)
+        .def_property("LTOL", &Settings::get_LTOL, &Settings::set_LTOL)
+        .def_property("STOL", &Settings::get_STOL, &Settings::set_STOL)
+        .def_property("EPS", &Settings::get_EPS, &Settings::set_EPS)
+        .def_property("DT_MIN", &Settings::get_DT_MIN, &Settings::set_DT_MIN)
+        .def_property("MAXITS_YSI", &Settings::get_MAXITS_YSI, &Settings::set_MAXITS_YSI)
+        .def_property("MAXITS_YSC", &Settings::get_MAXITS_YSC, &Settings::set_MAXITS_YSC)
+        .def_property("NSUB", &Settings::get_NSUB, &Settings::set_NSUB);
+
+    // Derivatives object.
+    py::class_<Derivatives>(m, "Derivatives")
+        .def(py::init<>())
+        .def_property("df_dsigma_prime", &Derivatives::get_df_dsigma_prime, &Derivatives::set_df_dsigma_prime)
+        .def_property("dg_dsigma_prime", &Derivatives::get_dg_dsigma_prime, &Derivatives::set_dg_dsigma_prime)
+        .def_property("H_s", &Derivatives::get_H_s, &Derivatives::set_H_s)
+        .def_property("B_s", &Derivatives::get_B_s, &Derivatives::set_B_s);
 
     // Models.
 
