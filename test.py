@@ -165,7 +165,7 @@ while i<increments-1:
     sigma_prime[i,:] = model.sigma_prime_tilde
     print("Increment {}: p = {:.2f} ; q = {:.2f} ; q/p = {:.2f}".format(i, p[i], q[i], q[i]/p[i]))
 
-plt.plot(axial_strain, q, ":")
+plt.plot(axial_strain, q, "--")
 plt.xlabel(r"$\epsilon_{a}$ (-)")
 plt.ylabel("q (kPa)")   
 
@@ -200,7 +200,7 @@ while i<increments-1:
     sigma_prime[i,:] = model.sigma_prime_tilde
     print("Increment {}: p = {:.2f} ; q = {:.2f} ; q/p = {:.2f}".format(i, p[i], q[i], q[i]/p[i]))
 
-plt.plot(axial_strain, q)
+plt.plot(axial_strain, q, "-.")
 plt.xlabel(r"$\epsilon_{a}$ (-)")
 plt.ylabel("q (kPa)")
 
