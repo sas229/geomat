@@ -162,9 +162,9 @@ struct Settings {
     void set_STOL(double STOL) {this->STOL = STOL;};
     void set_EPS(double EPS) {this->EPS = EPS;};
     void set_DT_MIN(double DT_MIN) {this->DT_MIN = DT_MIN;};
-    void set_MAXITS_YSI(double MAXITS_YSI) {this->MAXITS_YSI = MAXITS_YSI;};
-    void set_MAXITS_YSC(double MAXITS_YSC) {this->MAXITS_YSC = MAXITS_YSC;};
-    void set_NSUB(double NSUB) {this->NSUB = NSUB;};
+    void set_MAXITS_YSI(int MAXITS_YSI) {this->MAXITS_YSI = MAXITS_YSI;};
+    void set_MAXITS_YSC(int MAXITS_YSC) {this->MAXITS_YSC = MAXITS_YSC;};
+    void set_NSUB(int NSUB) {this->NSUB = NSUB;};
 
     // Getters.
     double get_FTOL(void) {return FTOL;};
@@ -172,9 +172,9 @@ struct Settings {
     double get_STOL(void) {return STOL;};
     double get_EPS(void) {return EPS;};
     double get_DT_MIN(void) {return DT_MIN;};
-    double get_MAXITS_YSI(void) {return MAXITS_YSI;};
-    double get_MAXITS_YSC(void) {return MAXITS_YSC;};
-    double get_NSUB(void) {return NSUB;};
+    int get_MAXITS_YSI(void) {return MAXITS_YSI;};
+    int get_MAXITS_YSC(void) {return MAXITS_YSC;};
+    int get_NSUB(void) {return NSUB;};
 };
 
 #endif

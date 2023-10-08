@@ -170,8 +170,6 @@ PYBIND11_MODULE(abstract, m) {
         .def("compute_s", &Model::compute_s)
         .def("compute_dq_dsigma_prime", &Model::compute_dq_dsigma_prime)
         .def("get_q", &Model::get_q)
-        .def_property("name", &Model::get_model_name, &Model::set_model_name)
-        .def_property("type", &Model::get_model_type, &Model::set_model_type)
         .def_property_readonly("p_prime", &Model::get_p_prime)
         .def_property_readonly("q", &Model::get_q)
         .def_property_readonly("sigma_prime_tilde", &Model::get_sigma_prime_tilde)

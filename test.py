@@ -8,10 +8,14 @@ class pyMCC(Elastoplastic):
 
     def __init__(self, parameters, state, log_severity):
         super().__init__()
-        self.parameters = parameters
-        self.state = state
+        self.set_model_name("MCC")
+        self.set_model_type("Elastoplastic")
 
         # Define individual parameters and state variables.
+        self.parameters = parameters
+        self.state = state
+        self.parameters_required = 5
+        self.state_required = 1
         self.M = self.parameters[0]
         self.nu = self.parameters[1]
         self.N = self.parameters[2]
@@ -19,17 +23,9 @@ class pyMCC(Elastoplastic):
         self.kappa_star = self.parameters[4]
         self.p_c = self.state[0]
 
-        # Set model name and type.
-        self.name = "MCC"
-        self.type = "Elastoplastic"
-
         # Set the log severity.
         self.initialise_log(log_severity)
 
-        # Required number of parameters and state variables.
-        self.parameters_required = 5
-        self.state_required = 1
-        
         # Check the number of state variables required.
         self.check_inputs(self.name, self.parameters.shape[0], self.state.shape[0], self.parameters_required, self.state_required)
 
