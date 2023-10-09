@@ -305,4 +305,3 @@ plt.plot(axial_strain, q)
 plt.xlabel(r"$\epsilon_{a}$ (-)")
 plt.ylabel("q (kPa)")
 plt.show()
-
