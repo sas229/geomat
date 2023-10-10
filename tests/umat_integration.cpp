@@ -8,7 +8,7 @@ int main() {
     int ndi = 3;
     int nshr = 3;
     int ntens = 6;
-    double stress[6] = {-10, -10, -10, 0, 0, 0};
+    double stress[6] = {-7.5, -7.5, -7.5, 0, 0, 0};
     int nstatv = 1;
     double statev[1] = {10};
     double ddsdde[36] = {0};

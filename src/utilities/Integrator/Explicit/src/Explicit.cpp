@@ -51,6 +51,7 @@ double Explicit::compute_new_substep_size(void) {
     if (dT == settings->DT_MIN) {
         PLOG_FATAL << "Minimum step size DT_MIN = " << settings->DT_MIN << " failed to generated an accepted increment.";
         assert(false);
+        throw std::range_error("Minimum step size reached.");
     }
     double q_step;
     if (accepted) {

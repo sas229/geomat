@@ -20,9 +20,11 @@ void Integrator::solve(
         } else {
             PLOG_FATAL << "Invalid method defined. This option is not yet implemented.";
             assert(false);
+            throw std::invalid_argument("Invalid method defined. This option is not yet implemented.");
         }
     } else {
         PLOG_FATAL << "Invalid solver defined. This option is not yet implemented.";
         assert(false);
+        throw std::invalid_argument("Invalid solver defined. This option is not yet implemented.");
     } 
 }

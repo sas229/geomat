@@ -52,6 +52,7 @@ double Intersection::solve(Cauchy sigma_prime, State state, Voigt Delta_epsilon_
     } else {
         PLOG_FATAL << "Illegal stress state.";
         assert(false);
+        throw std::range_error("Illegal stress state.");
     }
     return 0.0;
 }
@@ -104,7 +105,7 @@ void Intersection::refine_alpha_bounds(void) {
             State Delta_state_n(state.size());
             mf->compute_trial_increment(sigma_prime, state, alpha_n * Delta_epsilon_tilde, Delta_sigma_prime_n, Delta_state_n);
             sigma_prime_n = sigma_prime + Delta_sigma_prime_n;
-            state_n = state + state_n;
+            state_n = state + Delta_state_n;
 
             // Check yield function.
             double f_n = mf->compute_f(sigma_prime_n, state_n);
@@ -142,6 +143,7 @@ void Intersection::refine_alpha_bounds(void) {
     }
     PLOG_FATAL << "Transition not found therefore failed to compute valid bounds on alpha.";
     assert(false);
+    throw std::range_error("Transition not found therefore failed to compute valid bounds on alpha.");
 }
 
 double Intersection::pegasus_regula_falsi(void) {
@@ -159,27 +161,37 @@ double Intersection::pegasus_regula_falsi(void) {
 
         mf->compute_trial_increment(sigma_prime, state, alpha_n * Delta_epsilon_tilde, Delta_sigma_prime_n, Delta_state_n);
         sigma_prime_n = sigma_prime + Delta_sigma_prime_n;
-        state_n = state + state_n;
+        state_n = state + Delta_state_n;
         f_n = mf->compute_f(sigma_prime_n, state_n);
 
+        PLOG_DEBUG << "Pegasus iteration: " << ITS_YSI;
+        PLOG_DEBUG << "f_0 = " << f_0 << "; f_1 = " << f_1;
+        PLOG_DEBUG << "alpha_0 = " << alpha_0 << "; alpha_1 = " << alpha_1;
+        PLOG_DEBUG << "alpha_n = " << alpha_n;
+        PLOG_DEBUG << "f_n = " << f_n;
+
         // Update trial using Pegasus method rules.
-        if (f_n * f_1 < 0) {
+        if (f_0 * f_n > 0) {
+            f_1 = f_1 * f_0/(f_0 + f_n);
+        } else {
             alpha_1 = alpha_0;
             f_1 = f_0;
-        } else {
-            f_1 = f_1 * f_0 / (f_0 + f_n);
         }
         alpha_0 = alpha_n;
         f_0 = f_n;
         ITS_YSI += 1;
+        
     }
     alpha = alpha_n;
     alpha = std::max(alpha, 0.0);
     alpha = std::min(alpha, 1.0);
     double f = f_n;
     if (std::abs(f) >= settings->FTOL) {
-        PLOG_FATAL << "Performed " << settings->MAXITS_YSI << " Pegasus iteration(s): alpha = " << alpha << "; |f| = " << std::abs(f) << " > tolerance = " << settings->FTOL << ".";
+        PLOG_FATAL << "Performed " << settings->MAXITS_YSI << " Pegasus iteration(s): "
+                   << "alpha = " << alpha << "; "
+                   << "|f| = " << std::abs(f) << " > tolerance = " << settings->FTOL << ".";
         assert(false);
+        throw std::range_error("Maximum number of intersection iterations performed.");
     } else {
         PLOG_INFO << "Performed " << ITS_YSI << " Pegasus iteration(s): "
                   << "alpha = " << alpha << "; "
