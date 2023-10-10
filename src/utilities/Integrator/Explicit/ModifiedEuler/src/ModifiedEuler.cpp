@@ -15,7 +15,7 @@ void ModifiedEuler::compute_initial_estimate(void) {
     mf->compute_plastic_increment(sigma_prime_ep, state_ep, Delta_epsilon_tilde_dT, Delta_sigma_prime_1, Delta_state_1);
     Cauchy sigma_prime_1 = sigma_prime_ep + to_cauchy(Delta_sigma_prime_1);
     State state_1 = state_ep + Delta_state_1;
-    mf->compute_plastic_increment(sigma_prime_1, state_ep, Delta_epsilon_tilde_dT, Delta_sigma_prime_2, Delta_state_2);
+    mf->compute_plastic_increment(sigma_prime_1, state_1, Delta_epsilon_tilde_dT, Delta_sigma_prime_2, Delta_state_2);
     PLOG_DEBUG << "State variable increment 1, Delta_state_1 = " << Delta_state_1;
     PLOG_DEBUG << "State variable increment 2, Delta_state_2 = " << Delta_state_2;
 

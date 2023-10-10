@@ -56,8 +56,8 @@ class pyMCC(Elastoplastic):
         p_c = state[0]
 
         # Compute mean effective stress, deviatoric stress tensor and derivatives of the stress state for current stress state.
-        df_dsigma_prime = np.array((3,3))
-        dg_dsigma_prime = np.array((3,3))
+        df_dsigma_prime = np.array(np.shape(sigma_prime))
+        dg_dsigma_prime = np.array(np.shape(sigma_prime))
         H_s = np.array(np.shape(state))
         B_s = np.array(np.shape(state))
         q = self.compute_q(sigma_prime)

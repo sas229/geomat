@@ -99,7 +99,7 @@ class Elastic : public Model {
          * @brief Pure virtual method to compute the elastic matrix.
          * 
          * @param[in] sigma_prime Effective stress tensor.
-         * @param[in] state Stave variables.
+         * @param[in] state State variables.
          * @param[in] Delta_epsilon Strain increment.
          * @return Constitutive
          */
