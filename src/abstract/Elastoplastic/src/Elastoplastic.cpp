@@ -64,7 +64,7 @@ void Elastoplastic::solve(void) {
             PLOG_INFO << "Fully elastic stress increment integrated directly.";
         }
         PLOG_DEBUG << "Final stress state, sigma_prime_tilde = " << to_voigt(sigma_prime);
-        PLOG_DEBUG << "Final state variables, state = " << state;
+        PLOG_DEBUG << "Final state variables, state = " << get_state_variables();
 
         // Compute final stress invariants.
         p_prime = compute_p_prime(sigma_prime);

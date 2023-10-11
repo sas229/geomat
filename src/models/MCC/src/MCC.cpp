@@ -62,8 +62,8 @@ Derivatives MCC::compute_derivatives(Cauchy sigma_prime, State state) {
     H_s(0) = (pow(M,2)*p_prime*p_c)/(lambda_star-kappa_star)*tr(dg_dsigma_prime);
 
     // State variable increment factors.
-    double dg_dp_c = -pow(M,2)*p_prime;
-    B_s(0) = H_s(0)/dg_dp_c;
+    double df_dp_c = -pow(M,2)*p_prime;
+    B_s(0) = H_s(0)/df_dp_c;
 
     // Return Derivatives object.
     Derivatives derivatives;

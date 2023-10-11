@@ -124,7 +124,7 @@ class Intersection {
          * \f[ \alpha_{n} = \alpha_{1} - f_{1} \left[ \frac{\left( \alpha_{1} - \alpha_{0} \right)}{\left( f_{1} - f_{0} \right)} \right] \f]
          * 
          * Using the new estimate for the root, the corresponding yield function value \f$ f_{n} \f$ is computed. If the
-         * product of \f$ f_{n} \text{ and } f_{1} \f$ is less than zero then:
+         * product of \f$ f_{0} \text{ and } f_{n} \f$ is less than or equal to zero then:
          * 
          * \f[ \alpha_{1} = \alpha_{0} \f]
          * \f[ f_{1} = f_{0} \f]
