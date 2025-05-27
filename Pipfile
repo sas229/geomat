@@ -5,17 +5,15 @@ name = "pypi"
 
 [packages]
 matplotlib = "*"
-numpy = "*"
-geomat = {path = "."}
+geomat = {file = "."}
 
 [dev-packages]
 sphinxcontrib-bibtex = "*"
 sphinx-autoapi = "*"
 sphinx-copybutton = "*"
-scikit-build = "*"
+scikit-build-core = "*"
 sphinx-rtd-theme = "*"
 sphinx = "*"
-build = "*"
 twine = "*"
 
 [pipenv]

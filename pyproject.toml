@@ -1,14 +1,9 @@
 [build-system]
 requires = [
-    "setuptools",
-    "wheel",
-    "scikit-build",
-    "cmake",
-    "ninja",
-    "sphinx",
-    "breathe"
+    "scikit-build-core",
+    "pybind11"
 ]
-build-backend = "setuptools.build_meta"
+build-backend = "scikit_build_core.build"
 
 [project]
 name = "geomat"
@@ -30,8 +25,32 @@ classifiers = [
 ]
 
 dependencies = [
-    "numpy==1.23.3",
-    "matplotlib==3.6.3",
+    "numpy",
+    "matplotlib",
+]
+
+[project.optional-dependencies]
+dev = [
+    "sphinxcontrib-bibtex",
+    "sphinx-autoapi",
+    "sphinx-copybutton",
+    "scikit-build",
+    "sphinx-rtd-theme",
+    "sphinx",
+    "build",
+    "twine"
+]
+
+[tool.scikit-build]
+minimum-version = "0.5"
+
+[tool.scikit-build.wheel]
+packages = ["geomat"]
+cmake = true
+
+[tool.scikit-build.sdist]
+include = [
+    "test.py"
 ]
 
 [project.urls]

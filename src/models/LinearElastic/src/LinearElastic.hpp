@@ -21,7 +21,7 @@ class LinearElastic : public Elastic {
         /** 
          * @brief LinearElastic model destructor. 
          */
-        virtual ~LinearElastic() {}
+        virtual ~LinearElastic() = default;
 
         /**
          * @brief Get the state variables vector.

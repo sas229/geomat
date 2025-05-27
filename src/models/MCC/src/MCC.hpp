@@ -16,12 +16,12 @@ class MCC : public Elastoplastic {
          * @param[in] state Vector of state variables.
          * @param[in] log_severity Severity of message to log.
          */
-        MCC(State parameters, State state, std::string log_severity="none");
+        MCC(Parameters parameters, State state, std::string log_severity="none");
 
         /** 
          * @brief MCC model destructor. 
          */
-        virtual ~MCC() {}
+        virtual ~MCC() = default;
 
         /**
          * @brief Get the state variables vector.

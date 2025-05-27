@@ -16,12 +16,12 @@ class EMC : public Elastoplastic {
          * @param[in] state Vector of state variables.
          * @param[in] log_severity Severity of message to log.
          */
-        EMC(State parameters, State state, std::string log_severity="none");
+        EMC(Parameters parameters, State state, std::string log_severity="none");
 
         /** 
          * @brief EMC model destructor. 
          */
-        virtual ~EMC() {}
+        virtual ~EMC() = default;
 
         /**
          * @brief Get the state variables vector.

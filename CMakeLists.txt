@@ -11,6 +11,7 @@ enable_testing()
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -Wuninitialized -fsanitize=undefined,address -g")
 
 # Add subdirectories of documentation and source code.
 if(${BUILD_DOCS})
@@ -48,19 +49,19 @@ if(${pybind11_FOUND})
     target_link_libraries(pyabstract PUBLIC abstract utilities)
     target_compile_definitions(pyabstract PUBLIC EIGEN_DONT_PARALLELIZE=1)
     set_target_properties(pyabstract PROPERTIES OUTPUT_NAME "abstract")
-    install(TARGETS pyabstract LIBRARY DESTINATION ./)
+    install(TARGETS pyabstract LIBRARY DESTINATION geomat)
 
     pybind11_add_module(pymodels MODULE src/geomat/pymodels.cpp)
     target_link_libraries(pymodels PUBLIC abstract models)
     target_compile_definitions(pymodels PUBLIC EIGEN_DONT_PARALLELIZE=1)
     set_target_properties(pymodels PROPERTIES OUTPUT_NAME "models")
-    install(TARGETS pymodels LIBRARY DESTINATION ./)
+    install(TARGETS pymodels LIBRARY DESTINATION geomat)
 
     pybind11_add_module(pyutilities MODULE src/geomat/pyutilities.cpp)
     target_link_libraries(pyutilities PUBLIC utilities)
     target_compile_definitions(pyutilities PUBLIC EIGEN_DONT_PARALLELIZE=1)
     set_target_properties(pyutilities PROPERTIES OUTPUT_NAME "utilities")
-    install(TARGETS pyutilities LIBRARY DESTINATION ./)
+    install(TARGETS pyutilities LIBRARY DESTINATION geomat)
 endif()
 
 # Tests.

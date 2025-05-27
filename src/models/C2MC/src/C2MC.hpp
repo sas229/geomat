@@ -16,12 +16,12 @@ class C2MC : public Elastoplastic {
          * @param[in] state Vector of state variables.
          * @param[in] log_severity Severity of message to log.
          */
-        C2MC(State parameters, State state, std::string log_severity="none");
+        C2MC(Parameters parameters, State state, std::string log_severity="none");
 
         /** 
          * @brief C2MC model destructor. 
          */
-        virtual ~C2MC() {}
+        virtual ~C2MC() = default;
 
         /**
          * @brief Get the state variables vector.

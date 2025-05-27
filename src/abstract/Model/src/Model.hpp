@@ -20,7 +20,7 @@ class Model {
         explicit Model(std::string log_severity="none");
 
         /** @brief Virtual destructor for Model class. */
-        virtual ~Model() {}
+        virtual ~Model() = default;
 
         /**
          * @brief Function to check model inputs.
@@ -434,7 +434,7 @@ class Model {
          * 
          * \f[ \boldsymbol{\tilde{\sigma}}^{\prime} = \left[\sigma_{1 1}^{\prime}, \sigma_{2 2}^{\prime}, \sigma_{3 3}^{\prime}, \tau_{1 2}, \tau_{1 3}, \tau_{2 3}\right]^T\f]
          */
-        Voigt sigma_prime_tilde;
+        Voigt sigma_prime_tilde = Voigt::Zero();
 
         /** 
          * @brief Effective stress tensor:
@@ -470,7 +470,7 @@ class Model {
          * 
          * \f[ \Delta \tilde{\epsilon} = \left[\Delta \epsilon_{1 1}, \Delta \epsilon_{2 2}, \Delta \epsilon_{3 3}, \Delta \epsilon_{1 2}, \Delta \epsilon_{1 3}, \Delta \epsilon_{2 3}\right]^T\f]. 
          */
-        Voigt Delta_epsilon_tilde;
+        Voigt Delta_epsilon_tilde = Voigt::Zero();
 
         /** 
          * @brief Strain increment tensor:
@@ -494,7 +494,7 @@ class Model {
          * 
          * where \f$ \Delta \boldsymbol{\epsilon} \f$ is the strain increment tensor. 
          */
-        double Delta_epsilon_vol;
+        double Delta_epsilon_vol = 0.0;
         
         /** 
          * @brief Identity matrix:
@@ -511,7 +511,7 @@ class Model {
         /** 
          * @brief Pore pressure. Computed for undrained (bulk modulus) approach, otherwise provided as a state variable.
          */
-        double u;
+        double u = 0.0;
 
         /** 
          * @brief Jacobian matrix. 
@@ -521,47 +521,47 @@ class Model {
         /** 
          * @brief First stress invariant.
          */
-        double I_1; 
+        double I_1 = 0.0; 
 
         /** 
          * @brief Second stress invariant. 
          */
-        double I_2; 
+        double I_2 = 0.0; 
 
         /** 
          * @brief Third stress invariant.
          */
-        double I_3; 
+        double I_3 = 0.0; 
 
         /** 
          * @brief First deviatoric stress invariant.
          */
-        double J_1; 
+        double J_1 = 0.0; 
 
         /** 
          * @brief Second deviatoric stress invariant.
          */
-        double J_2; 
+        double J_2 = 0.0; 
 
         /** 
          * @brief Third deviatoric stress invariant.
          */
-        double J_3; 
+        double J_3 = 0.0; 
 
         /** 
          * @brief Mean stress calculated by compute_p().
          */
-        double p; 
+        double p = 0.0; 
 
         /** 
          * @brief Effective mean stress calculated by compute_p_prime().
          */
-        double p_prime; 
+        double p_prime = 0.0; 
 
         /**
          * @brief Deviatoric stress calculated by compute_q(). 
          */
-        double q; 
+        double q = 0.0; 
 
         /** 
          * @brief Principal stress tensor \f$ \mathbf{S} \f$: 
@@ -580,17 +580,17 @@ class Model {
         /** 
          * @brief Major principal stress. 
          */
-        double sigma_1; 
+        double sigma_1 = 0.0; 
 
         /** 
          * @brief Intermediate principal stress. 
          */
-        double sigma_2; 
+        double sigma_2 = 0.0; 
 
         /** 
          * @brief Minor principal stress. 
          */
-        double sigma_3;
+        double sigma_3 = 0.0;
 
         /** 
          * @brief Principal stress directions tensor \f$ R_{i j} \f$. 
@@ -604,7 +604,7 @@ class Model {
          * 
          * where \f$ J_2 \f$ is the second deviatoric stress invariant. 
          */
-        double mises_stress;
+        double mises_stress = 0.0;
 
         /** 
          * @brief Maximum shear stress:
@@ -613,27 +613,27 @@ class Model {
          * 
          * where \f$ \sigma_1 \f$, \f$ \sigma_2 \f$ and \f$ \sigma_3 \f$ are the principal stresses. 
          */
-        double max_shear;  
+        double max_shear = 0.0;  
 
         /** 
          * @brief Lode angle from cosine definition. 
          */
-        double theta_c;
+        double theta_c = 0.0;
 
         /** 
          * @brief Lode angle from sine definition. 
          */
-        double theta_s;
+        double theta_s = 0.0;
 
         /** 
          * @brief Lode angle from negative sine definition. 
          */
-        double theta_s_bar;
+        double theta_s_bar = 0.0;
 
         /**
          * @brief Boolean indicating whether the current strain increment has been solved.
          */
-        bool solved;
+        bool solved = false;
 
         /**
          * @brief Derivative of the mean stress with respect to the effective stress state:
@@ -647,7 +647,7 @@ class Model {
         /**
          * @brief Derivative of the deviatoric stress with respect to the effective stress state.
          */
-        Cauchy dq_dsigma_prime;
+        Cauchy dq_dsigma_prime = Cauchy::Zero();
 
         /**
          * @brief Derivatives of the thrid deviatoric stress invariant with respect to the effective stress state.

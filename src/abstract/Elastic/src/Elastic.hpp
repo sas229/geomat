@@ -16,7 +16,7 @@ class Elastic : public Model {
         explicit Elastic(std::string log_severity="none");
 
         /** @brief Elastic model destructor. */
-        virtual ~Elastic() {}
+        virtual ~Elastic() = default;
 
        /**
         * @brief Method to compute the bulk modulus from elastic parameters:
@@ -126,12 +126,12 @@ class Elastic : public Model {
        /**
         * @brief Bulk modulus.
         */
-       double K;
+       double K = 0.0;
        
        /**
         * @brief Shear modulus.
         */
-       double G;
+       double G = 0.0;
 
 };
 

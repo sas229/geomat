@@ -4,6 +4,7 @@ from geomat.utilities import Derivatives
 from geomat.models import LinearElastic, MCC, SMCC, C2MC, EMC
 from matplotlib import pyplot as plt
 
+
 class pyMCC(Elastoplastic):
 
     def __init__(self, parameters, state, log_severity):
@@ -134,10 +135,13 @@ plt.ylabel("q/p (-)")
 increments = 100
 parameters = np.array([0.92, 0.2, 1.195, 0.08, 0.02])
 state = np.array([50.0])
-stress = np.array([50.0, 50.0, 50.0, 0.0, 0.0, 0.0])
+stress = np.array([50, 50, 50, 0, 0, 0], dtype=np.float64).reshape((6, 1))
+print("Stress shape:", stress.shape)
+print("Stress dtype:", stress.dtype)
+print("Stress:", stress)
 ea_max = 0.5
 ea_increment = ea_max/increments
-Delta_epsilon_tilde = np.array([ea_increment, -ea_increment/2, -ea_increment/2, 0.0, 0.0, 0.0])
+Delta_epsilon_tilde = np.array([ea_increment, -ea_increment/2, -ea_increment/2, 0.0, 0.0, 0.0], dtype=np.float64).reshape((6, 1))
 axial_strain = np.arange(0, increments*ea_increment, ea_increment)
 
 model = pyMCC(parameters=parameters, state=state, log_severity="none")
@@ -163,16 +167,16 @@ while i<increments-1:
 
 plt.plot(axial_strain, q, "--")
 plt.xlabel(r"$\epsilon_{a}$ (-)")
-plt.ylabel("q (kPa)")   
+plt.ylabel("q (kPa)") 
 
 # MCC test.
 increments = 100
 parameters = np.array([0.92, 0.2, 1.195, 0.08, 0.02])
 state = np.array([50.0])
-stress = np.array([50.0, 50.0, 50.0, 0.0, 0.0, 0.0])
+stress = np.array([50.0, 50.0, 50.0, 0.0, 0.0, 0.0], dtype=np.float64).reshape((6, 1))
 ea_max = 0.5
 ea_increment = ea_max/increments
-Delta_epsilon_tilde = np.array([ea_increment, -ea_increment/2, -ea_increment/2, 0.0, 0.0, 0.0])
+Delta_epsilon_tilde = np.array([ea_increment, -ea_increment/2, -ea_increment/2, 0.0, 0.0, 0.0], dtype=np.float64).reshape((6, 1))
 axial_strain = np.arange(0, increments*ea_increment, ea_increment)
 
 model = MCC(parameters=parameters, state=state, log_severity="none")

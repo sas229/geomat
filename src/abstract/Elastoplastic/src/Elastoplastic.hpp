@@ -22,7 +22,7 @@ class Elastoplastic : public Elastic {
         /**
          *  @brief Elastoplastic model destructor. 
          */
-        virtual ~Elastoplastic() {}
+        virtual ~Elastoplastic() = default;
 
         /**
          *  @brief Solve current strain increment using refined explicit approach of Sloan et al. (2001). 

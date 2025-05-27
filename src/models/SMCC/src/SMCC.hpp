@@ -16,12 +16,12 @@ class SMCC : public Elastoplastic {
          * @param[in] state Vector of state variables.
          * @param[in] log_severity Severity of message to log.
          */
-        SMCC(State parameters, State state, std::string log_severity="none");
+        SMCC(Parameters parameters, State state, std::string log_severity="none");
 
         /** 
          * @brief SMCC model destructor. 
          */
-        virtual ~SMCC() {}
+        virtual ~SMCC() = default;
 
         /**
          * @brief Get the state variables vector.
