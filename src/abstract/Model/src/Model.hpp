@@ -6,6 +6,7 @@
 #include <plog/Formatters/TxtFormatter.h>
 #include <plog/Appenders/ColorConsoleAppender.h>
 #include <string>
+#include <vector>
 #include <Eigen/Eigen>
 #include "Tensor.hpp"
 #include "Types.hpp"
@@ -629,6 +630,42 @@ class Model {
          * @brief Lode angle from negative sine definition. 
          */
         double theta_s_bar = 0.0;
+
+        /**
+         * @brief Get the parameter names for this model.
+         * @return std::vector<std::string>
+         */
+        virtual std::vector<std::string> get_param_names() const { return {}; }
+
+        /**
+         * @brief Get the parameter units for this model.
+         * @return std::vector<std::string>
+         */
+        virtual std::vector<std::string> get_param_units() const { return {}; }
+
+        /**
+         * @brief Get the state variable names for this model.
+         * @return std::vector<std::string>
+         */
+        virtual std::vector<std::string> get_state_var_names() const { return {}; }
+
+        /**
+         * @brief Get the state variable units for this model.
+         * @return std::vector<std::string>
+         */
+        virtual std::vector<std::string> get_state_var_units() const { return {}; }
+
+        /**
+         * @brief Get the number of parameters required by this model.
+         * @return int
+         */
+        virtual int get_parameters_required() const { return 0; }
+
+        /**
+         * @brief Get the number of state variables required by this model.
+         * @return int
+         */
+        virtual int get_state_required() const { return 0; }
 
         /**
          * @brief Boolean indicating whether the current strain increment has been solved.

@@ -1,18 +1,15 @@
 #ifndef UMAT_CPP_INTERFACE_H
 #define UMAT_CPP_INTERFACE_H
 
-#include <iostream>
 #include <string>
-#include <vector>
-#include <typeinfo>
 #include <memory>
-#include <cassert>
+#include <mutex>
 #include <Eigen/Eigen>
 #include <plog/Log.h>
 #include <plog/Initializers/RollingFileInitializer.h>
 #include "Types.hpp"
 #include "Model.hpp"
-#include "models.hpp"
+#include "ModelLookup.hpp"
 
 #ifdef __cplusplus
 extern "C"

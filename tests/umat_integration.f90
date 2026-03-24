@@ -1,9 +1,28 @@
-include "umat.f90"
-
 program main
     use, intrinsic :: ISO_C_BINDING
-    
+
     implicit none
+
+    interface
+      subroutine umat(stress, statev, ddsdde, sse, spd, scd, &
+          rpl, ddsddt, drplde, drpldt, stran, dstran, time, dtime, temp, &
+          dtemp, predef, dpred, cmname, ndi, nshr, ntens, nstatv, props_array, &
+          nprops, coords, drot, pnewdt, celent, dfgrd0, dfgrd1, noel, npt, &
+          layer, kspt, jstep, kinc)
+        use, intrinsic :: ISO_C_BINDING
+        implicit none
+        real(c_double) :: stress(ntens), statev(nstatv), ddsdde(ntens,ntens)
+        real(c_double) :: sse, spd, scd, rpl, ddsddt(ntens), drplde(ntens)
+        real(c_double) :: drpldt
+        real(c_double) :: stran(ntens), dstran(ntens), time(2), dtime, temp
+        real(c_double) :: dtemp, predef(1), dpred(1)
+        character(c_char) :: cmname(80)
+        integer(c_int) :: ndi, nshr, ntens, nstatv, nprops
+        real(c_double) :: props_array(nprops), coords(3), drot(3, 3), pnewdt
+        real(c_double) :: celent, dfgrd0(3,3), dfgrd1(3,3)
+        integer(c_int) :: noel, npt, layer, kspt, jstep(4), kinc
+      end subroutine umat
+    end interface
     integer(c_int) :: ndi, nshr, ntens, nstatv, nprops, &
         noel, npt, layer, kspt, jstep(4), kinc, i
     real(c_double) :: stress(6), statev(2), ddsdde(6,6), &

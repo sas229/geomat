@@ -4,6 +4,8 @@
 #include "Elastoplastic.hpp"
 #include "Math.hpp"
 #include "Types.hpp"
+#include <vector>
+#include <string>
 
 class EMC : public Elastoplastic {
 
@@ -31,6 +33,21 @@ class EMC : public Elastoplastic {
         State get_state_variables(void) {return state;};
 
         void set_state_variables(State new_state) {this->state = new_state;};
+
+        std::vector<std::string> get_param_names() const override {
+            return {"E", "@n#", "a", "@f#_p", "@f#_cv", "@b#", "@q#_t", "a_h"};
+        }
+        std::vector<std::string> get_param_units() const override {
+            return {"F/L^2#", "-", "F/L^2#", "^o#", "^o#", "-", "^o#", "F/L^2#"};
+        }
+        std::vector<std::string> get_state_var_names() const override {
+            return {"@f#_m"};
+        }
+        std::vector<std::string> get_state_var_units() const override {
+            return {"^o#"};
+        }
+        int get_parameters_required() const override { return parameters_required; }
+        int get_state_required() const override { return state_required; }
 
     protected:
  

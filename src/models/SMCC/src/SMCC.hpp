@@ -4,6 +4,8 @@
 #include "Elastoplastic.hpp"
 #include "Tensor.hpp"
 #include "Types.hpp"
+#include <vector>
+#include <string>
 
 class SMCC : public Elastoplastic {
 
@@ -31,6 +33,21 @@ class SMCC : public Elastoplastic {
         State get_state_variables(void) {return state;};
 
         void set_state_variables(State new_state) {this->state = new_state;};
+
+        std::vector<std::string> get_param_names() const override {
+            return {"M", "@n#", "N", "@l#^*#", "@k#^*#", "s_ep,i", "k", "A"};
+        }
+        std::vector<std::string> get_param_units() const override {
+            return {"-", "-", "-", "-", "-", "-", "-", "-"};
+        }
+        std::vector<std::string> get_state_var_names() const override {
+            return {"p_c", "s_ep"};
+        }
+        std::vector<std::string> get_state_var_units() const override {
+            return {"F/L^2#", "-"};
+        }
+        int get_parameters_required() const override { return parameters_required; }
+        int get_state_required() const override { return state_required; }
 
     protected:
  
