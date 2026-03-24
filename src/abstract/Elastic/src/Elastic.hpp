@@ -119,6 +119,13 @@ class Elastic : public Model {
         void solve(void);
 
        /**
+        * @brief Get the elastic constitutive matrix.
+        *
+        * @return Constitutive
+        */
+       Constitutive get_D_e(void) { return D_e; }
+
+       /**
         * @brief Elastic constitutive matrix.
         */
        Constitutive D_e = Constitutive::Zero();

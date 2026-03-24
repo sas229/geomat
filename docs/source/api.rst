@@ -1,10 +1,16 @@
 API
 ===
-    
+
 Abaqus Interface
 ----------------
 
 .. doxygenfunction:: umat
+   :project: geomat
+
+Plaxis Interface
+----------------
+
+.. doxygenfunction:: udsm_cpp_interface
    :project: geomat
 
 Abstract Classes
@@ -12,7 +18,7 @@ Abstract Classes
 
 The following classes form the basis for user-implemented models.
 
-Model 
+Model
 ^^^^^
 
 The base class from which all constitutive models are derived.
@@ -37,7 +43,7 @@ Elastic model class that contains basic elastic functionality. Inherits the Mode
 Elastoplastic
 ^^^^^^^^^^^^^
 
-Elastoplastic model class that contains basic elastoplastic functionality based on refined explicit stress integration with 
+Elastoplastic model class that contains basic elastoplastic functionality based on refined explicit stress integration with
 automatic error control after Sloan et al. (2001). Inherits the Model and Elastic classes.
 
 .. doxygenclass:: Elastoplastic
@@ -49,7 +55,7 @@ automatic error control after Sloan et al. (2001). Inherits the Model and Elasti
 Models
 ------
 
-The following models have been implemented using this framework. Each model inherits one of the "Abstract Classes" based 
+The following models have been implemented using this framework. Each model inherits one of the "Abstract Classes" based
 on the genera of constitutive behaviour required.
 
 Linear Elastic
@@ -85,10 +91,32 @@ The Soft Modified Cam Clay (SMCC) model is implemented here. Theory to go here..
     :protected-members:
     :private-members:
 
+C2 Continuous Mohr-Coulomb (C2MC)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The C2 continuous Mohr-Coulomb model provides a smooth approximation to the Mohr-Coulomb yield surface.
+
+.. doxygenclass:: C2MC
+    :project: geomat
+    :members:
+    :protected-members:
+    :private-members:
+
+Extended Mohr-Coulomb (EMC)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Extended Mohr-Coulomb model includes strain hardening and softening via a mobilised friction angle.
+
+.. doxygenclass:: EMC
+    :project: geomat
+    :members:
+    :protected-members:
+    :private-members:
+
 Utilities
 ---------
 
-The following modules, typedefs and classes contain types used by the constitutive model development framework. 
+The following modules, typedefs and classes contain types used by the constitutive model development framework.
 
 Checks
 ^^^^^^
@@ -136,4 +164,30 @@ Types
     :project: geomat
 
 .. doxygenfunction:: to_voigt
+    :project: geomat
+
+Settings
+^^^^^^^^
+
+.. doxygenstruct:: Settings
+    :project: geomat
+    :members:
+
+Derivatives
+^^^^^^^^^^^
+
+.. doxygenstruct:: Derivatives
+    :project: geomat
+    :members:
+
+ModelLookup
+^^^^^^^^^^^
+
+.. doxygenfunction:: create_model
+    :project: geomat
+
+.. doxygenfunction:: get_model_count
+    :project: geomat
+
+.. doxygenfunction:: get_model_names
     :project: geomat

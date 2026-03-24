@@ -49,7 +49,7 @@ void Elastoplastic::solve(void) {
             // Perform elastoplastic stress integration on plastic portion of strain increment.
             PLOG_INFO << "Plastic increment; alpha = " << alpha;
             Voigt Delta_epsilon_tilde_p = (1.0-alpha)*Delta_epsilon_tilde;
-            sigma_prime_ep = sigma_prime_e; 
+            sigma_prime_ep = sigma_prime_e;
             state_ep = state_e;
             PLOG_DEBUG << "Plastic strain increment, Delta_epsilon_tilde_p = " << Delta_epsilon_tilde_p;
             PLOG_DEBUG << "Initial elastoplastic stress state, sigma_prime_ep_tilde = " << to_voigt(sigma_prime_ep);
@@ -57,11 +57,22 @@ void Elastoplastic::solve(void) {
             integrator.solve(sigma_prime_ep, state_ep, Delta_epsilon_tilde_p);
             sigma_prime = sigma_prime_ep;
             set_state_variables(state_ep);
+
+            // Compute elastoplastic tangent stiffness (consistent tangent).
+            Constitutive D_e_final = compute_D_e(sigma_prime, Cauchy::Zero());
+            Derivatives derivatives = compute_derivatives(sigma_prime, get_state_variables());
+            Voigt a = to_voigt(derivatives.df_dsigma_prime);
+            Voigt b = to_voigt(derivatives.dg_dsigma_prime);
+            double H = derivatives.H_s.sum();
+            jacobian = D_e_final - (D_e_final * b * a.transpose() * D_e_final) / (H + a.transpose() * D_e_final * b);
         } else {
             // Fully elastic increment. Update stress and state variables.
             sigma_prime = sigma_prime_e;
             set_state_variables(state_e);
             PLOG_INFO << "Fully elastic stress increment integrated directly.";
+
+            // Jacobian is the elastic tangent stiffness.
+            jacobian = D_e;
         }
         PLOG_DEBUG << "Final stress state, sigma_prime_tilde = " << to_voigt(sigma_prime);
         PLOG_DEBUG << "Final state variables, state = " << get_state_variables();

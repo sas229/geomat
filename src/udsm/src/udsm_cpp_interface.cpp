@@ -85,21 +85,22 @@ void udsm_cpp_interface(
 
             auto model = create_model(get_model_names()[*iMod - 1], parameters, state, "none");
 
-            // Set stress state for stress-dependent stiffness.
+            // Set stress and a small strain increment, solve, then read the Jacobian.
+            // The Jacobian is now populated by both Elastic::solve() and Elastoplastic::solve().
             Voigt sigma_voigt;
             for (int i = 0; i < 6; i++) sigma_voigt[i] = -Sig0[i];
             model->set_sigma_prime_tilde(sigma_voigt);
 
-            // Compute stiffness matrix via a zero-strain solve to populate the Jacobian.
-            Voigt zero_strain = Voigt::Zero();
-            model->set_Delta_epsilon_tilde(zero_strain);
+            Voigt dstran;
+            for (int i = 0; i < 6; i++) dstran[i] = -dEps[i];
+            model->set_Delta_epsilon_tilde(dstran);
             model->solve();
-            Constitutive D_e = model->get_jacobian();
+            Constitutive D_eff = model->get_jacobian();
 
             // Write to D array (column-major, Fortran order).
             for (int j = 0; j < 6; j++) {
                 for (int i = 0; i < 6; i++) {
-                    D[j * 6 + i] = D_e(i, j);
+                    D[j * 6 + i] = D_eff(i, j);
                 }
             }
             break;
@@ -132,14 +133,17 @@ void udsm_cpp_interface(
 
             auto model = create_model(get_model_names()[*iMod - 1], parameters, state, "none");
 
-            // Set stress state for stress-dependent stiffness.
+            // Set stress state for stress-dependent elastic stiffness.
             Voigt sigma_voigt;
             for (int i = 0; i < 6; i++) sigma_voigt[i] = -Sig0[i];
             model->set_sigma_prime_tilde(sigma_voigt);
 
-            // Compute elastic stiffness matrix via a zero-strain solve.
+            // Compute purely elastic stiffness via an elastic solve (zero strain).
             Voigt zero_strain = Voigt::Zero();
             model->set_Delta_epsilon_tilde(zero_strain);
+
+            // Use Elastic::solve() path which sets jacobian = D_e.
+            // For elastoplastic models with zero strain, alpha=1 (fully elastic), so jacobian = D_e.
             model->solve();
             Constitutive D_e = model->get_jacobian();
 
